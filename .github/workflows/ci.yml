@@ -33,7 +33,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
 
-      - name: Run 73-test pytest suite with coverage
+      - name: Run 90-test pytest suite with coverage
         run: |
           pytest -v --cov=agentflight --cov-report=term-missing
 

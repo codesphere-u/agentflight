@@ -19,6 +19,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
+from .diff import compare_cassettes
 from .eval import TrajectoryEvaluator
 from .guard import CircuitBreakerTripped, TrajectoryCircuitBreaker
 from .linter import (
@@ -27,6 +28,8 @@ from .linter import (
     SHOWCASE_HARDENED_MCP_TOOLS,
     ToolSmellLinter,
 )
+from .mcp_server import AgentFlightMCPServer
+from .otel_export import export_cassette_to_otel
 from .recorder import CassetteReplayer, FlightRecorder, verify_cassette
 
 
@@ -423,7 +426,79 @@ def build_parser() -> argparse.ArgumentParser:
     p_bench.add_argument("--json", action="store_true", help="Emit JSON benchmark metrics.")
     p_bench.set_defaults(func=_run_benchmark_command)
 
+    p_diff = sub.add_parser(
+        "diff",
+        help="Compare a baseline cassette against a candidate cassette to detect behavioral regressions.",
+    )
+    p_diff.add_argument("baseline", type=str, help="Path to baseline .flight.json or .flight.jsonl cassette.")
+    p_diff.add_argument("candidate", type=str, help="Path to candidate .flight.json or .flight.jsonl cassette.")
+    p_diff.add_argument("--json", action="store_true", help="Emit JSON diff report.")
+    p_diff.add_argument(
+        "--similarity-threshold",
+        type=float,
+        default=0.80,
+        help="Minimum similarity score before flagging regression (default 0.80).",
+    )
+    p_diff.set_defaults(func=_run_diff_command)
+
+    p_otel = sub.add_parser(
+        "export-otel",
+        help="Export a recorded cassette into W3C TraceContext / OpenTelemetry JSON spans for StackPulse.",
+    )
+    p_otel.add_argument("cassette", type=str, help="Path to .flight.json or .flight.jsonl cassette.")
+    p_otel.add_argument(
+        "--output",
+        type=str,
+        default=None,
+        help="Optional output file path for exported OTel JSON spans.",
+    )
+    p_otel.add_argument(
+        "--service-name",
+        type=str,
+        default=None,
+        help="Optional override for OpenTelemetry service_name.",
+    )
+    p_otel.set_defaults(func=_run_export_otel_command)
+
+    p_mcp = sub.add_parser(
+        "serve-mcp",
+        help="Start the JSON-RPC 2.0 MCP server over stdio.",
+    )
+    p_mcp.set_defaults(func=_run_serve_mcp_command)
+
     return parser
+
+
+def _run_diff_command(args: argparse.Namespace) -> int:
+    report = compare_cassettes(
+        baseline=args.baseline,
+        candidate=args.candidate,
+        similarity_threshold=args.similarity_threshold,
+    )
+    if args.json:
+        print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
+    else:
+        print(report.summary_markdown)
+    return 1 if report.regression_detected else 0
+
+
+def _run_export_otel_command(args: argparse.Namespace) -> int:
+    spans = export_cassette_to_otel(
+        cassette=args.cassette,
+        service_name=args.service_name,
+        output_path=args.output,
+    )
+    if not args.output:
+        print(json.dumps(spans, indent=2, sort_keys=True))
+    else:
+        print(f"Exported {len(spans)} W3C TraceContext / OpenTelemetry spans to {args.output}")
+    return 0
+
+
+def _run_serve_mcp_command(args: argparse.Namespace) -> int:
+    server = AgentFlightMCPServer()
+    server.serve_stdio()
+    return 0
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

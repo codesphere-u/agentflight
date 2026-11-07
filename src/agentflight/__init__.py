@@ -5,7 +5,14 @@ AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay,
 Loop/Cost Circuit Breaker & MCP Tool-Smell Linter.
 """
 
-from .eval import StepDiffItem, TrajectoryDiffReport, TrajectoryEvaluator, diff_trajectories
+from .diff import (
+    TrajectoryDifferentialAnalyzer,
+    TrajectoryDiffReport,
+    compare_cassettes,
+    compute_lcs_length,
+    compute_levenshtein_distance,
+)
+from .eval import StepDiffItem, TrajectoryEvaluator, diff_trajectories
 from .guard import CircuitBreakerStats, CircuitBreakerTripped, TrajectoryCircuitBreaker
 from .linter import (
     RULE_CATALOG,
@@ -16,6 +23,8 @@ from .linter import (
     ToolSmellLinter,
     estimate_schema_tokens,
 )
+from .mcp_server import AgentFlightMCPServer, MCP_TOOLS
+from .otel_export import OTelSpanPayload, export_cassette_to_otel
 from .recorder import (
     GENESIS_HASH,
     CassetteReplayer,
@@ -28,7 +37,7 @@ from .recorder import (
     verify_cassette,
 )
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 __all__ = [
     "__version__",
@@ -52,7 +61,15 @@ __all__ = [
     "CircuitBreakerTripped",
     "CircuitBreakerStats",
     "TrajectoryEvaluator",
+    "TrajectoryDifferentialAnalyzer",
     "TrajectoryDiffReport",
+    "compare_cassettes",
+    "compute_levenshtein_distance",
+    "compute_lcs_length",
     "StepDiffItem",
     "diff_trajectories",
+    "OTelSpanPayload",
+    "export_cassette_to_otel",
+    "AgentFlightMCPServer",
+    "MCP_TOOLS",
 ]

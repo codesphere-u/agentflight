@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agentflight"
-version = "1.0.0"
+version = "1.1.0"
 description = "AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay, Loop/Cost Circuit Breaker & MCP Tool-Smell Linter"
 readme = "README.md"
 license = {text = "MIT"}

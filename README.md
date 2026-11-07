@@ -1,11 +1,12 @@
 # AgentFlight (`agentflight`)
 
 [![CI & Reliability Gate](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml)
+[![Release v1.1.0](https://img.shields.io/badge/release-v1.1.0-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.1.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Zero External API Keys](https://img.shields.io/badge/dependencies-zero%20runtime%20deps-brightgreen.svg)](pyproject.toml)
 
-**AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay (`<0.02 ms`, `$0.00` CI Spend), Real-Time Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter.**
+**AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay (`<0.02 ms`, `$0.00` CI Spend), Differential Regression Detector, OpenTelemetry / W3C TraceContext Exporter (for `stackpulse`), Real-Time Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter.**
 
 ---
 
@@ -145,13 +146,32 @@ except CircuitBreakerTripped as exc:
     # -> ping_pong_oscillation 3 {'period': 2, 'cycles': 2, 'pattern_actors': ['search_logs', 'refine_query']}
 ```
 
-### 5. Compare Candidate vs. Golden Trajectories (`TrajectoryEvaluator`)
+### 5. Compare Candidate vs. Golden Trajectories (`compare_cassettes` & `TrajectoryEvaluator`)
 
 ```python
-from agentflight import diff_trajectories
+from agentflight import compare_cassettes, diff_trajectories
 
+# v1.1.0 Trajectory Differential Analyzer (Levenshtein/LCS sequence diff + loop/error/cost regression check)
+report = compare_cassettes("cassettes/baseline.flight.jsonl", "cassettes/candidate.flight.jsonl")
+print(report.regression_detected, report.similarity_score, report.added_tools, report.cost_delta_pct)
+print(report.summary_markdown)
+
+# Golden Evaluation Metrics (Precision, Recall, F1, Step Efficiency)
 diff = diff_trajectories(golden_recorder, candidate_recorder)
 print(diff.tool_precision, diff.tool_recall, diff.step_efficiency_ratio, diff.goal_completion_score)
+```
+
+### 6. Export W3C TraceContext / OpenTelemetry Spans for `stackpulse` (`export_cassette_to_otel`)
+
+```python
+from agentflight import export_cassette_to_otel
+
+spans = export_cassette_to_otel(
+    "cassettes/incident_8841.flight.json",
+    service_name="sre-incident-agent",
+    output_path="spans.json",
+)
+# Directly ingestible by `codesphere-u/stackpulse` for critical-path DAG analysis and SLO burn-rate monitoring!
 ```
 
 ---
@@ -199,6 +219,15 @@ agentflight demo
 
 # 3. Run the reproducible subsystem benchmark suite
 agentflight benchmark
+
+# 4. Compare baseline vs. candidate cassettes for behavioral regressions (v1.1.0)
+agentflight diff baseline.flight.jsonl candidate.flight.jsonl --json
+
+# 5. Export cassette to W3C TraceContext / OpenTelemetry JSON spans for StackPulse (v1.1.0)
+agentflight export-otel incident_8841.flight.json --output spans.json
+
+# 6. Start the JSON-RPC 2.0 MCP Server over stdio (exposes agentflight_diff_cassettes, etc.)
+agentflight serve-mcp
 ```
 
 ---
