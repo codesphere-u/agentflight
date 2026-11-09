@@ -424,3 +424,13 @@ def test_mcp_server_stdio_loop() -> None:
     assert len(lines) == 2
     assert lines[0]["error"]["code"] == -32700
     assert lines[1]["id"] == 1
+
+
+def test_quickstart_example_runs_end_to_end():
+    import runpy
+    ns = runpy.run_path("examples/quickstart.py")
+    res = ns["main"]()
+    assert res["steps_recorded"] == 3
+    assert res["cassette_verified"] is True
+    assert res["otel_spans"] == 4
+    assert res["linter_findings"] > 0
