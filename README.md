@@ -56,6 +56,10 @@ Production AI agent engineering in 2026 faces two compounding bottlenecks:
 ## Installation
 
 ```bash
+pip install "git+https://github.com/codesphere-u/agentflight.git@v1.1.0"
+# After the first PyPI release: pip install agentflight
+
+# Contributors:
 pip install -e ".[dev]"
 ```
 
