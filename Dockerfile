@@ -9,5 +9,11 @@ COPY src/ ./src/
 # Install package
 RUN pip install --no-cache-dir .
 
-# Start the MCP server over stdio
-ENTRYPOINT ["agentflight", "serve-mcp"]
+# Configuration for remote cloud hosting (Glama.ai, Fly.io, Docker)
+ENV HOST=0.0.0.0
+ENV PORT=8000
+
+EXPOSE 8000
+
+# Start HTTP/SSE remote MCP server
+ENTRYPOINT ["agentflight", "serve-http", "--host", "0.0.0.0", "--port", "8000"]

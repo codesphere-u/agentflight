@@ -460,6 +460,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_otel.set_defaults(func=_run_export_otel_command)
 
+    p_http = sub.add_parser(
+        "serve-http",
+        help="Start the remote HTTP / SSE MCP server for cloud hosting (Glama.ai, Fly.io, Docker).",
+    )
+    p_http.add_argument("--host", default="0.0.0.0", help="Host interface to bind (default: 0.0.0.0)")
+    p_http.add_argument("--port", type=int, default=8000, help="Port to listen on (default: 8000)")
+    p_http.set_defaults(func=_run_serve_http_command)
+
     p_mcp = sub.add_parser(
         "serve-mcp",
         help="Start the JSON-RPC 2.0 MCP server over stdio.",
@@ -492,6 +500,18 @@ def _run_export_otel_command(args: argparse.Namespace) -> int:
         print(json.dumps(spans, indent=2, sort_keys=True))
     else:
         print(f"Exported {len(spans)} W3C TraceContext / OpenTelemetry spans to {args.output}")
+    return 0
+
+
+def _run_serve_http_command(args: argparse.Namespace) -> int:
+    from .http_server import run_http_server
+    server = AgentFlightMCPServer()
+    httpd = run_http_server(server, host=args.host, port=args.port)
+    print(f"AgentFlight HTTP/SSE server running on http://{args.host}:{args.port}")
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        httpd.server_close()
     return 0
 
 
