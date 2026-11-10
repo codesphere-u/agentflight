@@ -100,6 +100,157 @@ def render_developer_portal(
     }
     presets_json = json.dumps(presets, indent=2)
 
+    sample_flights = {
+        "flight_golden": {
+            "title": "Flight #101: Clean Multi-Step Checkout (4 Spans)",
+            "spans": [
+                {
+                    "step": 0,
+                    "actor": "search_catalog",
+                    "kind": "tool_call",
+                    "status": "ok",
+                    "latency_ms": 14.2,
+                    "cost_usd": 0.0003,
+                    "tokens": 120,
+                    "input": {"category": "developer_tools", "max_price": 50},
+                    "output": {"items": [{"id": "AF-PRO", "title": "AgentFlight Pro Linter", "price": 29.0}]},
+                    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                },
+                {
+                    "step": 1,
+                    "actor": "check_inventory",
+                    "kind": "tool_call",
+                    "status": "ok",
+                    "latency_ms": 8.7,
+                    "cost_usd": 0.0002,
+                    "tokens": 85,
+                    "input": {"sku": "AF-PRO"},
+                    "output": {"in_stock": True, "available_seats": 500},
+                    "hash": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+                },
+                {
+                    "step": 2,
+                    "actor": "apply_discount_coupon",
+                    "kind": "tool_call",
+                    "status": "ok",
+                    "latency_ms": 6.5,
+                    "cost_usd": 0.0001,
+                    "tokens": 60,
+                    "input": {"code": "GLAMA2026", "sku": "AF-PRO"},
+                    "output": {"valid": True, "discount_pct": 20, "final_price": 23.20},
+                    "hash": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+                },
+                {
+                    "step": 3,
+                    "actor": "create_order",
+                    "kind": "tool_call",
+                    "status": "ok",
+                    "latency_ms": 28.1,
+                    "cost_usd": 0.0006,
+                    "tokens": 210,
+                    "input": {"sku": "AF-PRO", "amount": 23.20, "currency": "USD"},
+                    "output": {"order_id": "ORD-9912", "status": "confirmed", "license_key": "AF-LIVE-PRO-881"},
+                    "hash": "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+                },
+            ],
+        },
+        "flight_incident": {
+            "title": "Flight #204: Oscillating Loop Incident (Tripped)",
+            "spans": [
+                {
+                    "step": 0,
+                    "actor": "fetch_user_account",
+                    "kind": "tool_call",
+                    "status": "ok",
+                    "latency_ms": 11.0,
+                    "cost_usd": 0.0002,
+                    "tokens": 90,
+                    "input": {"user_id": "usr_9981"},
+                    "output": {"user": "alice", "plan": "enterprise"},
+                    "hash": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+                },
+                {
+                    "step": 1,
+                    "actor": "execute_payment",
+                    "kind": "tool_call",
+                    "status": "error",
+                    "latency_ms": 65.4,
+                    "cost_usd": 0.0005,
+                    "tokens": 140,
+                    "input": {"amount": 500, "card": "tok_visa_declined"},
+                    "output": {"error": "Card Declined by Issuer (402)", "isError": True},
+                    "hash": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+                },
+                {
+                    "step": 2,
+                    "actor": "execute_payment",
+                    "kind": "tool_call",
+                    "status": "error",
+                    "latency_ms": 62.1,
+                    "cost_usd": 0.0005,
+                    "tokens": 140,
+                    "input": {"amount": 500, "card": "tok_visa_declined"},
+                    "output": {"error": "Card Declined by Issuer (402)", "isError": True},
+                    "hash": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6",
+                },
+                {
+                    "step": 3,
+                    "actor": "TrajectoryCircuitBreaker",
+                    "kind": "state_checkpoint",
+                    "status": "tripped",
+                    "latency_ms": 0.1,
+                    "cost_usd": 0.0,
+                    "tokens": 0,
+                    "input": {"reason": "LOOP_OSCILLATION_DETECTED", "consecutive_errors": 2},
+                    "output": {"circuit_state": "OPEN", "action": "SEVER_RUNAWAY_TRAJECTORY", "spend_saved": 4.50},
+                    "hash": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1",
+                },
+            ],
+        },
+        "flight_openany": {
+            "title": "Flight #305: OpenAny Multi-Model Gateway Chain",
+            "spans": [
+                {
+                    "step": 0,
+                    "actor": "agentflight_openany_models",
+                    "kind": "tool_call",
+                    "status": "ok",
+                    "latency_ms": 42.0,
+                    "cost_usd": 0.0,
+                    "tokens": 65,
+                    "input": {"refresh": False},
+                    "output": {"provider": "openany", "available_models": 168, "gateway": "AIephant"},
+                    "hash": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3",
+                },
+                {
+                    "step": 1,
+                    "actor": "agentflight_openany_chat",
+                    "kind": "tool_call",
+                    "status": "ok",
+                    "latency_ms": 180.5,
+                    "cost_usd": 0.00015,
+                    "tokens": 320,
+                    "input": {"model": "MiniMax-M2.5", "prompt": "Audit safety constraints for tool calling"},
+                    "output": {"content": "Deterministic replay with SHA-256 guarantees zero regression.", "cost_usd": 0.00015},
+                    "hash": "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5",
+                },
+                {
+                    "step": 2,
+                    "actor": "export_otel_spans",
+                    "kind": "tool_call",
+                    "status": "ok",
+                    "latency_ms": 1.5,
+                    "cost_usd": 0.0,
+                    "tokens": 40,
+                    "input": {"service_name": "agentflight-telemetry"},
+                    "output": {"spans_exported": 3, "w3c_traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"},
+                    "hash": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1",
+                },
+            ],
+        },
+    }
+    sample_flights_json = json.dumps(sample_flights, indent=2)
+
     # Tool cards
     tool_cards = []
     for t in tools:
@@ -476,6 +627,62 @@ def render_developer_portal(
           <span class="hud-val mono">W3C OTel + MCP JSON-RPC</span>
         </div>
       </div>
+
+      <!-- Interactive Flight Player Controls -->
+      <div class="player-controls" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="mono text-xs font-bold" style="color: var(--amber);">COCKPIT TELEMETRY REPLAYER:</span>
+            <select id="flight-select" class="btn btn-sm" onchange="changeFlight(this.value)" style="background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); color: #fff; cursor: pointer;">
+              <option value="flight_golden">Flight #101: Clean Multi-Step Checkout (4 Spans)</option>
+              <option value="flight_incident">Flight #204: Oscillating Loop Incident (Tripped)</option>
+              <option value="flight_openany">Flight #305: OpenAny Multi-Model Gateway Chain</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <button class="btn btn-sm" onclick="prevStep()">◀ Prev</button>
+            <button class="btn btn-sm btn-amber" id="play-btn" onclick="togglePlay()">▶ Play</button>
+            <button class="btn btn-sm" onclick="nextStep()">Next ▶</button>
+            <span id="step-counter" class="mono text-xs text-dim" style="margin-left: 8px;">Step 1 / 4</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <input type="range" id="flight-scrubber" min="0" max="3" value="0" style="width: 100%; accent-color: var(--amber); cursor: pointer;" oninput="scrubStep(parseInt(this.value))">
+        </div>
+
+        <!-- Telemetry Gauges for Active Step -->
+        <div class="flight-step-card" style="background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span id="step-kind-badge" class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">tool_call</span>
+              <span id="step-actor" class="mono font-bold" style="color: #fff; font-size: 14px;">search_catalog</span>
+              <span id="step-status-badge" class="badge" style="background: rgba(74, 222, 128, 0.2); color: #4ade80;">200 OK</span>
+            </div>
+            <div class="mono text-xs" id="step-metrics" style="color: var(--text-dim);">
+              <span style="color: var(--amber);">14.2 ms</span> &bull; 
+              <span style="color: var(--green);">$0.0003</span> &bull; 
+              <span>120 Tokens</span>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
+            <div>
+              <div class="mono text-xs text-muted" style="margin-bottom: 4px;">INPUT ARGUMENTS</div>
+              <pre id="step-input" class="response-box" style="margin: 0; max-height: 120px; font-size: 11px;"></pre>
+            </div>
+            <div>
+              <div class="mono text-xs text-muted" style="margin-bottom: 4px;">OUTPUT RESULT / TELEMETRY</div>
+              <pre id="step-output" class="response-box" style="margin: 0; max-height: 120px; font-size: 11px;"></pre>
+            </div>
+          </div>
+          
+          <div id="step-hash-bar" class="mono text-xs" style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+            <span>CHAIN HASH: <span id="step-hash" style="color: var(--amber);">e3b0c442...</span></span>
+            <span style="color: #4ade80;">✔ SHA-256 INTEGRITY VERIFIED</span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Quick Connect Box -->
@@ -615,6 +822,123 @@ def render_developer_portal(
     const PROMPTS = {prompts_json};
     const SAMPLE_CALL = {sample_call_json};
     const PRESETS = {presets_json};
+    const FLIGHTS = {sample_flights_json};
+
+    let currentFlightKey = 'flight_golden';
+    let currentStepIdx = 0;
+    let isPlaying = false;
+    let playInterval = null;
+
+    function renderFlightStep(flightKey, stepIdx) {{
+      const flight = FLIGHTS[flightKey];
+      if (!flight) return;
+      const spans = flight.spans || [];
+      if (stepIdx < 0) stepIdx = 0;
+      if (stepIdx >= spans.length) stepIdx = spans.length - 1;
+      currentStepIdx = stepIdx;
+
+      const span = spans[stepIdx];
+      const scrubber = document.getElementById('flight-scrubber');
+      if (scrubber) {{
+        scrubber.max = spans.length - 1;
+        scrubber.value = stepIdx;
+      }}
+      const counter = document.getElementById('step-counter');
+      if (counter) counter.innerText = `Step ${{stepIdx + 1}} / ${{spans.length}}`;
+
+      const actorEl = document.getElementById('step-actor');
+      if (actorEl) actorEl.innerText = span.actor;
+
+      const kindEl = document.getElementById('step-kind-badge');
+      if (kindEl) kindEl.innerText = span.kind;
+
+      const statBadge = document.getElementById('step-status-badge');
+      if (statBadge) {{
+        if (span.status === 'ok') {{
+          statBadge.innerText = '200 OK';
+          statBadge.style.color = '#4ade80';
+          statBadge.style.background = 'rgba(74, 222, 128, 0.2)';
+        }} else if (span.status === 'tripped') {{
+          statBadge.innerText = '⚡ CIRCUIT TRIPPED';
+          statBadge.style.color = '#f87171';
+          statBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+        }} else {{
+          statBadge.innerText = '❌ ERROR';
+          statBadge.style.color = '#f87171';
+          statBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+        }}
+      }}
+
+      const metricsEl = document.getElementById('step-metrics');
+      if (metricsEl) {{
+        metricsEl.innerHTML = `
+          <span style="color: var(--amber);">${{span.latency_ms}} ms</span> &bull; 
+          <span style="color: var(--green);">$${{span.cost_usd.toFixed(4)}}</span> &bull; 
+          <span>${{span.tokens}} Tokens</span>
+        `;
+      }}
+
+      const inEl = document.getElementById('step-input');
+      if (inEl) inEl.textContent = JSON.stringify(span.input, null, 2);
+
+      const outEl = document.getElementById('step-output');
+      if (outEl) outEl.textContent = JSON.stringify(span.output, null, 2);
+
+      const hashEl = document.getElementById('step-hash');
+      if (hashEl) hashEl.innerText = span.hash ? span.hash.substring(0, 16) + '...' : 'GENESIS';
+    }}
+
+    function scrubStep(idx) {{
+      renderFlightStep(currentFlightKey, idx);
+    }}
+
+    function prevStep() {{
+      if (currentStepIdx > 0) {{
+        renderFlightStep(currentFlightKey, currentStepIdx - 1);
+      }}
+    }}
+
+    function nextStep() {{
+      const flight = FLIGHTS[currentFlightKey];
+      if (flight && currentStepIdx < flight.spans.length - 1) {{
+        renderFlightStep(currentFlightKey, currentStepIdx + 1);
+      }} else if (isPlaying) {{
+        togglePlay();
+      }}
+    }}
+
+    function togglePlay() {{
+      const btn = document.getElementById('play-btn');
+      if (isPlaying) {{
+        clearInterval(playInterval);
+        isPlaying = false;
+        if (btn) {{
+          btn.innerText = '▶ Play';
+          btn.classList.remove('btn-cyan');
+          btn.classList.add('btn-amber');
+        }}
+      }} else {{
+        isPlaying = true;
+        if (btn) {{
+          btn.innerText = '⏸ Pause';
+          btn.classList.remove('btn-amber');
+          btn.classList.add('btn-cyan');
+        }}
+        playInterval = setInterval(() => {{
+          const flight = FLIGHTS[currentFlightKey];
+          if (currentStepIdx >= flight.spans.length - 1) {{
+            currentStepIdx = -1;
+          }}
+          nextStep();
+        }}, 1400);
+      }}
+    }}
+
+    function changeFlight(key) {{
+      if (isPlaying) togglePlay();
+      currentFlightKey = key;
+      renderFlightStep(currentFlightKey, 0);
+    }}
 
     function switchTab(btn, paneId) {{
       btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -796,6 +1120,12 @@ def render_developer_portal(
         btn.innerText = 'Send Request →';
       }}
     }}
+
+    // Initialize telemetry flight player on load
+    document.addEventListener('DOMContentLoaded', () => {{
+      renderFlightStep('flight_golden', 0);
+    }});
+    renderFlightStep('flight_golden', 0);
   </script>
 </body>
 </html>

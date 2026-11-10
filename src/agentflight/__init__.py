@@ -25,6 +25,7 @@ from .linter import (
 )
 from .mcp_server import AgentFlightMCPServer, MCP_TOOLS
 from .otel_export import OTelSpanPayload, export_cassette_to_otel
+from .post_mortem import FlightPostMortemAnalyzer, IncidentReport
 from .providers import get_provider, list_providers, register_provider
 from .providers.openany import (
     OpenAnyAuthError,
@@ -46,6 +47,8 @@ from .recorder import (
     canonical_json,
     verify_cassette,
 )
+from .schema_optimizer import SchemaOptimizationResult, ToolSchemaOptimizer
+from .testing import FlightSession, flight_test
 
 __version__ = "1.1.0"
 
@@ -92,4 +95,10 @@ __all__ = [
     "get_provider",
     "list_providers",
     "register_provider",
+    "FlightSession",
+    "flight_test",
+    "FlightPostMortemAnalyzer",
+    "IncidentReport",
+    "ToolSchemaOptimizer",
+    "SchemaOptimizationResult",
 ]

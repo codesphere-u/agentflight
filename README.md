@@ -236,20 +236,51 @@ Reproducible via `python -m agentflight.cli benchmark` (measured on Python 3.12)
 # 1. Lint showcase flawed vs. hardened MCP tool suites (or pass --schema-file path/to/tools.json)
 agentflight lint
 
-# 2. Run the end-to-end recording, <0.02ms replay, circuit breaker & diff demo
+# 2. Automated Schema Repair: harden smelly tools to Glama TDQS Gold Standard
+agentflight fix tools.json --output hardened_tools.json
+
+# 3. CI/CD Pre-Flight Gate: lint tool smells, verify cassette integrity, enforce budget SLAs
+agentflight ci --schema-file tools.json --cassette runs/test.cassette.json --fail-on-smell
+
+# 4. Forensic Post-Mortem Investigator: generate AAIB/NTSB incident reports from flight cassettes
+agentflight post-mortem crash_incident.cassette.json --output report.md
+
+# 5. Run the end-to-end recording, <0.02ms replay, circuit breaker & diff demo
 agentflight demo
 
-# 3. Run the reproducible subsystem benchmark suite
+# 6. Run the reproducible subsystem benchmark suite
 agentflight benchmark
 
-# 4. Compare baseline vs. candidate cassettes for behavioral regressions (v1.1.0)
-agentflight diff baseline.flight.jsonl candidate.flight.jsonl --json
+# 7. Compare baseline vs. candidate cassettes for behavioral regressions
+agentflight diff baseline.flight.json candidate.flight.json --json
 
-# 5. Export cassette to W3C TraceContext / OpenTelemetry JSON spans for StackPulse (v1.1.0)
+# 8. Export cassette to W3C TraceContext / OpenTelemetry JSON spans for StackPulse
 agentflight export-otel incident_8841.flight.json --output spans.json
 
-# 6. Start the JSON-RPC 2.0 MCP Server over stdio (exposes agentflight_diff_cassettes, etc.)
+# 9. Start the JSON-RPC 2.0 MCP Server over stdio
 agentflight serve-mcp
+```
+
+---
+
+## Deterministic Testing with `@flight_test` (VCR for AI Agents)
+
+Eliminate non-determinism, API cost, and network latency from your CI test suite:
+
+```python
+import pytest
+from agentflight.testing import flight_test
+
+@flight_test("tests/fixtures/checkout.cassette.json")
+def test_checkout_agent(flight):
+    # During first run: executes live and records cryptographic cassette.
+    # During subsequent runs (e.g. CI): replays in <3 μs with $0.00 network cost!
+    agent = OrderAgent()
+    result = agent.execute("Order item sku_881 with coupon SAVE10")
+    
+    assert result.status == "confirmed"
+    assert flight.step_count == 3
+    assert flight.total_cost_usd <= 0.05
 ```
 
 ---

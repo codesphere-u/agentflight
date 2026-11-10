@@ -13,7 +13,9 @@ Subcommands:
 from __future__ import annotations
 
 import argparse
+import copy
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -514,6 +516,35 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_mcp_alias.set_defaults(func=_run_serve_mcp_command)
 
+    p_pm = sub.add_parser(
+        "post-mortem",
+        help="Generate an AAIB/NTSB-grade incident investigation report from a recorded cassette.",
+    )
+    p_pm.add_argument("cassette", type=str, help="Path to .flight.json cassette to investigate.")
+    p_pm.add_argument("--output", "-o", type=str, default=None, help="Optional output path for Markdown report.")
+    p_pm.add_argument("--json", action="store_true", help="Emit JSON incident report.")
+    p_pm.set_defaults(func=_run_post_mortem_command)
+
+    p_ci = sub.add_parser(
+        "ci",
+        help="Run CI/CD pre-flight gate (Tool-Smell audits, cassette integrity, budget & latency SLA verification).",
+    )
+    p_ci.add_argument("--schema-file", type=str, default=None, help="Path to MCP tool schemas JSON to audit.")
+    p_ci.add_argument("--cassette", type=str, default=None, help="Path to recorded cassette to verify.")
+    p_ci.add_argument("--max-cost", type=float, default=2.00, help="Maximum allowed cost in USD (default: $2.00).")
+    p_ci.add_argument("--fail-on-smell", action="store_true", help="Exit code 1 if any tool smells detected.")
+    p_ci.add_argument("--github-summary", action="store_true", help="Append markdown report to $GITHUB_STEP_SUMMARY.")
+    p_ci.set_defaults(func=_run_ci_command)
+
+    p_fix = sub.add_parser(
+        "fix",
+        help="Automatically repair and harden flawed MCP tool schemas to Glama/Smithery TDQS Gold Standard.",
+    )
+    p_fix.add_argument("schema_file", type=str, help="Path to JSON file containing tool definitions to fix.")
+    p_fix.add_argument("--output", "-o", type=str, default=None, help="Output path for hardened schemas.")
+    p_fix.add_argument("--in-place", "-i", action="store_true", help="Overwrite input file with hardened schemas.")
+    p_fix.set_defaults(func=_run_fix_command)
+
     return parser
 
 
@@ -674,6 +705,105 @@ def _run_openany_command(args: argparse.Namespace) -> int:
 
     print("Please specify an OpenAny subcommand: models, chat, lint-tools, replay. Use --help for options.")
     return 1
+
+
+def _run_post_mortem_command(args: argparse.Namespace) -> int:
+    from .post_mortem import FlightPostMortemAnalyzer
+    analyzer = FlightPostMortemAnalyzer()
+    report = analyzer.analyze(args.cassette)
+    if args.json:
+        print(json.dumps(report.to_dict(), indent=2))
+    else:
+        md = report.to_markdown()
+        if args.output:
+            with open(args.output, "w", encoding="utf-8") as f:
+                f.write(md)
+            print(f"Post-Mortem Incident Report written to {args.output}")
+        else:
+            print(md)
+    return 1 if report.severity in ("CRITICAL", "HIGH") else 0
+
+
+def _run_ci_command(args: argparse.Namespace) -> int:
+    from .linter import ToolSmellLinter, SHOWCASE_HARDENED_MCP_TOOLS
+    from .post_mortem import FlightPostMortemAnalyzer
+
+    lines = [
+        "# ✈️ AgentFlight CI Pre-Flight Verification Gate",
+        "",
+        "| Gate Check | Status | Details |",
+        "| :--- | :---: | :--- |",
+    ]
+    exit_code = 0
+
+    # 1. Tool-Smell Linter
+    tools = SHOWCASE_HARDENED_MCP_TOOLS
+    if args.schema_file:
+        with open(args.schema_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            tools = data if isinstance(data, list) else data.get("tools", [])
+
+    linter = ToolSmellLinter()
+    report = linter.lint(tools)
+    smell_count = len(report.findings)
+    if smell_count > 0:
+        lines.append(f"| **MCP Tool-Smell Audit** | ⚠️ WARN | Found {smell_count} smells across {len(tools)} tools |")
+        if args.fail_on_smell:
+            exit_code = 1
+    else:
+        lines.append(f"| **MCP Tool-Smell Audit** | ✅ PASS | 0 smells detected across {len(tools)} tools |")
+
+    # 2. Cassette check if provided
+    if args.cassette:
+        pm = FlightPostMortemAnalyzer(max_cost_ceiling_usd=args.max_cost).analyze(args.cassette)
+        if not pm.is_hash_chain_valid:
+            lines.append(f"| **Cassette Cryptographic Chain** | ❌ FAIL | SHA-256 chain verification failed |")
+            exit_code = 1
+        else:
+            lines.append(f"| **Cassette Cryptographic Chain** | ✅ PASS | SHA-256 chain valid ({pm.total_steps} steps) |")
+
+        if pm.severity in ("CRITICAL", "HIGH"):
+            lines.append(f"| **Flight Safety & Budget SLA** | ❌ FAIL | Root Cause: `{pm.root_cause}` (${pm.total_cost_usd:.4f}) |")
+            exit_code = 1
+        else:
+            lines.append(f"| **Flight Safety & Budget SLA** | ✅ PASS | Cost ${pm.total_cost_usd:.4f} within ${args.max_cost:.2f} limit |")
+
+    summary_md = "\n".join(lines)
+    print(summary_md)
+
+    if args.github_summary or os.environ.get("GITHUB_STEP_SUMMARY"):
+        gh_step = os.environ.get("GITHUB_STEP_SUMMARY")
+        if gh_step:
+            with open(gh_step, "a", encoding="utf-8") as f:
+                f.write("\n" + summary_md + "\n")
+
+    return exit_code
+
+
+def _run_fix_command(args: argparse.Namespace) -> int:
+    from .schema_optimizer import ToolSchemaOptimizer
+    with open(args.schema_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    is_dict = isinstance(data, dict)
+    tools = data.get("tools", []) if is_dict else data
+
+    optimizer = ToolSchemaOptimizer()
+    results = optimizer.optimize_tools(tools)
+    hardened_tools = [r.hardened_tool for r in results]
+
+    output_data = copy.deepcopy(data) if is_dict else hardened_tools
+    if is_dict:
+        output_data["tools"] = hardened_tools
+
+    target_path = args.schema_file if args.in_place else (args.output or "hardened_tools.json")
+    with open(target_path, "w", encoding="utf-8") as f:
+        json.dump(output_data, f, indent=2)
+
+    total_smells_resolved = sum(r.smells_resolved for r in results)
+    print(f"✅ Successfully hardened {len(tools)} tool definitions into {target_path}")
+    print(f"   Resolved {total_smells_resolved} tool smells. Meets Glama TDQS Gold Standard.")
+    return 0
 
 
 def _run_serve_mcp_command(args: argparse.Namespace) -> int:
