@@ -1,5 +1,9 @@
 # AgentFlight (`agentflight`)
 
+<p align="center">
+  <img src="assets/banner.jpg" alt="AgentFlight: AI Agent Black-Box Flight Recorder & Deterministic Trajectory Replay" width="100%" />
+</p>
+
 [![CI & Reliability Gate](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml)
 [![Release v1.1.0](https://img.shields.io/badge/release-v1.1.0-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.1.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
