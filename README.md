@@ -12,7 +12,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-✔%20Connected-10b981?logo=anthropic&logoColor=white)](#hosted-endpoint-vercel)
 [![Glama Score](https://glama.ai/mcp/servers/codesphere-u/agentflight/badges/score.svg)](https://glama.ai/mcp/servers/codesphere-u/agentflight)
 [![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
-[![Tests Passed](https://img.shields.io/badge/tests-100%20passed-brightgreen.svg)](tests/)
+[![Tests Passed](https://img.shields.io/badge/tests-113%20passed-brightgreen.svg)](tests/)
 [![Zero External API Keys](https://img.shields.io/badge/dependencies-zero%20runtime%20deps-brightgreen.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
@@ -406,6 +406,60 @@ npx -y @smithery/cli install @codesphere-u/agentflight --client claude
 **Hosted limitations:** Only `agentflight_lint_tools` is exposed. The cassette tools (`agentflight_diff_cassettes`, `agentflight_export_otel`, `agentflight_verify_cassette`) read/write local files and are **disabled on the hosted endpoint** — use the local stdio install.
 
 The hosted gateway is [`api/index.py`](api/index.py); it enforces a 1 MB body limit, strict JSON-RPC envelopes and the tool restrictions above. Deploy your own copy with `npx vercel deploy --prod` (entrypoint is configured in `pyproject.toml` under `[tool.vercel]`).
+
+---
+
+## Official OpenAny Provider Integration
+
+AgentFlight features an official provider integration for [OpenAny](https://openany.si), giving developers access to 168+ AI models and 3,200+ external APIs with pre-execution cost circuit breaking, black-box flight recording, and $0.00 sub-millisecond deterministic replay.
+
+### Quick Start with OpenAny
+
+```python
+from agentflight import OpenAnyProvider, OpenAnyConfig, TrajectoryCircuitBreaker, FlightRecorder
+
+# Initialize provider with spending limits
+provider = OpenAnyProvider(
+    config=OpenAnyConfig(
+        api_key="your_openany_api_key",
+        default_model="MiniMax-M2.5",
+        max_budget_usd=0.05,
+    )
+)
+
+guard = TrajectoryCircuitBreaker(max_cost_usd=0.02)
+recorder = FlightRecorder(agent_id="openany-agent")
+
+# Pre-execution budget shield automatically trips BEFORE any paid request if cost exceeds limits
+resp = provider.chat_completion(
+    messages=[{"role": "user", "content": "Summarize distributed consensus"}],
+    guard=guard,
+    recorder=recorder,
+)
+
+# Save tamper-evident cassette for $0.00 CI testing
+recorder.save("session.flight.json")
+```
+
+### CLI Commands for OpenAny
+
+```bash
+# List all 168+ models and real-time per-token prompt/completion pricing
+agentflight openany models
+
+# Run a model prompt with budget guardrail and flight recording
+agentflight openany chat --model MiniMax-M2.5 --prompt "Explain Paxos" --budget 0.01 --record paxos.flight.json
+
+# Audit OpenAny remote MCP tools against 10 ergonomics rules (TS001-TS010)
+agentflight openany lint-tools
+
+# Deterministically replay recorded trajectory in <0.02ms with zero API spend
+agentflight openany replay --cassette paxos.flight.json
+```
+
+For complete technical documentation, architecture diagrams, and partnership details, see [`docs/OPENANY_INTEGRATION.md`](docs/OPENANY_INTEGRATION.md).
+
+---
 
 ## License
 

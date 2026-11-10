@@ -28,3 +28,6 @@ ENV/
 *.flight.json
 *.flight.jsonl
 .vercel
+.env
+.env.local
+.env.*.local

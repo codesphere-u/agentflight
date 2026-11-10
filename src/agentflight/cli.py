@@ -480,6 +480,34 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_stdio.set_defaults(func=_run_serve_mcp_command)
 
+    p_openany = sub.add_parser(
+        "openany",
+        help="Interact with OpenAny models and APIs with flight recording, cost circuit breaking, and replay.",
+    )
+    oa_sub = p_openany.add_subparsers(dest="openany_subcommand", required=False)
+
+    oa_models = oa_sub.add_parser("models", help="List available OpenAny models and per-token pricing.")
+    oa_models.add_argument("--json", action="store_true", help="Emit raw JSON model catalog.")
+    oa_models.set_defaults(func=_run_openany_command)
+
+    oa_chat = oa_sub.add_parser("chat", help="Execute an OpenAny chat prompt with budget protection and flight recording.")
+    oa_chat.add_argument("--prompt", "-p", type=str, required=True, help="User prompt to send to OpenAny.")
+    oa_chat.add_argument("--model", "-m", type=str, default=None, help="Model ID (default from OPENANY_DEFAULT_MODEL or MiniMax-M2.5).")
+    oa_chat.add_argument("--budget", "-b", type=float, default=None, help="Max USD budget allowed before tripping circuit breaker.")
+    oa_chat.add_argument("--record", "-r", type=str, default=None, help="File path to save recorded .flight.json cassette.")
+    oa_chat.add_argument("--api-key", type=str, default=None, help="Optional API key override.")
+    oa_chat.set_defaults(func=_run_openany_command)
+
+    oa_lint = oa_sub.add_parser("lint-tools", help="Audit OpenAny remote MCP tool definitions against TS001-TS010.")
+    oa_lint.add_argument("--json", action="store_true", help="Emit JSON lint report.")
+    oa_lint.set_defaults(func=_run_openany_command)
+
+    oa_replay = oa_sub.add_parser("replay", help="Replay an OpenAny trajectory cassette deterministically with zero network calls.")
+    oa_replay.add_argument("--cassette", "-c", type=str, required=True, help="Path to .flight.json cassette.")
+    oa_replay.set_defaults(func=_run_openany_command)
+
+    p_openany.set_defaults(func=_run_openany_command)
+
     p_mcp_alias = sub.add_parser(
         "mcp",
         help="Start the JSON-RPC 2.0 MCP server over stdio (alias for serve-mcp).",
@@ -525,6 +553,127 @@ def _run_serve_http_command(args: argparse.Namespace) -> int:
     except KeyboardInterrupt:
         httpd.server_close()
     return 0
+
+
+def _run_openany_command(args: argparse.Namespace) -> int:
+    from .providers.openany import (
+        OpenAnyBudgetExceededError,
+        OpenAnyConfig,
+        OpenAnyProvider,
+    )
+
+    config = OpenAnyConfig.from_env()
+    if getattr(args, "api_key", None):
+        config.api_key = args.api_key
+    if getattr(args, "model", None):
+        config.default_model = args.model
+    if getattr(args, "budget", None):
+        config.max_budget_usd = args.budget
+
+    provider = OpenAnyProvider(config=config)
+    subcmd = getattr(args, "openany_subcommand", None)
+
+    if subcmd == "models":
+        models = provider.get_models()
+        if getattr(args, "json", False):
+            print(json.dumps(models, indent=2, sort_keys=True))
+            return 0
+        print(f"=== OpenAny Model Catalog ({len(models)} models available) ===")
+        print("| Model ID | Context | Max Output | Prompt USD/1M | Completion USD/1M | Modalities |")
+        print("| :--- | :--- | :--- | :--- | :--- | :--- |")
+        for m in models[:25]:
+            pricing = m.get("pricing", {})
+            if isinstance(pricing, list) and pricing:
+                pricing = pricing[0]
+            p_prompt = float(pricing.get("prompt", "0") or 0.0) * 1_000_000
+            p_comp = float(pricing.get("completion", "0") or 0.0) * 1_000_000
+            mods = ",".join(m.get("input_modalities", []))
+            print(
+                f"| `{m.get('id')}` | {m.get('context_length', 0):,} | "
+                f"{m.get('max_output_length', 0):,} | ${p_prompt:.4f} | "
+                f"${p_comp:.4f} | {mods} |"
+            )
+        if len(models) > 25:
+            print(f"\n... and {len(models) - 25} more models. Use --json to view the complete list.")
+        return 0
+
+    if subcmd == "lint-tools":
+        report = provider.lint_openany_tools()
+        if getattr(args, "json", False):
+            print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
+        else:
+            _print_lint_report("OpenAny Remote MCP Tool Definitions", report)
+        return 0 if report.error_count == 0 else 1
+
+    if subcmd == "chat":
+        prompt = args.prompt
+        target_model = args.model or config.default_model
+        budget = args.budget if args.budget is not None else config.max_budget_usd
+        record_path = getattr(args, "record", None)
+
+        recorder = FlightRecorder(agent_id=f"openany-agent-{target_model}") if record_path else None
+        guard = TrajectoryCircuitBreaker(max_cost_usd=budget)
+
+        print(f"Connecting to OpenAny ({target_model})... Budget cap: ${budget:.4f}")
+        try:
+            resp = provider.chat_completion(
+                messages=[{"role": "user", "content": prompt}],
+                model=target_model,
+                guard=guard,
+                recorder=recorder,
+            )
+            choices = resp.get("choices", [])
+            content = choices[0].get("message", {}).get("content", "") if choices else str(resp)
+            usage = resp.get("usage", {})
+            meta = resp.get("_agentflight", {})
+
+            print("\n--- OpenAny Response ---")
+            print(content)
+            print("\n--- AgentFlight Telemetry ---")
+            print(
+                f"Tokens: {usage.get('total_tokens', 0)} "
+                f"({usage.get('prompt_tokens', 0)} prompt + {usage.get('completion_tokens', 0)} completion)"
+            )
+            print(
+                f"Est Cost: ${meta.get('estimated_cost_usd', 0.0):.6f} | "
+                f"Billed Cost: ${meta.get('actual_cost_usd', 0.0):.6f}"
+            )
+            print(f"Latency: {meta.get('latency_ms', 0.0)} ms | Partner: {meta.get('partner_id', 'none')}")
+
+            if recorder and record_path:
+                recorder.save(record_path)
+                print(f"Recorded flight trajectory cassette saved to: {record_path}")
+            return 0
+        except OpenAnyBudgetExceededError as e:
+            print(f"\n[CIRCUIT BREAKER TRIPPED]: {e}")
+            return 2
+        except Exception as e:
+            print(f"\n[ERROR]: {e}")
+            return 1
+
+    if subcmd == "replay":
+        cassette_path = args.cassette
+        replayer = CassetteReplayer(cassette_path)
+        print(f"Replaying OpenAny cassette: {cassette_path}")
+        print(f"Recorded Agent ID: {replayer.agent_id} | Steps: {len(replayer.spans)}")
+        step_idx = 0
+        start = time.perf_counter()
+        while not replayer.is_exhausted:
+            span = replayer.advance()
+            step_idx += 1
+            print(
+                f"  Step {span.step_index}: [{span.kind}] {span.actor} -> "
+                f"status={span.status} (Recorded Cost: ${span.cost_usd:.6f})"
+            )
+        elapsed_us = (time.perf_counter() - start) * 1_000_000
+        print(
+            f"\nDeterministic Replay Complete: {step_idx} steps verified in "
+            f"{elapsed_us:.2f} us ($0.00 network cost)."
+        )
+        return 0
+
+    print("Please specify an OpenAny subcommand: models, chat, lint-tools, replay. Use --help for options.")
+    return 1
 
 
 def _run_serve_mcp_command(args: argparse.Namespace) -> int:

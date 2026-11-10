@@ -459,12 +459,15 @@ class CassetteReplayer:
         if isinstance(cassette, (str, Path)):
             recorder = FlightRecorder.load(cassette, verify=True)
             self._spans = recorder.spans
+            self._agent_id = recorder.agent_id
         elif isinstance(cassette, FlightRecorder):
             verify_cassette(cassette)
             self._spans = cassette.spans
+            self._agent_id = cassette.agent_id
         else:
             verify_cassette(cassette)
             self._spans = list(cassette)
+            self._agent_id = "replayed-agent"
 
         self.strict_order = strict_order
         self._cursor: int = 0
@@ -478,6 +481,29 @@ class CassetteReplayer:
     @property
     def cursor(self) -> int:
         return self._cursor
+
+    @property
+    def spans(self) -> List[TrajectorySpan]:
+        """Return the sequence of recorded spans loaded in this cassette replayer."""
+        return list(self._spans)
+
+    @property
+    def agent_id(self) -> str:
+        """Return the recorded agent ID of the cassette."""
+        return getattr(self, "_agent_id", "replayed-agent")
+
+    @property
+    def is_exhausted(self) -> bool:
+        """True if the replay cursor has advanced through all spans in the cassette."""
+        return self._cursor >= len(self._spans)
+
+    def advance(self) -> TrajectorySpan:
+        """Advance the replay cursor by one step and return that TrajectorySpan."""
+        if self.is_exhausted:
+            raise StopIteration("CassetteReplayer cursor is exhausted.")
+        span = self._spans[self._cursor]
+        self._cursor += 1
+        return span
 
     @property
     def remaining_steps(self) -> int:
