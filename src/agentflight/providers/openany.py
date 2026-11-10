@@ -23,6 +23,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from pathlib import Path
 from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Sequence, Union
 
@@ -124,7 +125,25 @@ class OpenAnyConfig:
 
     @classmethod
     def from_env(cls) -> "OpenAnyConfig":
-        """Instantiate configuration from environment variables."""
+        """Instantiate configuration from environment variables or .env file."""
+        if not os.environ.get("OPENANY_API_KEY"):
+            # Attempt to read local .env file without external dependencies
+            for candidate in (Path.cwd() / ".env", Path.cwd().parent / ".env"):
+                if candidate.is_file():
+                    try:
+                        with open(candidate, "r", encoding="utf-8") as f:
+                            for line in f:
+                                line = line.strip()
+                                if line and not line.startswith("#") and "=" in line:
+                                    k, v = line.split("=", 1)
+                                    k = k.strip()
+                                    v = v.strip().strip("'\"")
+                                    if k not in os.environ:
+                                        os.environ[k] = v
+                    except Exception:
+                        pass
+                    break
+
         return cls(
             api_key=os.environ.get("OPENANY_API_KEY"),
             base_url=os.environ.get("OPENANY_BASE_URL", "https://api.openany.si/v1").rstrip("/"),
