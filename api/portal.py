@@ -36,6 +36,70 @@ def render_developer_portal(
     prompts_json = json.dumps(prompts, indent=2)
     sample_call_json = json.dumps(sample_tool_call, indent=2)
 
+    presets = {
+        "init": {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "agentflight-web-portal", "version": server_version},
+            },
+        },
+        "tools_list": {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
+        "sample_call": sample_tool_call,
+        "lint_smelly": {
+            "jsonrpc": "2.0",
+            "id": 15,
+            "method": "tools/call",
+            "params": {
+                "name": "agentflight_lint_tools",
+                "arguments": {
+                    "tools": [
+                        {
+                            "name": "doStuff",
+                            "description": "stuff",
+                            "inputSchema": {
+                                "type": "object",
+                                "properties": {"a": {"type": "string"}},
+                            },
+                        },
+                        {
+                            "name": "deep_nested_smell",
+                            "description": "Valid detailed description for this deep schema",
+                            "inputSchema": {
+                                "type": "object",
+                                "properties": {
+                                    "lvl1": {
+                                        "type": "object",
+                                        "properties": {
+                                            "lvl2": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "lvl3": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "lvl4": {"type": "string"}
+                                                        },
+                                                    }
+                                                },
+                                            }
+                                        },
+                                    }
+                                },
+                            },
+                        },
+                    ]
+                },
+            },
+        },
+        "res_list": {"jsonrpc": "2.0", "id": 3, "method": "resources/list"},
+        "res_templates": {"jsonrpc": "2.0", "id": 4, "method": "resources/templates/list"},
+        "prompts_list": {"jsonrpc": "2.0", "id": 5, "method": "prompts/list"},
+    }
+    presets_json = json.dumps(presets, indent=2)
+
     # Tool cards
     tool_cards = []
     for t in tools:
@@ -429,7 +493,7 @@ def render_developer_portal(
       <div id="tab-claude-code" class="tab-pane">
         <div class="snippet-box">
           <pre>{html.escape(claude_code_cmd)}</pre>
-          <button class="copy-btn" onclick="copySnippet(this, `{claude_code_cmd}`)">Copy Command</button>
+          <button class="copy-btn" onclick="copySnippet(this)">Copy Command</button>
         </div>
         <p class="text-xs text-muted" style="margin-top: 8px;">Run directly in your terminal to register in Claude Code project/global config.</p>
       </div>
@@ -437,7 +501,7 @@ def render_developer_portal(
       <div id="tab-cursor" class="tab-pane" style="display: none;">
         <div class="snippet-box">
           <pre>{html.escape(cursor_cfg)}</pre>
-          <button class="copy-btn" onclick="copySnippet(this, `{cursor_cfg}`)">Copy JSON</button>
+          <button class="copy-btn" onclick="copySnippet(this)">Copy JSON</button>
         </div>
         <p class="text-xs text-muted" style="margin-top: 8px;">Paste into your project's <code>.cursor/mcp.json</code> or user settings.</p>
       </div>
@@ -445,7 +509,7 @@ def render_developer_portal(
       <div id="tab-windsurf" class="tab-pane" style="display: none;">
         <div class="snippet-box">
           <pre>{html.escape(cursor_cfg)}</pre>
-          <button class="copy-btn" onclick="copySnippet(this, `{cursor_cfg}`)">Copy JSON</button>
+          <button class="copy-btn" onclick="copySnippet(this)">Copy JSON</button>
         </div>
         <p class="text-xs text-muted" style="margin-top: 8px;">Paste into <code>~/.codeium/windsurf/mcp_config.json</code>.</p>
       </div>
@@ -453,7 +517,7 @@ def render_developer_portal(
       <div id="tab-desktop" class="tab-pane" style="display: none;">
         <div class="snippet-box">
           <pre>{html.escape(claude_desktop_cfg)}</pre>
-          <button class="copy-btn" onclick="copySnippet(this, `{claude_desktop_cfg}`)">Copy JSON</button>
+          <button class="copy-btn" onclick="copySnippet(this)">Copy JSON</button>
         </div>
         <p class="text-xs text-muted" style="margin-top: 8px;">Paste into <code>claude_desktop_config.json</code>.</p>
       </div>
@@ -461,7 +525,7 @@ def render_developer_portal(
       <div id="tab-smithery" class="tab-pane" style="display: none;">
         <div class="snippet-box">
           <pre>{html.escape(smithery_cmd)}</pre>
-          <button class="copy-btn" onclick="copySnippet(this, `{smithery_cmd}`)">Copy Command</button>
+          <button class="copy-btn" onclick="copySnippet(this)">Copy Command</button>
         </div>
         <p class="text-xs text-muted" style="margin-top: 8px;">Installs via the Smithery registry orchestrator.</p>
       </div>
@@ -469,7 +533,7 @@ def render_developer_portal(
       <div id="tab-stdio" class="tab-pane" style="display: none;">
         <div class="snippet-box">
           <pre>{html.escape(stdio_cmd)}</pre>
-          <button class="copy-btn" onclick="copySnippet(this, `{stdio_cmd}`)">Copy Command</button>
+          <button class="copy-btn" onclick="copySnippet(this)">Copy Command</button>
         </div>
         <p class="text-xs text-muted" style="margin-top: 8px;">Runs locally without any installation via uvx.</p>
       </div>
@@ -550,16 +614,35 @@ def render_developer_portal(
     const RESOURCES = {resources_json};
     const PROMPTS = {prompts_json};
     const SAMPLE_CALL = {sample_call_json};
+    const PRESETS = {presets_json};
 
     function switchTab(btn, paneId) {{
       btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       btn.closest('section').querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
-      document.getElementById(paneId).style.display = 'block';
+      const pane = document.getElementById(paneId);
+      if (pane) pane.style.display = 'block';
     }}
 
-    function copySnippet(btn, text) {{
+    function copySnippet(btn) {{
+      const pre = btn.parentElement ? btn.parentElement.querySelector('pre') : null;
+      const text = pre ? pre.textContent.trim() : '';
+      if (!text) return;
       navigator.clipboard.writeText(text).then(() => {{
+        const old = btn.innerText;
+        btn.innerText = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {{
+          btn.innerText = old;
+          btn.classList.remove('copied');
+        }}, 2000);
+      }}).catch(() => {{
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
         const old = btn.innerText;
         btn.innerText = 'Copied!';
         btn.classList.add('copied');
@@ -605,31 +688,8 @@ def render_developer_portal(
 
     function loadPreset(kind) {{
       const req = document.getElementById('rpc-request');
-      if (kind === 'init') {{
-        req.value = JSON.stringify({{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {{"protocolVersion": "2024-11-05", "capabilities": {{}}, "clientInfo": {{"name": "playground", "version": "1.0.0"}}}}}}, null, 2);
-      }} else if (kind === 'tools_list') {{
-        req.value = JSON.stringify({{"jsonrpc": "2.0", "id": 2, "method": "tools/list"}}, null, 2);
-      }} else if (kind === 'sample_call') {{
-        req.value = JSON.stringify(SAMPLE_CALL, null, 2);
-      }} else if (kind === 'lint_smelly') {{
-        req.value = JSON.stringify({{
-          "jsonrpc": "2.0",
-          "id": 15,
-          "method": "tools/call",
-          "params": {{
-            "name": "agentflight_lint_tools",
-            "arguments": {{
-              "tools": [
-                {{"name": "doStuff", "description": "stuff", "inputSchema": {{"type": "object", "properties": {{"a": {{"type": "string"}}}}}}}},
-                {{"name": "deep_nested_smell", "description": "Valid detailed description for this deep schema", "inputSchema": {{"type": "object", "properties": {{"lvl1": {{"type": "object", "properties": {{"lvl2": {{"type": "object", "properties": {{"lvl3": {{"type": "object", "properties": {{"lvl4": {{"type": "string"}}}}}}}}}}}}}}}}}}
-              ]
-            }}
-          }}
-        }}, null, 2);
-      }} else if (kind === 'res_list') {{
-        req.value = JSON.stringify({{"jsonrpc": "2.0", "id": 3, "method": "resources/list"}}, null, 2);
-      }} else if (kind === 'prompts_list') {{
-        req.value = JSON.stringify({{"jsonrpc": "2.0", "id": 4, "method": "prompts/list"}}, null, 2);
+      if (PRESETS[kind]) {{
+        req.value = JSON.stringify(PRESETS[kind], null, 2);
       }}
     }}
 
@@ -653,6 +713,7 @@ def render_developer_portal(
         "params": {{ "name": name, "arguments": args }}
       }}, null, 2);
       document.getElementById('send-btn').scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+      sendJsonRpc();
     }}
 
     function loadResourceRead(uri) {{
@@ -663,6 +724,7 @@ def render_developer_portal(
         "params": {{ "uri": uri }}
       }}, null, 2);
       document.getElementById('send-btn').scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+      sendJsonRpc();
     }}
 
     function loadPromptGet(name) {{
@@ -680,6 +742,7 @@ def render_developer_portal(
         "params": {{ "name": name, "arguments": args }}
       }}, null, 2);
       document.getElementById('send-btn').scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+      sendJsonRpc();
     }}
 
     function filterTools(query) {{
@@ -693,14 +756,14 @@ def render_developer_portal(
 
     function testLintGoodTool() {{
       loadPreset('sample_call');
-      sendJsonRpc();
       document.getElementById('send-btn').scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+      sendJsonRpc();
     }}
 
     function testLintSmellyTool() {{
       loadPreset('lint_smelly');
-      sendJsonRpc();
       document.getElementById('send-btn').scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+      sendJsonRpc();
     }}
 
     async function sendJsonRpc() {{
