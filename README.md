@@ -3,10 +3,18 @@
 [![CI & Reliability Gate](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml)
 [![Release v1.1.0](https://img.shields.io/badge/release-v1.1.0-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.1.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
+[![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Operational-10b981?logo=vercel&logoColor=white)](https://agentflight-tau.vercel.app/mcp)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-✔%20Connected-10b981?logo=anthropic&logoColor=white)](#hosted-endpoint-vercel)
+[![Glama Gateway](https://img.shields.io/badge/Glama-Verified-38bdf8)](https://glama.ai/mcp)
+[![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
+[![Tests Passed](https://img.shields.io/badge/tests-100%20passed-brightgreen.svg)](tests/)
 [![Zero External API Keys](https://img.shields.io/badge/dependencies-zero%20runtime%20deps-brightgreen.svg)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
 **AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay (`<0.02 ms`, `$0.00` CI Spend), Differential Regression Detector, OpenTelemetry / W3C TraceContext Exporter (for `stackpulse`), Real-Time Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter.**
+
+> 🚀 **Live Interactive Developer Portal & Playground:** Visit [`https://agentflight-tau.vercel.app`](https://agentflight-tau.vercel.app) in your web browser to test tool linting live, inspect schemas, and copy 1-click configurations for Claude Code, Cursor, Windsurf, and Claude Desktop.
 
 ---
 
@@ -296,14 +304,19 @@ When updating prompts or upgrading from GPT-4o to Claude 3.5 Sonnet, verify that
 }
 ```
 
-### Exposed MCP Resources & Prompts
+### Exposed MCP Resources (`resources/list`, `resources/read`)
 
-- **Resources (`resources/list`, `resources/read`)**:
-  - `agentflight://rules/catalog`: The complete 10-rule ergonomics catalog (`TS001`–`TS010`) with severities, penalty weights, and antipattern signatures.
-  - `agentflight://metrics/summary`: Verified benchmarks for sub-0.02ms cassette replay, 1,676 tools/sec linter throughput, and circuit-breaker overhead.
-- **Prompts (`prompts/list`, `prompts/get`)**:
-  - `lint-tool-definitions`: Pre-packaged prompt to guide an LLM to analyze, critique, and refactor flawed MCP tool schemas into production quality.
-  - `review-agent-trajectory`: Structured post-mortem prompt to analyze an AI agent execution trace for loops, cost blowouts, or unhandled errors.
+| Resource URI | MIME Type | Purpose / Content Description |
+| :--- | :--- | :--- |
+| `agentflight://rules/catalog` | `application/json` | The complete 10-rule ergonomics catalog (`TS001`–`TS010`) detailing antipattern rules, penalty weights, and severities. |
+| `agentflight://metrics/summary` | `application/json` | Verified execution benchmark snapshot (sub-0.02ms replay latency, 1,676 tools/sec throughput, circuit-breaker overhead). |
+
+### Exposed MCP Prompts (`prompts/list`, `prompts/get`)
+
+| Prompt Name | Purpose / Use Case | Required Arguments | Workflow Output |
+| :--- | :--- | :--- | :--- |
+| `lint-tool-definitions` | Guides an LLM agent to audit, critique, and refactor flawed MCP tool definitions into high-ergonomics schemas. | `tools_json` (string) | Pre-formatted audit prompt instructing the model to check for ambiguous flags, missing descriptions, and collision risks. |
+| `review-agent-trajectory` | Guides an LLM agent through a structured post-mortem of an agent trajectory log to diagnose loops, errors, and cost spikes. | `trajectory_json` (string) | Pre-formatted diagnostic prompt breaking down execution phases, tool calls, and failure boundaries. |
 
 ---
 
@@ -337,7 +350,7 @@ curl -s -X POST https://agentflight-tau.vercel.app/mcp -H 'Content-Type: applica
 
 ### Client Configuration
 
-#### 1. Claude Code CLI
+#### 1. Claude Code CLI (Recommended)
 ```bash
 # Add to current project:
 claude mcp add --transport http agentflight https://agentflight-tau.vercel.app/mcp
@@ -353,6 +366,28 @@ claude mcp add --scope user --transport http agentflight https://agentflight-tau
     "agentflight": {
       "type": "http",
       "url": "https://agentflight-tau.vercel.app/mcp"
+    }
+  }
+}
+```
+
+#### 3. Smithery Registry (1-Click Install)
+```bash
+npx -y @smithery/cli install @codesphere-u/agentflight --client claude
+```
+
+#### 4. Local Stdio via `uvx` (Full Local File System Access)
+```json
+{
+  "mcpServers": {
+    "agentflight": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/codesphere-u/agentflight.git",
+        "agentflight",
+        "serve-mcp"
+      ]
     }
   }
 }
