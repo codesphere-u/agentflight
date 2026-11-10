@@ -27,3 +27,4 @@ ENV/
 .DS_Store
 *.flight.json
 *.flight.jsonl
+.vercel
