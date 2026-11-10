@@ -240,26 +240,62 @@ def estimate_schema_tokens(tool_def: Dict[str, Any]) -> int:
     return max(1, math.ceil(len(serialized) / 3.6))
 
 
-def _compute_schema_depth(schema: Any, current_depth: int = 0) -> int:
-    """Compute maximum object/array nesting depth of a JSON Schema."""
+def _resolve_schema_ref(ref: str, root_schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Resolve an in-schema JSON Pointer reference (e.g. '#/$defs/Foo' or '#/definitions/Foo')."""
+    if not isinstance(ref, str) or not ref.startswith("#/"):
+        return None
+    parts = ref[2:].split("/")
+    cur: Any = root_schema
+    for part in parts:
+        part = part.replace("~1", "/").replace("~0", "~")
+        if isinstance(cur, dict) and part in cur:
+            cur = cur[part]
+        else:
+            return None
+    return cur if isinstance(cur, dict) else None
+
+
+def _compute_schema_depth(
+    schema: Any,
+    current_depth: int = 0,
+    root_schema: Optional[Dict[str, Any]] = None,
+    visited_refs: Optional[Set[str]] = None,
+) -> int:
+    """Compute maximum object/array nesting depth of a JSON Schema, resolving $ref pointers."""
     if not isinstance(schema, dict):
         return current_depth
 
+    if root_schema is None:
+        root_schema = schema
+    if visited_refs is None:
+        visited_refs = set()
+
     max_d = current_depth
+
+    # Follow $ref if present and not visited
+    if "$ref" in schema and isinstance(schema["$ref"], str):
+        ref = schema["$ref"]
+        if ref not in visited_refs:
+            visited_refs = set(visited_refs)
+            visited_refs.add(ref)
+            resolved = _resolve_schema_ref(ref, root_schema)
+            if resolved:
+                max_d = max(max_d, _compute_schema_depth(resolved, current_depth, root_schema, visited_refs))
+
     props = schema.get("properties")
     if isinstance(props, dict) and props:
         for sub in props.values():
-            max_d = max(max_d, _compute_schema_depth(sub, current_depth + 1))
+            max_d = max(max_d, _compute_schema_depth(sub, current_depth + 1, root_schema, visited_refs))
 
     items = schema.get("items")
     if isinstance(items, dict):
-        max_d = max(max_d, _compute_schema_depth(items, current_depth + 1))
+        max_d = max(max_d, _compute_schema_depth(items, current_depth + 1, root_schema, visited_refs))
 
     for combiner in ("anyOf", "oneOf", "allOf"):
         variants = schema.get(combiner)
         if isinstance(variants, list):
             for v in variants:
-                max_d = max(max_d, _compute_schema_depth(v, current_depth + 1))
+                max_d = max(max_d, _compute_schema_depth(v, current_depth + 1, root_schema, visited_refs))
 
     return max_d
 
@@ -418,9 +454,19 @@ class ToolSmellLinter:
                 )
 
             # Inspect individual properties for TS002, TS005, TS006
-            for prop_name, prop_schema in props.items():
-                if not isinstance(prop_schema, dict):
+            for prop_name, raw_prop_schema in props.items():
+                if not isinstance(raw_prop_schema, dict):
                     continue
+
+                # Resolve $ref if present to inherit type, enum, description from $defs/definitions
+                prop_schema = dict(raw_prop_schema)
+                if "$ref" in raw_prop_schema and isinstance(raw_prop_schema["$ref"], str):
+                    resolved = _resolve_schema_ref(raw_prop_schema["$ref"], schema)
+                    if resolved:
+                        merged = dict(resolved)
+                        merged.update(raw_prop_schema)
+                        prop_schema = merged
+
                 prop_desc = str(prop_schema.get("description") or "").strip()
                 prop_type = prop_schema.get("type")
 

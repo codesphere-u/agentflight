@@ -798,3 +798,70 @@ def test_parametrized_ts010_destructive_prefixes(destructive_prefix: str) -> Non
         ]
     )
     assert "TS010" in report.rule_counts
+
+
+def test_linter_resolves_defs_ref_for_property_description_and_enum() -> None:
+    """Verify that $ref pointers to $defs resolve descriptions and enum constraints."""
+    linter = ToolSmellLinter()
+    report = linter.lint(
+        [
+            {
+                "name": "update_agent_status",
+                "description": "Updates the lifecycle state of a managed autonomous agent.",
+                "inputSchema": {
+                    "type": "object",
+                    "required": ["status"],
+                    "properties": {
+                        "status": {"$ref": "#/$defs/AgentLifecycleStatus"}
+                    },
+                    "$defs": {
+                        "AgentLifecycleStatus": {
+                            "type": "string",
+                            "description": "Canonical lifecycle status of the agent.",
+                            "enum": ["active", "paused", "terminated"]
+                        }
+                    }
+                },
+            }
+        ]
+    )
+    # TS002 (missing description) should NOT be flagged because $ref target provides description
+    assert "TS002" not in report.rule_counts
+    # TS006 (unconstrained finite string) should NOT be flagged because $ref target has enum
+    assert "TS006" not in report.rule_counts
+    assert report.ergonomics_score >= 95
+
+
+def test_linter_computes_depth_through_defs_ref() -> None:
+    """Verify that $ref nesting depth is correctly traversed and bounded."""
+    linter = ToolSmellLinter(max_schema_depth=2)
+    report = linter.lint(
+        [
+            {
+                "name": "deep_nested_tool",
+                "description": "Processes deeply nested tree structured payloads.",
+                "inputSchema": {
+                    "type": "object",
+                    "required": ["root"],
+                    "properties": {
+                        "root": {"$ref": "#/definitions/NodeLevel1"}
+                    },
+                    "definitions": {
+                        "NodeLevel1": {
+                            "type": "object",
+                            "properties": {
+                                "child": {
+                                    "type": "object",
+                                    "properties": {
+                                        "leaf": {"type": "string", "description": "Leaf value."}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+            }
+        ]
+    )
+    assert "TS003" in report.rule_counts
+
