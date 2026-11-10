@@ -250,6 +250,30 @@ agentflight serve-mcp
 
 ---
 
+## Hosted endpoint (Vercel)
+
+A free, public, stateless deployment of AgentFlight runs over **MCP Streamable HTTP**:
+
+| | |
+|---|---|
+| MCP endpoint | `https://agentflight-tau.vercel.app/mcp` (JSON-RPC 2.0 over `POST`) |
+| Health probe | `https://agentflight-tau.vercel.app/health` |
+
+```bash
+curl -s -X POST https://agentflight-tau.vercel.app/mcp -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
+
+Client config (any Streamable-HTTP-capable MCP client):
+
+```json
+{ "mcpServers": { "agentflight": { "url": "https://agentflight-tau.vercel.app/mcp" } } }
+```
+
+**Hosted limitations:** Only `agentflight_lint_tools` is exposed. The cassette tools (`agentflight_diff_cassettes`, `agentflight_export_otel`, `agentflight_verify_cassette`) read/write local files and are **disabled on the hosted endpoint** — use the local stdio install.
+
+The hosted gateway is [`api/index.py`](api/index.py); it enforces a 1 MB body limit, strict JSON-RPC envelopes and the tool restrictions above. Deploy your own copy with `npx vercel deploy --prod` (entrypoint is configured in `pyproject.toml` under `[tool.vercel]`).
+
 ## License
 
 MIT License — Copyright (c) 2026 [Akandwanaho Ivan Alvin (`codesphere-u`)](https://github.com/codesphere-u).

@@ -7,15 +7,13 @@
   "description": "AI agent black-box flight recorder, deterministic trajectory replay, loop circuit breaker, and MCP tool-smell linter.",
   "type": "mcp_server",
   "status": "production",
-  "url": "https://agentflight-tau.vercel.app/sse",
+  "url": "https://agentflight-tau.vercel.app/mcp",
   "endpoints": {
-    "sse": "https://agentflight-tau.vercel.app/sse",
-    "http": "https://agentflight-tau.vercel.app/messages",
+    "streamable_http": "https://agentflight-tau.vercel.app/mcp",
     "health": "https://agentflight-tau.vercel.app/health"
   },
   "transport": [
-    "http",
-    "sse",
+    "streamable-http",
     "stdio"
   ],
   "keywords": [
