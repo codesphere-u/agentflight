@@ -236,6 +236,68 @@ agentflight serve-mcp
 
 ---
 
+## MCP Tools Reference & Usage Guide
+
+AgentFlight provides 4 specialized MCP tools for AI coding agents and LLM tool designers:
+
+| Tool Name | What is its use? (Purpose) | Key Arguments | Hosted on Vercel? | Typical Output |
+| :--- | :--- | :--- | :--- | :--- |
+| `agentflight_lint_tools` | Statically analyzes MCP tool definitions against 10 ergonomics rules (`TS001`–`TS010`), flags schema anti-patterns, and computes a 0–100 Agent Ergonomics Score. | `tools` (list of tool schema dicts) | **Yes (Public)** | `{"overall_score": 88.5, "passed": true, "findings": [...]}` |
+| `agentflight_diff_cassettes` | Compares a baseline `.flight.json` cassette against a candidate cassette across model or prompt upgrades to detect tool sequence divergence, new errors, and cost/token drift. | `baseline_path` (str), `candidate_path` (str), `similarity_threshold` (float) | Local stdio | `{"verdict": "PASSED", "similarity_score": 0.95, "cost_delta_usd": 0.00}` |
+| `agentflight_export_otel` | Converts recorded agent trajectories into W3C TraceContext / OpenTelemetry JSON spans for critical-path DAG analysis and SLO monitoring. | `cassette_path` (str), `output_path` (str), `service_name` (str) | Local stdio | `{"spans_count": 14, "trace_id": "...", "exported": true}` |
+| `agentflight_verify_cassette` | Verifies the cryptographic SHA-256 hash chain of a `.flight.json` cassette to guarantee zero tampering or silent step mutations. | `cassette_path` (str) | Local stdio | `{"verified": true, "step_count": 8, "merkle_root": "..."}` |
+
+### Tool Usage Examples
+
+#### 1. `agentflight_lint_tools` — Auditing MCP Tool Ergonomics Before Deployment
+AI agent frameworks often suffer from confusing tool descriptions, ambiguous parameters, or overlapping tools. Call `agentflight_lint_tools` to validate your schemas before registering them:
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "agentflight_lint_tools",
+    "arguments": {
+      "tools": [
+        {
+          "name": "search_database",
+          "description": "Searches customer database by email address or user ID. Returns matched records.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "query": { "type": "string", "description": "Email or user ID string." }
+            },
+            "required": ["query"]
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+#### 2. `agentflight_diff_cassettes` — Detecting Agent Behavioral Regressions in CI
+When updating prompts or upgrading from GPT-4o to Claude 3.5 Sonnet, verify that the new agent's tool execution trajectory does not deviate or loop:
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "agentflight_diff_cassettes",
+    "arguments": {
+      "baseline_path": "fixtures/golden_deploy_workflow.flight.json",
+      "candidate_path": "test_runs/candidate_deploy.flight.json",
+      "similarity_threshold": 0.85,
+      "max_cost_increase_pct": 20.0
+    }
+  }
+}
+```
+
+---
+
 ## Architectural Decision Records (ADRs)
 
 ### ADR-001: Canonical JSON SHA-256 Chaining for Trajectory Cassettes
@@ -264,10 +326,27 @@ curl -s -X POST https://agentflight-tau.vercel.app/mcp -H 'Content-Type: applica
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
-Client config (any Streamable-HTTP-capable MCP client):
+### Client Configuration
 
+#### 1. Claude Code CLI
+```bash
+# Add to current project:
+claude mcp add --transport http agentflight https://agentflight-tau.vercel.app/mcp
+
+# Or add globally across all projects:
+claude mcp add --scope user --transport http agentflight https://agentflight-tau.vercel.app/mcp
+```
+
+#### 2. Claude Desktop / Cursor / Windsurf (`mcp.json`)
 ```json
-{ "mcpServers": { "agentflight": { "url": "https://agentflight-tau.vercel.app/mcp" } } }
+{
+  "mcpServers": {
+    "agentflight": {
+      "type": "http",
+      "url": "https://agentflight-tau.vercel.app/mcp"
+    }
+  }
+}
 ```
 
 **Hosted limitations:** Only `agentflight_lint_tools` is exposed. The cassette tools (`agentflight_diff_cassettes`, `agentflight_export_otel`, `agentflight_verify_cassette`) read/write local files and are **disabled on the hosted endpoint** — use the local stdio install.
