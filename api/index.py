@@ -77,10 +77,23 @@ INTERNAL_ERROR = -32603
 mcp_engine = AgentFlightMCPServer()
 
 app = FastAPI(
-    title="AgentFlight (hosted MCP)",
+    title=f"AgentFlight MCP Server ({SERVER_VERSION})",
+    description="High-performance Agent Tool Ergonomics & Flight Recorder Model Context Protocol (MCP) server running on Vercel Serverless. "
+                "Supports static tool-smell linting, token-budget compiling, and trajectory telemetry. "
+                "Built by CodeSphere Innovations.",
     version=SERVER_VERSION,
     docs_url="/docs",
+    redoc_url="/redoc",
     openapi_url="/openapi.json",
+    contact={
+        "name": "Codesphere Innovations",
+        "url": "https://github.com/codesphere-u/agentflight",
+        "email": "codesphereinnovationz@gmail.com",
+    },
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
 )
 app.add_middleware(
     CORSMiddleware,
