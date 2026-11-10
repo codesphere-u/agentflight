@@ -2,6 +2,7 @@
 
 Renders an ultra-fast, zero-dependency, responsive HTML5 developer interface
 when a user or browser visits the endpoint with Accept: text/html.
+Styled with an Aerospace Avionics Cockpit & Black-Box HUD theme (amber/radar-green).
 """
 
 from __future__ import annotations
@@ -22,7 +23,7 @@ def render_developer_portal(
     prompts: List[Dict[str, Any]],
     sample_tool_call: Dict[str, Any],
 ) -> str:
-    """Generate a self-contained HTML developer dashboard and playground."""
+    """Generate a self-contained, highly interactive HTML avionics flight dashboard."""
 
     safe_name = html.escape(server_name)
     safe_version = html.escape(server_version)
@@ -35,6 +36,7 @@ def render_developer_portal(
     prompts_json = json.dumps(prompts, indent=2)
     sample_call_json = json.dumps(sample_tool_call, indent=2)
 
+    # Tool cards
     tool_cards = []
     for t in tools:
         t_name = html.escape(t.get("name", ""))
@@ -47,9 +49,9 @@ def render_developer_portal(
         )
         tool_cards.append(
             f"""
-            <div class="card item-card" data-tool="{t_name}">
+            <div class="card item-card tool-card-item" data-name="{t_name}" data-desc="{t_desc}">
               <div class="card-head">
-                <span class="mono font-bold text-accent">{t_name}</span>
+                <span class="mono font-bold text-amber">{t_name}</span>
                 <button class="btn btn-sm btn-ghost" onclick="loadToolCall('{t_name}')">Test &rarr;</button>
               </div>
               <p class="text-sm text-dim">{t_desc}</p>
@@ -59,6 +61,7 @@ def render_developer_portal(
         )
     tools_html = "".join(tool_cards)
 
+    # Resource cards
     res_cards = []
     for r in resources:
         r_uri = html.escape(r.get("uri", ""))
@@ -67,9 +70,9 @@ def render_developer_portal(
         r_mime = html.escape(r.get("mimeType", "application/json"))
         res_cards.append(
             f"""
-            <div class="card item-card">
+            <div class="card item-card res-card-item" data-uri="{r_uri}">
               <div class="card-head">
-                <span class="mono font-bold text-accent">{r_uri}</span>
+                <span class="mono font-bold text-green">{r_uri}</span>
                 <button class="btn btn-sm btn-ghost" onclick="loadResourceRead('{r_uri}')">Read &rarr;</button>
               </div>
               <div class="text-xs text-muted mono">{r_name} &bull; {r_mime}</div>
@@ -79,6 +82,7 @@ def render_developer_portal(
         )
     resources_html = "".join(res_cards)
 
+    # Prompt cards
     prompt_cards = []
     for p in prompts:
         p_name = html.escape(p.get("name", ""))
@@ -90,9 +94,9 @@ def render_developer_portal(
         )
         prompt_cards.append(
             f"""
-            <div class="card item-card">
+            <div class="card item-card prompt-card-item" data-name="{p_name}">
               <div class="card-head">
-                <span class="mono font-bold text-accent">{p_name}</span>
+                <span class="mono font-bold text-cyan">{p_name}</span>
                 <button class="btn btn-sm btn-ghost" onclick="loadPromptGet('{p_name}')">Render &rarr;</button>
               </div>
               <p class="text-sm text-dim">{p_desc}</p>
@@ -113,36 +117,43 @@ def render_developer_portal(
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{safe_name} &bull; MCP Server & Live Playground</title>
+  <title>{safe_name} &bull; Flight Recorder & MCP Linter Portal</title>
   <meta name="description" content="{safe_tagline}" />
-  <meta property="og:title" content="{safe_name} &bull; MCP Server & Live Playground" />
+  <meta property="og:title" content="{safe_name} &bull; Flight Recorder MCP Gateway" />
   <meta property="og:description" content="{safe_tagline}" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="{safe_endpoint}" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="{safe_name} &bull; MCP Server & Playground" />
   <meta name="twitter:description" content="{safe_tagline}" />
-  <meta name="theme-color" content="#0b0f19" />
+  <meta name="theme-color" content="#080a0f" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22><text y=%2226%22 font-size=%2226%22>✈️</text></svg>">
   <style>
     :root {{
-      --bg: #0b0f19;
-      --card-bg: #121826;
-      --card-border: #1e293b;
+      --bg: #080a0f;
+      --card-bg: #0e131d;
+      --card-border: #1a2333;
+      --card-hover: #222e44;
       --text: #e2e8f0;
       --text-dim: #94a3b8;
       --text-muted: #64748b;
-      --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.15);
-      --emerald: #10b981;
-      --emerald-glow: rgba(16, 185, 129, 0.15);
-      --purple: #a855f7;
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.25);
+      --green: #22c55e;
+      --green-glow: rgba(34, 197, 94, 0.2);
+      --cyan: #06b6d4;
+      --red: #ef4444;
       --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-      --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }}
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
       background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.08) 0%, transparent 55%),
+        linear-gradient(rgba(18, 27, 41, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(18, 27, 41, 0.3) 1px, transparent 1px);
+      background-size: 100% 100%, 32px 32px, 32px 32px;
       color: var(--text);
       font-family: var(--font-sans);
       line-height: 1.5;
@@ -150,125 +161,179 @@ def render_developer_portal(
       min-height: 100vh;
     }}
     .mono {{ font-family: var(--font-mono); }}
-    .container {{ max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }}
+    .container {{ max-width: 1140px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }}
+    
+    /* Header */
     .header {{
-      background: linear-gradient(135deg, #131b2e 0%, #0d121f 100%);
+      background: linear-gradient(135deg, #131b29 0%, #090e17 100%);
       border: 1px solid var(--card-border);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 28px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      gap: 20px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+    }}
+    .header::before {{
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--amber) 0%, var(--green) 50%, var(--cyan) 100%);
     }}
     .header-top {{ display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }}
     .title-group {{ display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }}
-    h1 {{ font-size: 26px; font-weight: 700; color: #fff; }}
+    h1 {{ font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }}
     .badge {{
       display: inline-flex; align-items: center; gap: 6px;
       padding: 4px 10px; border-radius: 9999px;
       font-size: 12px; font-weight: 600;
     }}
-    .badge-live {{ background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }}
+    .badge-live {{ background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.35); }}
     .badge-live::before {{
       content: ""; width: 8px; height: 8px; border-radius: 50%;
-      background: #34d399; box-shadow: 0 0 8px #34d399;
+      background: #4ade80; box-shadow: 0 0 10px #4ade80;
       animation: pulse 2s infinite;
     }}
-    @keyframes pulse {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.4; }} }}
-    .badge-proto {{ background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }}
-    .badge-ver {{ background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }}
-    .links {{ display: flex; gap: 10px; }}
+    @keyframes pulse {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.35; }} }}
+    .badge-proto {{ background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }}
+    .badge-ver {{ background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }}
+    
+    .links {{ display: flex; gap: 8px; flex-wrap: wrap; }}
     .btn {{
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;
+      padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
       cursor: pointer; text-decoration: none; border: 1px solid var(--card-border);
-      background: #1e293b; color: #fff; transition: all 0.2s;
+      background: #141c2b; color: #fff; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }}
-    .btn:hover {{ background: #334155; border-color: #475569; }}
-    .btn-accent {{ background: #0284c7; border-color: #0369a1; }}
-    .btn-accent:hover {{ background: #0369a1; }}
-    .btn-sm {{ padding: 4px 10px; font-size: 12px; }}
-    .btn-ghost {{ background: transparent; border-color: transparent; color: var(--accent); }}
-    .btn-ghost:hover {{ background: var(--accent-glow); }}
+    .btn:hover {{ background: #1f2a3f; border-color: #314263; transform: translateY(-1px); }}
+    .btn-accent {{ background: #d97706; border-color: #b45309; box-shadow: 0 0 16px rgba(217, 119, 6, 0.35); }}
+    .btn-accent:hover {{ background: #b45309; }}
+    .btn-amber {{ background: rgba(245, 158, 11, 0.15); border-color: var(--amber); color: var(--amber); }}
+    .btn-amber:hover {{ background: rgba(245, 158, 11, 0.25); box-shadow: 0 0 12px var(--amber-glow); }}
+    .btn-sm {{ padding: 5px 11px; font-size: 12px; }}
+    .btn-ghost {{ background: transparent; border-color: transparent; color: var(--amber); }}
+    .btn-ghost:hover {{ background: var(--amber-glow); }}
+    
+    /* Stats */
     .grid-stats {{
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
     }}
     .stat-card {{
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 8px; padding: 14px 18px;
+      background: rgba(14, 19, 29, 0.7); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 16px 20px; transition: border-color 0.2s;
     }}
-    .stat-val {{ font-size: 22px; font-weight: 700; color: #fff; }}
-    .stat-lbl {{ font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }}
+    .stat-card:hover {{ border-color: var(--amber); }}
+    .stat-val {{ font-size: 26px; font-weight: 800; color: #fff; }}
+    .stat-lbl {{ font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }}
+    
     .card {{
       background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 10px; padding: 20px;
+      border-radius: 12px; padding: 22px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }}
+    
+    /* Flight HUD Telemetry Box */
+    .hud-card {{
+      background: linear-gradient(180deg, #0b111a 0%, #06090e 100%);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      position: relative; overflow: hidden;
+    }}
+    .hud-display {{
+      background: #030508; border: 1px solid #1a2536; border-radius: 8px;
+      padding: 16px 20px; font-family: var(--font-mono); font-size: 12px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; margin-top: 14px; position: relative;
+    }}
+    .hud-item {{ display: flex; flex-direction: column; gap: 4px; }}
+    .hud-label {{ color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }}
+    .hud-val {{ color: var(--green); font-size: 14px; font-weight: 700; }}
+    .hud-amber {{ color: var(--amber); }}
+    
+    /* Tabs & Snippets */
     .tabs {{ display: flex; gap: 6px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; margin-bottom: 16px; flex-wrap: wrap; }}
     .tab-btn {{
       background: transparent; border: none; color: var(--text-dim);
       padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
       border-radius: 6px; transition: all 0.2s;
     }}
-    .tab-btn:hover {{ color: #fff; background: rgba(255,255,255,0.05); }}
-    .tab-btn.active {{ color: #fff; background: #1e293b; }}
+    .tab-btn:hover {{ color: #fff; background: rgba(255,255,255,0.06); }}
+    .tab-btn.active {{ color: var(--amber); background: #1c2638; border: 1px solid #2f3e5c; }}
     .snippet-box {{
-      position: relative; background: #070a12; border: 1px solid #1e293b;
+      position: relative; background: #030508; border: 1px solid #162030;
       border-radius: 8px; padding: 16px; overflow-x: auto;
     }}
     .snippet-box pre {{ margin: 0; color: #e2e8f0; font-family: var(--font-mono); font-size: 13px; white-space: pre-wrap; word-break: break-all; }}
     .copy-btn {{
       position: absolute; top: 10px; right: 10px;
-      background: #1e293b; border: 1px solid #334155;
-      color: #94a3b8; padding: 4px 10px; border-radius: 4px;
-      font-size: 11px; cursor: pointer; font-family: var(--font-sans);
+      background: #172233; border: 1px solid #283954;
+      color: #94a3b8; padding: 5px 12px; border-radius: 6px;
+      font-size: 12px; cursor: pointer; font-family: var(--font-sans); font-weight: 600;
+      transition: all 0.2s;
     }}
-    .copy-btn:hover {{ color: #fff; background: #334155; }}
+    .copy-btn:hover {{ color: #fff; background: #23344f; }}
     .copy-btn.copied {{ background: #065f46; color: #34d399; border-color: #047857; }}
+    
+    /* Playground */
     .playground-grid {{
-      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px;
     }}
-    @media (max-width: 800px) {{
+    @media (max-width: 820px) {{
       .playground-grid {{ grid-template-columns: 1fr; }}
     }}
     .pane {{ display: flex; flex-direction: column; gap: 10px; }}
-    .pane-head {{ display: flex; justify-content: space-between; align-items: center; }}
-    .pane-title {{ font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); }}
+    .pane-head {{ display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }}
+    .pane-title {{ font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); }}
     textarea.code-editor {{
-      width: 100%; min-height: 280px; background: #070a12;
+      width: 100%; min-height: 290px; background: #030508;
       border: 1px solid var(--card-border); border-radius: 8px;
       padding: 14px; font-family: var(--font-mono); font-size: 12px;
-      color: #e2e8f0; resize: vertical; outline: none; line-height: 1.4;
+      color: #e2e8f0; resize: vertical; outline: none; line-height: 1.45;
     }}
-    textarea.code-editor:focus {{ border-color: var(--accent); }}
+    textarea.code-editor:focus {{ border-color: var(--amber); box-shadow: 0 0 12px var(--amber-glow); }}
     .response-box {{
-      min-height: 280px; max-height: 500px; background: #070a12;
+      min-height: 290px; max-height: 520px; background: #030508;
       border: 1px solid var(--card-border); border-radius: 8px;
       padding: 14px; font-family: var(--font-mono); font-size: 12px;
-      color: #38bdf8; overflow: auto; white-space: pre;
+      color: #4ade80; overflow: auto; white-space: pre;
     }}
     .preset-bar {{ display: flex; gap: 6px; flex-wrap: wrap; }}
-    .card-list {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }}
-    .item-card {{ display: flex; flex-direction: column; gap: 8px; background: #0d1322; }}
+    
+    /* Filter Bar */
+    .filter-bar {{
+      display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap;
+    }}
+    .search-input {{
+      flex: 1; min-width: 200px; background: #030508; border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 8px 14px; color: #fff; font-family: var(--font-sans);
+      font-size: 13px; outline: none;
+    }}
+    .search-input:focus {{ border-color: var(--amber); }}
+    
+    /* Item Cards */
+    .card-list {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }}
+    .item-card {{ display: flex; flex-direction: column; gap: 10px; background: #0b111a; border-color: #1a2536; transition: all 0.2s; }}
+    .item-card:hover {{ border-color: var(--amber); transform: translateY(-2px); }}
     .card-head {{ display: flex; justify-content: space-between; align-items: center; gap: 8px; }}
-    .text-accent {{ color: var(--accent); }}
+    .text-amber {{ color: var(--amber); }}
+    .text-green {{ color: var(--green); }}
+    .text-cyan {{ color: var(--cyan); }}
     .text-sm {{ font-size: 13px; }}
     .text-xs {{ font-size: 11px; }}
     .text-dim {{ color: var(--text-dim); }}
     .text-muted {{ color: var(--text-muted); }}
-    .param-row {{ display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }}
-    .param {{
-      font-family: var(--font-mono); font-size: 10px; padding: 2px 6px;
-      border-radius: 4px;
-    }}
-    .param.req {{ background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }}
-    .param.opt {{ background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }}
+    .param-row {{ display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }}
+    .badge.param {{ font-size: 11px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); }}
+    .badge.param.req {{ background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }}
+    .badge.param.opt {{ background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }}
+    
+    /* Footer */
     .footer {{
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 4px; color: var(--text-muted); font-size: 12px;
-      flex-wrap: wrap; gap: 12px; border-top: 1px solid #1e293b;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+      gap: 12px; padding: 18px 4px; border-top: 1px solid var(--card-border);
+      font-size: 12px; color: var(--text-muted);
     }}
+    .footer a {{ color: var(--amber); text-decoration: none; }}
   </style>
 </head>
 <body>
@@ -278,12 +343,12 @@ def render_developer_portal(
       <div class="header-top">
         <div>
           <div class="title-group">
-            <h1>{safe_name}</h1>
+            <h1><span>✈️</span> {safe_name}</h1>
             <span class="badge badge-ver">v{safe_version}</span>
             <span class="badge badge-live">Operational</span>
             <span class="badge badge-proto">MCP 2024-11-05</span>
           </div>
-          <p class="text-sm text-dim" style="margin-top: 6px;">{safe_tagline}</p>
+          <p class="text-sm text-dim" style="margin-top: 8px; max-width: 680px;">{safe_tagline}</p>
         </div>
         <div class="links">
           <a class="btn" href="{safe_github}" target="_blank" rel="noopener">GitHub</a>
@@ -293,25 +358,61 @@ def render_developer_portal(
           <a class="btn" href="https://smithery.ai" target="_blank" rel="noopener">Smithery</a>
         </div>
       </div>
+      
       <div class="grid-stats">
         <div class="stat-card">
-          <div class="stat-val text-accent">{len(tools)}</div>
-          <div class="stat-lbl">Tools Registered</div>
+          <div class="stat-val text-amber">2.83 &mu;s</div>
+          <div class="stat-lbl">Span Replay P50</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val" style="color: var(--emerald);">{len(resources)}</div>
-          <div class="stat-lbl">Resources Available</div>
+          <div class="stat-val text-green">353k</div>
+          <div class="stat-lbl">Spans / Second</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val" style="color: var(--purple);">{len(prompts)}</div>
-          <div class="stat-lbl">Prompt Templates</div>
+          <div class="stat-val text-cyan">10 Rules</div>
+          <div class="stat-lbl">MCP Tool-Smell Linter</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val" style="color: #f59e0b;">&lt; 1 ms</div>
-          <div class="stat-lbl">Engine Latency</div>
+          <div class="stat-val" style="color: #4ade80;">$0.00</div>
+          <div class="stat-lbl">Deterministic CI Replay</div>
         </div>
       </div>
     </header>
+
+    <!-- Avionics Cockpit & Black-Box HUD -->
+    <section class="card hud-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <h2 style="font-size: 16px; color: #fff; display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--amber);">✈</span> Black-Box Flight Recorder & Tool Ergonomics Radar
+          </h2>
+          <p class="text-xs text-dim">Deterministic trajectory replay, anti-loop circuit breaker, and 10-rule static tool-smell auditor.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-sm btn-amber" onclick="testLintGoodTool()">Lint Clean Tool &rarr;</button>
+          <button class="btn btn-sm" onclick="testLintSmellyTool()">Lint Smelly Tool &rarr;</button>
+        </div>
+      </div>
+
+      <div class="hud-display">
+        <div class="hud-item">
+          <span class="hud-label">Flight Status</span>
+          <span class="hud-val">ARMED / RECORDING</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Cassette Hash Chain</span>
+          <span class="hud-val hud-amber mono">SHA-256 (prev &rarr; entry)</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Circuit Breaker</span>
+          <span class="hud-val">10 MAX / 0 LOOP OSCILLATIONS</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Telemetry Format</span>
+          <span class="hud-val mono">W3C OTel + MCP JSON-RPC</span>
+        </div>
+      </div>
+    </section>
 
     <!-- Quick Connect Box -->
     <section class="card">
@@ -377,11 +478,15 @@ def render_developer_portal(
     <!-- Interactive Playground -->
     <section class="card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-        <h2 style="font-size: 16px; color: #fff;">Interactive JSON-RPC Playground</h2>
+        <div>
+          <h2 style="font-size: 16px; color: #fff;">Interactive JSON-RPC Playground</h2>
+          <p class="text-xs text-dim">Test live serverless MCP execution with sub-millisecond response measurement.</p>
+        </div>
         <div class="preset-bar">
           <button class="btn btn-sm" onclick="loadPreset('init')">initialize</button>
           <button class="btn btn-sm" onclick="loadPreset('tools_list')">tools/list</button>
-          <button class="btn btn-sm" onclick="loadPreset('sample_call')">tools/call</button>
+          <button class="btn btn-sm" onclick="loadPreset('sample_call')">lint_clean</button>
+          <button class="btn btn-sm" onclick="loadPreset('lint_smelly')">lint_smelly</button>
           <button class="btn btn-sm" onclick="loadPreset('res_list')">resources/list</button>
           <button class="btn btn-sm" onclick="loadPreset('prompts_list')">prompts/list</button>
         </div>
@@ -411,26 +516,32 @@ def render_developer_portal(
       </div>
     </section>
 
-    <!-- Capabilities Catalog -->
+    <!-- Capabilities Catalog with Search -->
     <section class="card">
-      <h2 style="font-size: 16px; margin-bottom: 14px; color: #fff;">Registered Tools ({len(tools)})</h2>
-      <div class="card-list">{tools_html}</div>
+      <div class="filter-bar">
+        <div>
+          <h2 style="font-size: 16px; color: #fff;">Registered Flight Tools ({len(tools)})</h2>
+          <p class="text-xs text-dim">Static tool-smell linters, cassette recorders, and trajectory diff engines.</p>
+        </div>
+        <input type="text" class="search-input" placeholder="Search tools by name or description..." oninput="filterTools(this.value)">
+      </div>
+      <div class="card-list" id="tools-list">{tools_html}</div>
     </section>
 
     <section class="card">
-      <h2 style="font-size: 16px; margin-bottom: 14px; color: #fff;">Exposed Resources ({len(resources)})</h2>
+      <h2 style="font-size: 16px; margin-bottom: 14px; color: #fff;">Exposed Flight Resources ({len(resources)})</h2>
       <div class="card-list">{resources_html}</div>
     </section>
 
     <section class="card">
-      <h2 style="font-size: 16px; margin-bottom: 14px; color: #fff;">Prompts Catalog ({len(prompts)})</h2>
+      <h2 style="font-size: 16px; margin-bottom: 14px; color: #fff;">Trajectory Prompts Catalog ({len(prompts)})</h2>
       <div class="card-list">{prompts_html}</div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-      <div>&copy; 2026 CodeSphere Collective &bull; Released under the MIT License</div>
-      <div class="mono">Transport: Streamable HTTP (<code>POST /mcp</code>) + Legacy SSE (<code>GET /sse</code>)</div>
+      <div>&copy; 2026 CodeSphere Innovations &bull; AgentFlight &bull; Released under the MIT License</div>
+      <div class="mono">Transport: Streamable HTTP (<code>POST /mcp</code>) + SSE (<code>GET /mcp</code>)</div>
     </footer>
   </div>
 
@@ -500,6 +611,21 @@ def render_developer_portal(
         req.value = JSON.stringify({{"jsonrpc": "2.0", "id": 2, "method": "tools/list"}}, null, 2);
       }} else if (kind === 'sample_call') {{
         req.value = JSON.stringify(SAMPLE_CALL, null, 2);
+      }} else if (kind === 'lint_smelly') {{
+        req.value = JSON.stringify({{
+          "jsonrpc": "2.0",
+          "id": 15,
+          "method": "tools/call",
+          "params": {{
+            "name": "agentflight_lint_tools",
+            "arguments": {{
+              "tools": [
+                {{"name": "doStuff", "description": "stuff", "inputSchema": {{"type": "object", "properties": {{"a": {{"type": "string"}}}}}}}},
+                {{"name": "deep_nested_smell", "description": "Valid detailed description for this deep schema", "inputSchema": {{"type": "object", "properties": {{"lvl1": {{"type": "object", "properties": {{"lvl2": {{"type": "object", "properties": {{"lvl3": {{"type": "object", "properties": {{"lvl4": {{"type": "string"}}}}}}}}}}}}}}}}}}
+              ]
+            }}
+          }}
+        }}, null, 2);
       }} else if (kind === 'res_list') {{
         req.value = JSON.stringify({{"jsonrpc": "2.0", "id": 3, "method": "resources/list"}}, null, 2);
       }} else if (kind === 'prompts_list') {{
@@ -512,10 +638,12 @@ def render_developer_portal(
       const props = (tool && tool.inputSchema && tool.inputSchema.properties) || {{}};
       const args = {{}};
       for (const [k, v] of Object.entries(props)) {{
-        if (v.type === 'string') args[k] = v.default || 'test-sample';
+        if (v.type === 'string') args[k] = v.default || 'test-tool';
         else if (v.type === 'integer' || v.type === 'number') args[k] = v.default || 10;
         else if (v.type === 'boolean') args[k] = v.default || false;
-        else if (v.type === 'array') args[k] = [];
+        else if (v.type === 'array') args[k] = [
+          {{"name": "query_database", "description": "Execute a parameterized SQL query against PostgreSQL with strict timeout bounds", "inputSchema": {{"type": "object", "properties": {{"sql": {{"type": "string"}}}}}}}}
+        ];
         else args[k] = {{}};
       }}
       document.getElementById('rpc-request').value = JSON.stringify({{
@@ -542,7 +670,7 @@ def render_developer_portal(
       const args = {{}};
       if (p && p.arguments) {{
         for (const a of p.arguments) {{
-          args[a.name] = 'example-value';
+          args[a.name] = 'cassette-run-101';
         }}
       }}
       document.getElementById('rpc-request').value = JSON.stringify({{
@@ -551,6 +679,27 @@ def render_developer_portal(
         "method": "prompts/get",
         "params": {{ "name": name, "arguments": args }}
       }}, null, 2);
+      document.getElementById('send-btn').scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+    }}
+
+    function filterTools(query) {{
+      const q = query.toLowerCase();
+      document.querySelectorAll('.tool-card-item').forEach(card => {{
+        const name = card.getAttribute('data-name').toLowerCase();
+        const desc = card.getAttribute('data-desc').toLowerCase();
+        card.style.display = (name.includes(q) || desc.includes(q)) ? 'flex' : 'none';
+      }});
+    }}
+
+    function testLintGoodTool() {{
+      loadPreset('sample_call');
+      sendJsonRpc();
+      document.getElementById('send-btn').scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+    }}
+
+    function testLintSmellyTool() {{
+      loadPreset('lint_smelly');
+      sendJsonRpc();
       document.getElementById('send-btn').scrollIntoView({{ behavior: 'smooth', block: 'center' }});
     }}
 
@@ -573,11 +722,11 @@ def render_developer_portal(
         }});
         const dur = (performance.now() - t0).toFixed(1);
         const data = await res.json();
-        meta.innerHTML = `<span style="color: var(--emerald);">${{res.status}} OK</span> &bull; ${{dur}} ms`;
+        meta.innerHTML = `<span style="color: var(--green);">${{res.status}} OK</span> &bull; ${{dur}} ms`;
         respBox.textContent = JSON.stringify(data, null, 2);
       }} catch (err) {{
         const dur = (performance.now() - t0).toFixed(1);
-        meta.innerHTML = `<span style="color: #ef4444;">Error</span> &bull; ${{dur}} ms`;
+        meta.innerHTML = `<span style="color: var(--red);">Error</span> &bull; ${{dur}} ms`;
         respBox.textContent = String(err);
       }} finally {{
         btn.disabled = false;
