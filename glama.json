@@ -23,5 +23,10 @@
     "circuit-breaker",
     "trajectory-replay",
     "tool-smell-linter"
+  ],
+  "capabilities": [
+    "tools",
+    "resources",
+    "prompts"
   ]
 }

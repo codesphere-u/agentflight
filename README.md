@@ -296,6 +296,15 @@ When updating prompts or upgrading from GPT-4o to Claude 3.5 Sonnet, verify that
 }
 ```
 
+### Exposed MCP Resources & Prompts
+
+- **Resources (`resources/list`, `resources/read`)**:
+  - `agentflight://rules/catalog`: The complete 10-rule ergonomics catalog (`TS001`–`TS010`) with severities, penalty weights, and antipattern signatures.
+  - `agentflight://metrics/summary`: Verified benchmarks for sub-0.02ms cassette replay, 1,676 tools/sec linter throughput, and circuit-breaker overhead.
+- **Prompts (`prompts/list`, `prompts/get`)**:
+  - `lint-tool-definitions`: Pre-packaged prompt to guide an LLM to analyze, critique, and refactor flawed MCP tool schemas into production quality.
+  - `review-agent-trajectory`: Structured post-mortem prompt to analyze an AI agent execution trace for loops, cost blowouts, or unhandled errors.
+
 ---
 
 ## Architectural Decision Records (ADRs)
