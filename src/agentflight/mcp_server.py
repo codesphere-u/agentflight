@@ -47,6 +47,21 @@ MCP_RESOURCES: List[Dict[str, Any]] = [
     },
 ]
 
+MCP_RESOURCE_TEMPLATES: List[Dict[str, Any]] = [
+    {
+        "uriTemplate": "agentflight://cassettes/{cassette_id}",
+        "name": "AgentFlight Trajectory Cassette Template",
+        "description": "Dynamic URI template to inspect recorded trajectory cassette spans and cryptographic SHA-256 verification.",
+        "mimeType": "application/json",
+    },
+    {
+        "uriTemplate": "agentflight://traces/{trace_id}",
+        "name": "AgentFlight OpenTelemetry Trace Template",
+        "description": "Dynamic URI template to access exported W3C TraceContext spans by trace ID.",
+        "mimeType": "application/json",
+    },
+]
+
 MCP_PROMPTS: List[Dict[str, Any]] = [
     {
         "name": "lint-tool-definitions",
@@ -366,6 +381,9 @@ class AgentFlightMCPServer:
     def get_resource_definitions(self) -> List[Dict[str, Any]]:
         return list(MCP_RESOURCES)
 
+    def get_resource_template_definitions(self) -> List[Dict[str, Any]]:
+        return list(MCP_RESOURCE_TEMPLATES)
+
     def get_prompt_definitions(self) -> List[Dict[str, Any]]:
         return list(MCP_PROMPTS)
 
@@ -586,6 +604,27 @@ class AgentFlightMCPServer:
                 "jsonrpc": "2.0",
                 "id": msg_id,
                 "result": {"resources": self.get_resource_definitions()},
+            }
+
+        if method == "resources/templates/list":
+            return {
+                "jsonrpc": "2.0",
+                "id": msg_id,
+                "result": {"resourceTemplates": self.get_resource_template_definitions()},
+            }
+
+        if method in ("resources/subscribe", "resources/unsubscribe"):
+            return {
+                "jsonrpc": "2.0",
+                "id": msg_id,
+                "result": {},
+            }
+
+        if method == "logging/setLevel":
+            return {
+                "jsonrpc": "2.0",
+                "id": msg_id,
+                "result": {},
             }
 
         if method == "resources/read":

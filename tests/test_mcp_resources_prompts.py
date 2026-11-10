@@ -59,3 +59,14 @@ def test_agentflight_mcp_prompts_list_and_get():
     res = get_resp["result"]
     assert len(res["messages"]) == 1
     assert "TS001-TS010" in res["messages"][0]["content"]["text"]
+
+
+def test_agentflight_mcp_resource_templates_list():
+    server = AgentFlightMCPServer()
+    resp = server.handle_request({"jsonrpc": "2.0", "id": 7, "method": "resources/templates/list"})
+    assert "result" in resp
+    templates = resp["result"]["resourceTemplates"]
+    assert len(templates) >= 2
+    uris = [t["uriTemplate"] for t in templates]
+    assert "agentflight://cassettes/{cassette_id}" in uris
+    assert "agentflight://traces/{trace_id}" in uris
