@@ -1,0 +1,22 @@
+{
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "maintainers": [
+    "codesphere-u"
+  ],
+  "name": "agentflight",
+  "description": "AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay, Loop/Cost Circuit Breaker & MCP Tool-Smell Linter.",
+  "type": "mcp_server",
+  "status": "production",
+  "transport": [
+    "stdio"
+  ],
+  "keywords": [
+    "mcp",
+    "tool-smell",
+    "linter",
+    "flight-recorder",
+    "agent-evaluation",
+    "circuit-breaker",
+    "model-context-protocol"
+  ]
+}
