@@ -4,9 +4,15 @@
     "codesphere-u"
   ],
   "name": "agentflight",
-  "description": "AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay, Loop/Cost Circuit Breaker & MCP Tool-Smell Linter.",
+  "description": "AI agent black-box flight recorder, deterministic trajectory replay, loop circuit breaker, and MCP tool-smell linter.",
   "type": "mcp_server",
   "status": "production",
+  "url": "https://agentflight-tau.vercel.app/sse",
+  "endpoints": {
+    "sse": "https://agentflight-tau.vercel.app/sse",
+    "http": "https://agentflight-tau.vercel.app/messages",
+    "health": "https://agentflight-tau.vercel.app/health"
+  },
   "transport": [
     "http",
     "sse",
@@ -14,11 +20,10 @@
   ],
   "keywords": [
     "mcp",
-    "tool-smell",
-    "linter",
+    "ai-agents",
     "flight-recorder",
-    "agent-evaluation",
     "circuit-breaker",
-    "model-context-protocol"
+    "trajectory-replay",
+    "tool-smell-linter"
   ]
 }
