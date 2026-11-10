@@ -398,7 +398,7 @@ def build_parser() -> argparse.ArgumentParser:
             "Loop/Cost Circuit Breaker & MCP Tool-Smell Linter"
         ),
     )
-    sub = parser.add_subparsers(dest="subcommand", required=True)
+    sub = parser.add_subparsers(dest="subcommand", required=False)
 
     p_lint = sub.add_parser(
         "lint",
@@ -474,6 +474,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_mcp.set_defaults(func=_run_serve_mcp_command)
 
+    p_stdio = sub.add_parser(
+        "serve-stdio",
+        help="Start the JSON-RPC 2.0 MCP server over stdio (alias for serve-mcp).",
+    )
+    p_stdio.set_defaults(func=_run_serve_mcp_command)
+
+    p_mcp_alias = sub.add_parser(
+        "mcp",
+        help="Start the JSON-RPC 2.0 MCP server over stdio (alias for serve-mcp).",
+    )
+    p_mcp_alias.set_defaults(func=_run_serve_mcp_command)
+
     return parser
 
 
@@ -524,6 +536,11 @@ def _run_serve_mcp_command(args: argparse.Namespace) -> int:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if not hasattr(args, "func") or args.func is None:
+        # Default to stdio MCP server for standard MCP clients, Claude Desktop, and container tests
+        server = AgentFlightMCPServer()
+        server.serve_stdio()
+        return 0
     return int(args.func(args))
 
 
