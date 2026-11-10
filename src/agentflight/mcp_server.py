@@ -82,33 +82,99 @@ MCP_TOOLS: List[Dict[str, Any]] = [
     {
         "name": "agentflight_diff_cassettes",
         "description": (
-            "Compare a baseline AgentFlight cassette against a candidate cassette across model "
-            "or prompt upgrades to detect tool sequence divergence (Levenshtein/LCS), new tool "
-            "errors, loop regressions, token/cost deltas, and structural output drift."
+            "Compare a baseline golden AgentFlight cassette against a candidate cassette to detect behavioral regressions.\n\n"
+            "### Purpose\n"
+            "Performs semantic trajectory diffing across model, prompt, or tool definition upgrades. Evaluates tool sequence divergence using Levenshtein distance and Longest Common Subsequence (LCS), identifies newly introduced tool failures, flags recursive loop regressions, and calculates token spend and USD cost deltas.\n\n"
+            "### When to use\n"
+            "- After upgrading LLM foundation models, prompt templates, or system instructions to verify agent behavior parity.\n"
+            "- In CI/CD pipelines to block regressions when agent trajectory similarity drops below threshold or costs spike.\n\n"
+            "### When NOT to use\n"
+            "- Do NOT use to inspect single cassette integrity; use `agentflight_verify_cassette` instead.\n"
+            "- Do NOT use to convert cassettes to telemetry traces; use `agentflight_export_otel` instead.\n\n"
+            "### Behavior & Side Effects\n"
+            "- Read-only: Reads both cassette files from disk without altering them.\n"
+            "- Deterministic & Idempotent: Repeated invocations with identical cassettes yield exact identical diff metrics.\n"
+            "- Returns structured diff metrics including similarity score (0.0 to 1.0), regression alerts, and cost deltas."
         ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "required": ["baseline_path", "candidate_path"],
             "properties": {
                 "baseline_path": {
                     "type": "string",
-                    "description": "Path to the golden baseline .flight.json or .flight.jsonl cassette.",
+                    "description": "Filesystem path to the golden reference baseline cassette (.flight.json or .flight.jsonl).",
                 },
                 "candidate_path": {
                     "type": "string",
-                    "description": "Path to the candidate .flight.json or .flight.jsonl cassette.",
+                    "description": "Filesystem path to the candidate cassette to evaluate against the baseline (.flight.json or .flight.jsonl).",
                 },
                 "similarity_threshold": {
                     "type": "number",
-                    "description": "Minimum trajectory similarity threshold in [0.0, 1.0] (default 0.80).",
+                    "description": "Minimum acceptable trajectory similarity coefficient in the range [0.0, 1.0]. Defaults to 0.80.",
+                    "minimum": 0.0,
+                    "maximum": 1.0,
+                    "default": 0.80,
                 },
                 "max_cost_increase_pct": {
                     "type": "number",
-                    "description": "Maximum allowed percentage increase in USD cost (default 50.0).",
+                    "description": "Maximum tolerated percentage increase in USD cost before triggering a cost regression alert. Defaults to 50.0.",
+                    "minimum": 0.0,
+                    "default": 50.0,
                 },
                 "max_token_increase_pct": {
                     "type": "number",
-                    "description": "Maximum allowed percentage increase in total tokens (default 50.0).",
+                    "description": "Maximum tolerated percentage increase in total tokens before triggering a token blowout alert. Defaults to 50.0.",
+                    "minimum": 0.0,
+                    "default": 50.0,
+                },
+            },
+        },
+        "outputSchema": {
+            "type": "object",
+            "required": ["passed", "similarity"],
+            "properties": {
+                "passed": {
+                    "type": "boolean",
+                    "description": "True if candidate satisfies similarity and cost/token thresholds without critical regressions.",
+                },
+                "similarity": {
+                    "type": "number",
+                    "description": "Trajectory similarity coefficient between 0.0 and 1.0 based on normalized sequence alignment.",
+                },
+                "baseline_id": {
+                    "type": "string",
+                    "description": "Identifier or filename of baseline cassette.",
+                },
+                "candidate_id": {
+                    "type": "string",
+                    "description": "Identifier or filename of candidate cassette.",
+                },
+                "cost_delta_usd": {
+                    "type": "number",
+                    "description": "USD cost variance between candidate and baseline trajectories.",
+                },
+                "cost_increase_pct": {
+                    "type": "number",
+                    "description": "Percentage increase in USD cost.",
+                },
+                "token_delta": {
+                    "type": "integer",
+                    "description": "Net difference in total tokens consumed.",
+                },
+                "token_increase_pct": {
+                    "type": "number",
+                    "description": "Percentage increase in total token consumption.",
+                },
+                "regressions": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Detailed list of identified behavioral regressions (new tool errors, loop states, missing tools).",
                 },
             },
         },
@@ -116,24 +182,55 @@ MCP_TOOLS: List[Dict[str, Any]] = [
     {
         "name": "agentflight_export_otel",
         "description": (
-            "Convert a recorded AgentFlight cassette into W3C TraceContext / OpenTelemetry "
-            "compatible JSON spans for critical-path DAG analysis and SLO monitoring in StackPulse."
+            "Export recorded AgentFlight cassette spans into W3C TraceContext and OpenTelemetry JSON traces.\n\n"
+            "### Purpose\n"
+            "Converts recorded agent execution spans into OpenTelemetry-compliant trace spans with standard gen_ai semantic conventions, enabling critical-path latency waterfall visualization and distributed tracing in systems like StackPulse, Jaeger, or Datadog.\n\n"
+            "### When to use\n"
+            "- Exporting agent trajectories into APM or observability platforms for SLO tracking and latency bottleneck analysis.\n"
+            "- Visualizing parent-child relationships and parallel tool execution spans.\n\n"
+            "### When NOT to use\n"
+            "- Do NOT use to verify hash chain cryptographic integrity; use `agentflight_verify_cassette` instead.\n"
+            "- Do NOT use to compare two trajectories for regressions; use `agentflight_diff_cassettes` instead.\n\n"
+            "### Behavior & Side Effects\n"
+            "- If `output_path` is provided, writes the formatted OpenTelemetry JSON to that file; otherwise returns spans in-memory.\n"
+            "- Idempotent: Successive calls with identical arguments produce identical span outputs."
         ),
+        "annotations": {
+            "readOnlyHint": False,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "required": ["cassette_path"],
             "properties": {
                 "cassette_path": {
                     "type": "string",
-                    "description": "Path to the .flight.json or .flight.jsonl cassette file.",
+                    "description": "Filesystem path to the input .flight.json or .flight.jsonl cassette file.",
                 },
                 "output_path": {
                     "type": "string",
-                    "description": "Optional file path where exported OTel spans JSON will be written.",
+                    "description": "Optional filesystem path where OpenTelemetry trace JSON will be saved. If omitted, spans are returned in payload only.",
                 },
                 "service_name": {
                     "type": "string",
-                    "description": "Optional override for the root OpenTelemetry service_name.",
+                    "description": "Optional service name to populate in OpenTelemetry resource attributes. Defaults to cassette agent_id.",
+                },
+            },
+        },
+        "outputSchema": {
+            "type": "object",
+            "required": ["span_count", "spans"],
+            "properties": {
+                "span_count": {
+                    "type": "integer",
+                    "description": "Total number of OpenTelemetry spans generated.",
+                },
+                "spans": {
+                    "type": "array",
+                    "description": "Array of W3C TraceContext compliant span dictionaries.",
+                    "items": {"type": "object"},
                 },
             },
         },
@@ -141,17 +238,59 @@ MCP_TOOLS: List[Dict[str, Any]] = [
     {
         "name": "agentflight_lint_tools",
         "description": (
-            "Statically analyze MCP tool schemas across all 10 ergonomics rules (TS001-TS010) "
-            "and compute an Agent Ergonomics Score (0-100)."
+            "Statically inspect MCP tool schema definitions against 10 ergonomics rules (TS001-TS010) and calculate an Agent Ergonomics Score.\n\n"
+            "### Purpose\n"
+            "Evaluates Model Context Protocol tool schemas for anti-patterns that confuse LLM tool-calling (tautological descriptions, missing required arrays, ambiguous parameter types, unconstrained inputs, and lack of usage boundaries). Produces an ergonomics score (0-100) and actionable remediation steps.\n\n"
+            "### When to use\n"
+            "- Auditing and validating MCP tool definitions during development or CI/CD pre-commit hooks.\n"
+            "- Benchmarking tool schema clarity and LLM tool selection readiness before deployment.\n\n"
+            "### When NOT to use\n"
+            "- Do NOT use to evaluate runtime agent trajectory recordings; use `agentflight_diff_cassettes` or `agentflight_verify_cassette` instead.\n\n"
+            "### Behavior & Side Effects\n"
+            "- Read-only: Operates purely in-memory; does not mutate any schemas or files.\n"
+            "- Deterministic: Analyzes schemas through static AST and JSON Schema inspection with zero external network calls."
         ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "required": ["tools"],
             "properties": {
                 "tools": {
                     "type": "array",
-                    "description": "List of MCP tool schema objects to lint.",
+                    "description": "List of MCP tool definition objects containing name, description, and inputSchema to be statically analyzed.",
                     "items": {"type": "object"},
+                },
+            },
+        },
+        "outputSchema": {
+            "type": "object",
+            "required": ["score", "passed", "violations"],
+            "properties": {
+                "score": {
+                    "type": "number",
+                    "description": "Agent Ergonomics Score from 0 to 100.",
+                },
+                "passed": {
+                    "type": "boolean",
+                    "description": "True if score meets or exceeds the passing threshold (>= 80).",
+                },
+                "violations": {
+                    "type": "array",
+                    "description": "List of detected tool smell violations across rules TS001 through TS010.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "rule_id": {"type": "string", "description": "Ergonomics rule code (e.g. TS001)."},
+                            "tool_name": {"type": "string", "description": "Violating tool name."},
+                            "message": {"type": "string", "description": "Diagnosis and guidance on fixing the smell."},
+                            "severity": {"type": "string", "description": "Severity grade (error, warning, info)."},
+                        },
+                    },
                 },
             },
         },
@@ -159,16 +298,54 @@ MCP_TOOLS: List[Dict[str, Any]] = [
     {
         "name": "agentflight_verify_cassette",
         "description": (
-            "Verify the cryptographic SHA-256 hash chain integrity of a recorded .flight.json "
-            "or .flight.jsonl cassette file."
+            "Cryptographically verify the SHA-256 hash chain and structural integrity of an AgentFlight cassette.\n\n"
+            "### Purpose\n"
+            "Validates that a recorded agent execution cassette (.flight.json or .flight.jsonl) has not been tampered with, truncated, or corrupted. Verifies that every span links to the previous span digest via canonical JSON SHA-256 hashing.\n\n"
+            "### When to use\n"
+            "- Auditing compliance and tamper-proof provenance of recorded agent trajectories.\n"
+            "- Pre-flight verification before running deterministic replays with `agentflight.replayer`.\n\n"
+            "### When NOT to use\n"
+            "- Do NOT use to compare two cassettes against each other; use `agentflight_diff_cassettes` instead.\n"
+            "- Do NOT use to lint MCP tool definitions; use `agentflight_lint_tools` instead.\n\n"
+            "### Behavior & Side Effects\n"
+            "- Read-only: Reads cassette from disk and recalculates the SHA-256 chain in-memory without modifications.\n"
+            "- Deterministic: Always outputs exact boolean verification status, step count, and cryptographic head hash."
         ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
         "inputSchema": {
             "type": "object",
             "required": ["cassette_path"],
             "properties": {
                 "cassette_path": {
                     "type": "string",
-                    "description": "Path to the cassette file to verify.",
+                    "description": "Filesystem path to the .flight.json or .flight.jsonl cassette file to verify.",
+                },
+            },
+        },
+        "outputSchema": {
+            "type": "object",
+            "required": ["valid", "agent_id", "step_count", "head_hash"],
+            "properties": {
+                "valid": {
+                    "type": "boolean",
+                    "description": "True if the cryptographic SHA-256 hash chain and metadata are completely valid and untampered.",
+                },
+                "agent_id": {
+                    "type": "string",
+                    "description": "Unique agent identifier recorded in the cassette header.",
+                },
+                "step_count": {
+                    "type": "integer",
+                    "description": "Total number of verified spans in the trajectory.",
+                },
+                "head_hash": {
+                    "type": "string",
+                    "description": "Final SHA-256 hexadecimal hash digest of the cassette chain.",
                 },
             },
         },
