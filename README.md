@@ -6,7 +6,7 @@
 [![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Operational-10b981?logo=vercel&logoColor=white)](https://agentflight-tau.vercel.app/mcp)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-✔%20Connected-10b981?logo=anthropic&logoColor=white)](#hosted-endpoint-vercel)
-[![Glama Gateway](https://img.shields.io/badge/Glama-Verified-38bdf8)](https://glama.ai/mcp)
+[![Glama Score](https://glama.ai/mcp/servers/codesphere-u/agentflight/badges/score.svg)](https://glama.ai/mcp/servers/codesphere-u/agentflight)
 [![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
 [![Tests Passed](https://img.shields.io/badge/tests-100%20passed-brightgreen.svg)](tests/)
 [![Zero External API Keys](https://img.shields.io/badge/dependencies-zero%20runtime%20deps-brightgreen.svg)](pyproject.toml)
@@ -15,6 +15,12 @@
 **AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay (`<0.02 ms`, `$0.00` CI Spend), Differential Regression Detector, OpenTelemetry / W3C TraceContext Exporter (for `stackpulse`), Real-Time Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter.**
 
 > 🚀 **Live Interactive Developer Portal & Playground:** Visit [`https://agentflight-tau.vercel.app`](https://agentflight-tau.vercel.app) in your web browser to test tool linting live, inspect schemas, and copy 1-click configurations for Claude Code, Cursor, Windsurf, and Claude Desktop.
+
+<p align="center">
+  <a href="https://glama.ai/mcp/servers/codesphere-u/agentflight">
+    <img src="https://glama.ai/mcp/servers/codesphere-u/agentflight/badges/card.svg" alt="agentflight MCP server – quality and maintenance score on Glama" width="500" />
+  </a>
+</p>
 
 ---
 
