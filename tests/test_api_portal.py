@@ -33,3 +33,14 @@ def test_portal_html_render():
     assert "lint-tool-definitions" in html
     assert "Operational" in html
     assert "claude mcp add" in html
+    # OpenAny-inspired aerospace mission control & highway assertions
+    assert "The Hero Trajectory Highway" in html
+    assert "highway-canvas" in html
+    assert "OpenAny Multi-Model Fleet Matrix" in html
+    assert "MiniMax-M2.5" in html
+    assert "DeepSeek-V3" in html
+    assert "Cryptographic Flight Usage Receipt" in html
+    assert "receipt-box" in html
+    assert "AGENTFLIGHT CASSETTE FLIGHT RECORD & USAGE SLIP" in html
+    assert "rcpt-total-cost" in html
+

@@ -1,9 +1,9 @@
 """Interactive Developer Portal & Avionics Flight Deck for AgentFlight.
 
-Renders a self-contained, magical, responsive HTML5 aerospace cockpit interface
-when a user or browser visits the endpoint with Accept: text/html.
-Features interactive trajectory replay, live radar canvas, schema auto-healer,
-synthesized Web Audio avionics, and live JSON-RPC execution.
+Renders a self-contained, aerospace-grade developer portal matching OpenAny's
+ultra-clean modern aesthetic (typography, hero trajectory highway, monospace
+usage receipts, client command ribbons, electric blue + radar amber palette)
+with live interactive execution, cockpit telemetry replayer, and schema doctor.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ def render_developer_portal(
     prompts: List[Dict[str, Any]],
     sample_tool_call: Dict[str, Any],
 ) -> str:
-    """Generate a magical, extraordinary HTML avionics cockpit flight dashboard."""
+    """Generate a high-performance, responsive HTML avionics cockpit flight dashboard."""
 
     safe_name = html.escape(server_name)
     safe_version = html.escape(server_version)
@@ -121,6 +121,27 @@ def render_developer_portal(
                 },
             },
         },
+        "openany_models": {
+            "jsonrpc": "2.0",
+            "id": 16,
+            "method": "tools/call",
+            "params": {
+                "name": "agentflight_openany_models",
+                "arguments": {"refresh": False},
+            },
+        },
+        "openany_chat": {
+            "jsonrpc": "2.0",
+            "id": 17,
+            "method": "tools/call",
+            "params": {
+                "name": "agentflight_openany_chat",
+                "arguments": {
+                    "model": "MiniMax-M2.5",
+                    "prompt": "Evaluate agent tool safety and circuit breaker parameters for zero runaway loops.",
+                },
+            },
+        },
         "res_list": {"jsonrpc": "2.0", "id": 3, "method": "resources/list"},
         "res_templates": {"jsonrpc": "2.0", "id": 4, "method": "resources/templates/list"},
         "prompts_list": {"jsonrpc": "2.0", "id": 5, "method": "prompts/list"},
@@ -132,6 +153,20 @@ def render_developer_portal(
             "title": "Flight #101: Clean Multi-Step Checkout (4 Spans)",
             "severity": "CLEAN",
             "status_label": "HEALTHY FLIGHT",
+            "receipt": {
+                "flight_no": "AF-101-GOLDEN",
+                "carrier": "OpenAny Gateway (AIephant)",
+                "model": "MiniMax-M2.5 (Thinking CoT)",
+                "prompt_tokens": 1420,
+                "prompt_cost": 0.000213,
+                "completion_tokens": 384,
+                "completion_cost": 0.000230,
+                "tool_calls": 3,
+                "circuit_status": "PASS (0 LOOPS)",
+                "total_cost": 0.000443,
+                "savings": 0.8400,
+                "merkle_hash": "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+            },
             "spans": [
                 {
                     "step": 0,
@@ -188,9 +223,23 @@ def render_developer_portal(
             ],
         },
         "flight_incident": {
-            "title": "Flight #204: Oscillating Loop Incident (Tripped)",
+            "title": "Flight #204: Oscillating Loop Incident (Circuit Tripped)",
             "severity": "CRITICAL",
             "status_label": "CIRCUIT BREAKER TRIPPED",
+            "receipt": {
+                "flight_no": "AF-204-TRIPPED",
+                "carrier": "OpenAny Gateway (AIephant)",
+                "model": "MiniMax-M2.5 (Runaway Severed)",
+                "prompt_tokens": 480,
+                "prompt_cost": 0.000072,
+                "completion_tokens": 280,
+                "completion_cost": 0.000168,
+                "tool_calls": 3,
+                "circuit_status": "TRIPPED (LOOP SEVERED)",
+                "total_cost": 0.000240,
+                "savings": 4.5000,
+                "merkle_hash": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1",
+            },
             "spans": [
                 {
                     "step": 0,
@@ -250,6 +299,20 @@ def render_developer_portal(
             "title": "Flight #305: OpenAny Multi-Model Gateway Chain",
             "severity": "CLEAN",
             "status_label": "PARTNER EXECUTION",
+            "receipt": {
+                "flight_no": "AF-305-OPENANY",
+                "carrier": "OpenAny Gateway (AIephant)",
+                "model": "MiniMax-M2.5 + DeepSeek-V3",
+                "prompt_tokens": 1950,
+                "prompt_cost": 0.000292,
+                "completion_tokens": 640,
+                "completion_cost": 0.000384,
+                "tool_calls": 4,
+                "circuit_status": "PASS (0 LOOPS)",
+                "total_cost": 0.000676,
+                "savings": 1.2500,
+                "merkle_hash": "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5",
+            },
             "spans": [
                 {
                     "step": 0,
@@ -379,49 +442,59 @@ def render_developer_portal(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{safe_name} &bull; Flight Recorder & MCP Linter Portal</title>
+  <title>{safe_name} &bull; Aerospace Mission Control & Flight Deck</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {{
-      --bg: #030712;
-      --card-bg: rgba(10, 16, 28, 0.75);
+      --bg: #040711;
+      --bg-alt: #080d1a;
+      --card-bg: rgba(9, 14, 26, 0.72);
       --card-border: rgba(255, 255, 255, 0.08);
-      --card-border-glow: rgba(245, 158, 11, 0.35);
+      --card-border-glow: rgba(0, 71, 255, 0.35);
+      --openany-blue: #0047ff;
+      --openany-blue-bright: #3b82f6;
+      --openany-blue-glow: rgba(0, 71, 255, 0.28);
       --amber: #f59e0b;
       --amber-glow: rgba(245, 158, 11, 0.25);
       --green: #10b981;
       --green-glow: rgba(16, 185, 129, 0.25);
       --cyan: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.25);
       --purple: #8b5cf6;
+      --purple-glow: rgba(139, 92, 246, 0.25);
       --red: #ef4444;
       --text: #f8fafc;
       --text-dim: #94a3b8;
       --text-muted: #64748b;
       --font-mono: 'JetBrains Mono', monospace;
       --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }}
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
       background: var(--bg);
       color: var(--text);
-      font-family: var(--font-sans);
+      font-family: var(--font-body);
       line-height: 1.5;
-      padding: 0 16px 40px;
+      padding: 0 16px 50px;
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
+    }}
+    h1, h2, h3, h4 {{
+      font-family: var(--font-sans);
     }}
     #radar-canvas {{
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
       pointer-events: none;
       z-index: 0;
-      opacity: 0.45;
+      opacity: 0.55;
     }}
     .container {{
-      max-width: 1200px;
+      max-width: 1240px;
       margin: 0 auto;
       position: relative;
       z-index: 1;
@@ -430,16 +503,16 @@ def render_developer_portal(
     /* Top Ticker */
     .top-ticker {{
       display: flex; justify-content: space-between; align-items: center;
-      background: rgba(15, 23, 42, 0.7);
+      background: rgba(8, 13, 26, 0.85);
       border-bottom: 1px solid var(--card-border);
-      padding: 8px 16px; margin: 0 -16px 20px -16px;
+      padding: 9px 18px; margin: 0 -16px 24px -16px;
       font-size: 11px; font-family: var(--font-mono);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(12px);
     }}
     .ticker-pulse {{
       display: inline-block; width: 7px; height: 7px; border-radius: 50%;
-      background: var(--green); margin-right: 6px;
-      box-shadow: 0 0 8px var(--green);
+      background: var(--openany-blue-bright); margin-right: 8px;
+      box-shadow: 0 0 10px var(--openany-blue-bright);
       animation: pulse 2s infinite;
     }}
     @keyframes pulse {{
@@ -449,44 +522,47 @@ def render_developer_portal(
 
     /* Header */
     .header {{
-      padding: 24px 0 18px;
+      padding: 24px 0 20px;
       border-bottom: 1px solid var(--card-border);
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }}
     .header-top {{
       display: flex; justify-content: space-between; align-items: flex-start;
-      flex-wrap: wrap; gap: 16px; margin-bottom: 20px;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 22px;
     }}
     .title-group {{ display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }}
     h1 {{
-      font-size: 28px; font-weight: 700; letter-spacing: -0.02em;
-      display: flex; align-items: center; gap: 10px;
-      background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+      font-size: 32px; font-weight: 700; letter-spacing: -0.03em;
+      display: flex; align-items: center; gap: 12px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }}
     .badge {{
-      font-size: 11px; font-family: var(--font-mono); padding: 3px 8px;
+      font-size: 11px; font-family: var(--font-mono); padding: 3px 9px;
       border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
     }}
-    .badge-ver {{ background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }}
-    .badge-live {{ background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }}
-    .badge-proto {{ background: rgba(6, 182, 212, 0.15); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.3); }}
+    .badge-ver {{ background: rgba(0, 71, 255, 0.15); color: #60a5fa; border: 1px solid rgba(0, 71, 255, 0.35); }}
+    .badge-live {{ background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.35); }}
+    .badge-proto {{ background: rgba(6, 182, 212, 0.15); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.35); }}
+    .badge-partner {{ background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.35); }}
     .links {{ display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }}
     
     /* Buttons */
     .btn {{
       background: rgba(255, 255, 255, 0.05); color: var(--text); border: 1px solid var(--card-border);
-      padding: 7px 13px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;
+      padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;
       text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(8px); font-family: var(--font-sans);
     }}
     .btn:hover {{
-      background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.22);
       transform: translateY(-1px);
     }}
     .btn:active {{ transform: translateY(0); }}
-    .btn-sm {{ font-size: 12px; padding: 5px 10px; }}
+    .btn-sm {{ font-size: 12px; padding: 5px 11px; }}
+    .btn-blue {{ background: var(--openany-blue); color: #fff; border-color: var(--openany-blue); font-weight: 600; }}
+    .btn-blue:hover {{ background: #1d4ed8; border-color: #3b82f6; box-shadow: 0 0 18px var(--openany-blue-glow); }}
     .btn-amber {{ background: var(--amber); color: #000; border-color: var(--amber); font-weight: 600; }}
     .btn-amber:hover {{ background: #fbbf24; border-color: #fbbf24; box-shadow: 0 0 16px var(--amber-glow); }}
     .btn-cyan {{ background: var(--cyan); color: #000; border-color: var(--cyan); font-weight: 600; }}
@@ -501,42 +577,151 @@ def render_developer_portal(
       border: 1px solid var(--card-border);
       border-radius: 12px; padding: 22px;
       margin-bottom: 24px;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.45);
       position: relative;
     }}
     
     /* Stats Grid */
     .grid-stats {{
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
       gap: 12px; margin-top: 18px;
     }}
     .stat-card {{
-      background: rgba(15, 23, 42, 0.45); border: 1px solid var(--card-border);
-      padding: 14px 18px; border-radius: 8px;
-      transition: all 0.2s ease;
+      background: rgba(11, 18, 33, 0.55); border: 1px solid var(--card-border);
+      padding: 15px 18px; border-radius: 8px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }}
-    .stat-card:hover {{ border-color: var(--card-border-glow); transform: translateY(-2px); }}
+    .stat-card:hover {{ border-color: var(--openany-blue-bright); transform: translateY(-2px); box-shadow: 0 6px 20px var(--openany-blue-glow); }}
     .stat-val {{ font-size: 24px; font-weight: 700; font-family: var(--font-mono); }}
-    .stat-lbl {{ font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }}
+    .stat-lbl {{ font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px; }}
+
+    /* ========================================================
+       HERO TRAJECTORY HIGHWAY (Matching OpenAny routing canvas)
+       ======================================================== */
+    .hero-highway-card {{
+      border: 1px solid rgba(0, 71, 255, 0.35);
+      background: radial-gradient(ellipse at 50% 0%, rgba(0, 71, 255, 0.12) 0%, rgba(8, 13, 26, 0.8) 70%);
+      box-shadow: 0 0 40px rgba(0, 71, 255, 0.15);
+      padding: 26px;
+    }}
+    .highway-stage {{
+      position: relative; width: 100%; height: 260px;
+      margin: 18px 0; border-radius: 10px;
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }}
+    #highway-canvas {{
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1; pointer-events: none;
+    }}
+    .highway-nodes {{
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 2; display: flex; justify-content: space-between; align-items: center;
+      padding: 0 40px; pointer-events: none;
+    }}
+    .highway-node {{
+      pointer-events: auto; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center;
+      background: rgba(10, 16, 30, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 14px 18px;
+      width: 220px; text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      transition: all 0.25s ease;
+      backdrop-filter: blur(12px);
+    }}
+    .highway-node:hover {{
+      transform: translateY(-3px) scale(1.02);
+      border-color: #60a5fa;
+      box-shadow: 0 12px 30px var(--openany-blue-glow);
+    }}
+    .highway-node.node-center {{
+      border-color: rgba(245, 158, 11, 0.5);
+      background: radial-gradient(circle at center, rgba(245, 158, 11, 0.15) 0%, rgba(10, 16, 30, 0.9) 70%);
+    }}
+    .highway-node.node-center:hover {{
+      border-color: var(--amber);
+      box-shadow: 0 12px 30px var(--amber-glow);
+    }}
+    .highway-node.node-right {{
+      border-color: rgba(16, 185, 129, 0.5);
+      background: radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, rgba(10, 16, 30, 0.9) 70%);
+    }}
+    .highway-node.node-right:hover {{
+      border-color: var(--green);
+      box-shadow: 0 12px 30px var(--green-glow);
+    }}
+    .node-icon {{ font-size: 24px; margin-bottom: 6px; }}
+    .node-title {{ font-size: 13px; font-weight: 700; font-family: var(--font-sans); color: #fff; }}
+    .node-sub {{ font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); margin-top: 3px; }}
+    .node-stat {{ font-size: 11px; font-family: var(--font-mono); margin-top: 6px; padding: 2px 6px; border-radius: 4px; }}
+
+    /* ========================================================
+       OPENANY MULTI-MODEL FLEET MATRIX
+       ======================================================== */
+    .matrix-grid {{
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px; margin-top: 16px;
+    }}
+    .model-card {{
+      background: rgba(11, 18, 33, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 16px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; flex-direction: column; justify-content: space-between;
+    }}
+    .model-card:hover {{
+      border-color: var(--openany-blue-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--openany-blue-glow);
+    }}
+    .model-head {{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }}
+    .model-name {{ font-family: var(--font-sans); font-size: 15px; font-weight: 700; color: #fff; }}
+    .model-provider {{ font-size: 11px; font-family: var(--font-mono); color: var(--text-dim); }}
+    .model-rates {{
+      display: flex; gap: 8px; margin: 10px 0; font-family: var(--font-mono); font-size: 11px;
+    }}
+    .rate-pill {{
+      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 3px 7px; border-radius: 4px;
+    }}
+    .rate-pill span {{ color: var(--green); font-weight: 600; }}
+
+    /* ========================================================
+       CRYPTOGRAPHIC FLIGHT USAGE RECEIPT (Monospace Terminal)
+       ======================================================== */
+    .receipt-container {{
+      background: #020409;
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #e2e8f0;
+      line-height: 1.6;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }}
+    .receipt-header {{
+      text-align: center; padding-bottom: 12px; margin-bottom: 12px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+    }}
+    .receipt-title {{ font-size: 14px; font-weight: 700; color: var(--openany-blue-bright); letter-spacing: 0.05em; }}
+    .receipt-line {{ display: flex; justify-content: space-between; margin: 3px 0; }}
+    .receipt-divider {{ border-top: 1px dashed rgba(255, 255, 255, 0.15); margin: 10px 0; }}
+    .receipt-total {{ font-weight: 700; font-size: 13px; color: var(--green); }}
+    .receipt-barcode {{
+      font-family: monospace; letter-spacing: 3px; font-size: 14px;
+      text-align: center; margin-top: 14px; opacity: 0.6;
+    }}
 
     /* Cockpit HUD */
     .hud-card {{
-      border: 1px solid var(--card-border-glow);
-      box-shadow: 0 0 25px rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.12);
     }}
-    .hud-display {{
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px; margin-top: 14px;
-    }}
-    .hud-item {{
-      background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 6px; padding: 12px 14px;
-    }}
-    .hud-label {{ font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; }}
-    .hud-val {{ font-size: 14px; font-weight: 600; color: #fff; margin-top: 4px; display: block; }}
-
-    /* Trajectory Visual Waypoints */
     .waypoint-track {{
       display: flex; justify-content: space-between; align-items: center;
       position: relative; margin: 20px 0 14px; padding: 0 20px;
@@ -546,7 +731,7 @@ def render_developer_portal(
       background: rgba(255, 255, 255, 0.1); z-index: 0;
     }}
     .waypoint-line-fill {{
-      height: 100%; background: linear-gradient(90deg, var(--amber), var(--green));
+      height: 100%; background: linear-gradient(90deg, var(--openany-blue), var(--amber), var(--green));
       width: 0%; transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }}
     .waypoint-node {{
@@ -555,7 +740,7 @@ def render_developer_portal(
     }}
     .waypoint-node:hover {{ transform: scale(1.1); }}
     .waypoint-dot {{
-      width: 36px; height: 36px; border-radius: 50%; background: #0f172a;
+      width: 36px; height: 36px; border-radius: 50%; background: #0b1220;
       border: 2px solid var(--text-muted); display: flex; align-items: center; justify-content: center;
       font-size: 12px; font-family: var(--font-mono); font-weight: 700; color: var(--text-dim);
       box-shadow: 0 0 10px rgba(0,0,0,0.5); transition: all 0.3s ease;
@@ -581,9 +766,10 @@ def render_developer_portal(
       background: transparent; color: var(--text-dim); border: none;
       padding: 10px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
       border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;
+      font-family: var(--font-sans);
     }}
     .tab-btn:hover {{ color: var(--text); }}
-    .tab-btn.active {{ color: var(--amber); border-bottom-color: var(--amber); font-weight: 600; }}
+    .tab-btn.active {{ color: var(--openany-blue-bright); border-bottom-color: var(--openany-blue); font-weight: 600; }}
     
     .snippet-box {{
       position: relative; background: #02040a; border: 1px solid var(--card-border);
@@ -593,7 +779,7 @@ def render_developer_portal(
     .copy-btn {{
       position: absolute; top: 10px; right: 10px;
       background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #cbd5e1; font-size: 11px; padding: 4px 9px; border-radius: 4px; cursor: pointer;
+      color: #cbd5e1; font-size: 11px; padding: 4px 10px; border-radius: 4px; cursor: pointer;
       transition: all 0.2s; font-family: var(--font-sans);
     }}
     .copy-btn:hover {{ background: rgba(255, 255, 255, 0.2); color: #fff; }}
@@ -634,29 +820,32 @@ def render_developer_portal(
       padding: 14px 16px; margin-bottom: 0;
       transition: all 0.2s ease;
     }}
-    .item-card:hover {{ border-color: var(--card-border-glow); transform: translateY(-2px); }}
+    .item-card:hover {{ border-color: var(--openany-blue-bright); transform: translateY(-2px); }}
     .card-head {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }}
     .param-row {{ display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }}
     .badge.param {{ font-size: 10px; padding: 2px 6px; border-radius: 3px; font-family: var(--font-mono); }}
     .badge.param.req {{ background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }}
     .badge.param.opt {{ background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }}
+    .meta-row {{ display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }}
+    .badge-sub {{ background: rgba(255, 255, 255, 0.05); color: var(--text-dim); font-size: 10px; }}
     .search-input {{
-      width: 100%; max-width: 380px; background: rgba(0,0,0,0.4); border: 1px solid var(--card-border);
-      border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 12px; outline: none;
-      transition: border-color 0.2s;
+      background: rgba(0, 0, 0, 0.4); border: 1px solid var(--card-border);
+      color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 13px;
+      width: 100%; max-width: 320px; outline: none; font-family: var(--font-sans);
     }}
-    .search-input:focus {{ border-color: var(--amber); }}
-    
+    .search-input:focus {{ border-color: var(--openany-blue-bright); }}
+
     /* Footer */
     .footer {{
       display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
-      gap: 12px; padding: 24px 4px; border-top: 1px solid var(--card-border);
+      gap: 12px; padding: 26px 4px; border-top: 1px solid var(--card-border);
       font-size: 12px; color: var(--text-muted);
     }}
-    .footer a {{ color: var(--amber); text-decoration: none; }}
+    .footer a {{ color: var(--openany-blue-bright); text-decoration: none; }}
 
     .mono {{ font-family: var(--font-mono); }}
     .font-bold {{ font-weight: 700; }}
+    .text-blue {{ color: var(--openany-blue-bright); }}
     .text-amber {{ color: var(--amber); }}
     .text-green {{ color: var(--green); }}
     .text-cyan {{ color: var(--cyan); }}
@@ -664,6 +853,13 @@ def render_developer_portal(
     .text-muted {{ color: var(--text-muted); }}
     .text-sm {{ font-size: 13px; }}
     .text-xs {{ font-size: 11px; }}
+
+    @media (max-width: 768px) {{
+      .highway-stage {{ height: 320px; }}
+      .highway-nodes {{ flex-direction: column; padding: 20px 10px; gap: 10px; justify-content: center; }}
+      .highway-node {{ width: 90%; }}
+      .playground-grid {{ grid-template-columns: 1fr; }}
+    }}
   </style>
 </head>
 <body>
@@ -672,11 +868,11 @@ def render_developer_portal(
   <div class="top-ticker">
     <div>
       <span class="ticker-pulse"></span>
-      <span class="text-green font-bold">ARMED:</span> AGENTFLIGHT BLACK-BOX AVIONICS &bull; PROTOCOL: MCP 2024-11-05 &bull; P50: 2.83 &mu;s
+      <span class="text-blue font-bold">OPERATIONAL:</span> AGENTFLIGHT AVIONICS &bull; OPENANY GATEWAY (168+ MODELS) &bull; P50: 2.83 &mu;s
     </div>
-    <div style="display: flex; gap: 12px; align-items: center;">
-      <span class="mono text-muted">OPENANY GATEWAY: 168+ MODELS</span>
-      <button class="btn btn-sm btn-ghost audio-toggle" onclick="toggleAudio()" id="audio-btn">🔊 Cockpit Sound: OFF</button>
+    <div style="display: flex; gap: 14px; align-items: center;">
+      <span class="mono text-muted">OPENANY REPLAY CASSETTE: VERIFIED</span>
+      <button class="btn btn-sm btn-ghost audio-toggle" onclick="toggleAudio()" id="audio-btn">🔊 Sound: OFF</button>
     </div>
   </div>
 
@@ -690,15 +886,15 @@ def render_developer_portal(
             <span class="badge badge-ver">v{safe_version}</span>
             <span class="badge badge-live">Operational</span>
             <span class="badge badge-proto">MCP 2024-11-05</span>
+            <span class="badge badge-partner">OpenAny Partner</span>
           </div>
-          <p class="text-sm text-dim" style="margin-top: 8px; max-width: 680px;">{safe_tagline}</p>
+          <p class="text-sm text-dim" style="margin-top: 8px; max-width: 720px;">{safe_tagline}</p>
         </div>
         <div class="links">
+          <a class="btn btn-blue" href="#openany-matrix">Explore 168+ Models &rarr;</a>
           <a class="btn" href="{safe_github}" target="_blank" rel="noopener">GitHub</a>
           <a class="btn" href="/docs" target="_blank" rel="noopener">Swagger UI &rarr;</a>
-          <a class="btn" href="/redoc" target="_blank" rel="noopener">ReDoc &rarr;</a>
           <a class="btn" href="https://glama.ai/mcp" target="_blank" rel="noopener">Glama</a>
-          <a class="btn" href="https://smithery.ai" target="_blank" rel="noopener">Smithery</a>
         </div>
       </div>
       
@@ -708,30 +904,220 @@ def render_developer_portal(
           <div class="stat-lbl">Span Replay P50</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val text-green">353k</div>
-          <div class="stat-lbl">Spans / Second</div>
+          <div class="stat-val text-blue">168 Models</div>
+          <div class="stat-lbl">OpenAny Multi-Model Gateway</div>
         </div>
         <div class="stat-card">
           <div class="stat-val text-cyan">10 Rules</div>
           <div class="stat-lbl">MCP Tool-Smell Linter</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val" style="color: #a855f7;">168 Models</div>
-          <div class="stat-lbl">OpenAny Multi-Model Gateway</div>
+          <div class="stat-val text-green">353k</div>
+          <div class="stat-lbl">Spans / Second</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val" style="color: #4ade80;">$0.00</div>
+          <div class="stat-val" style="color: #a855f7;">$0.00</div>
           <div class="stat-lbl">Deterministic CI Replay</div>
         </div>
       </div>
     </header>
 
-    <!-- Avionics Cockpit & Interactive Trajectory Flight Deck -->
+    <!-- ========================================================
+         HERO TRAJECTORY HIGHWAY (Matching OpenAny visual feel)
+         ======================================================== -->
+    <section class="card hero-highway-card" id="hero-highway">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge badge-ver">Dynamic Routing</span>
+            <span class="mono text-xs text-dim">END-TO-END TELEMETRY</span>
+          </div>
+          <h2 style="font-size: 22px; color: #fff; margin-top: 6px;">The Hero Trajectory Highway</h2>
+          <p class="text-xs text-dim" style="max-width: 640px; margin-top: 4px;">
+            Every agent call travels across our cryptographic highway: from your local agent client, through AgentFlight's anti-loop circuit breaker, directly into OpenAny's multi-model frontier routing gateway.
+          </p>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-sm btn-blue" onclick="setHighwayMode('full')">Full Avionics Route</button>
+          <button class="btn btn-sm" onclick="setHighwayMode('vcr')">Offline VCR Replay</button>
+          <button class="btn btn-sm" onclick="setHighwayMode('direct')">OpenAny Direct</button>
+        </div>
+      </div>
+
+      <!-- Highway Canvas & Interactive Nodes -->
+      <div class="highway-stage" id="highway-stage">
+        <canvas id="highway-canvas"></canvas>
+        <div class="highway-nodes">
+          <div class="highway-node" id="h-node-client" onclick="selectHighwayNode('client')">
+            <div class="node-icon">💻</div>
+            <div class="node-title">Agent Client Fleet</div>
+            <div class="node-sub">Claude Code &bull; Cursor &bull; Codex</div>
+            <div class="node-stat" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">MCP 2024-11-05</div>
+          </div>
+
+          <div class="highway-node node-center" id="h-node-shield" onclick="selectHighwayNode('shield')">
+            <div class="node-icon">🛡️</div>
+            <div class="node-title">AgentFlight Shield</div>
+            <div class="node-sub">Anti-Loop Breaker &bull; Merkle Cassette</div>
+            <div class="node-stat" style="background: rgba(245, 158, 11, 0.15); color: var(--amber);">2.83 &mu;s P50 Latency</div>
+          </div>
+
+          <div class="highway-node node-right" id="h-node-gateway" onclick="selectHighwayNode('gateway')">
+            <div class="node-icon">🌐</div>
+            <div class="node-title">OpenAny Gateway</div>
+            <div class="node-sub">MiniMax &bull; DeepSeek &bull; Claude &bull; 3k APIs</div>
+            <div class="node-stat" style="background: rgba(16, 185, 129, 0.15); color: var(--green);">168+ Live Models</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);">
+        <div><span class="text-green font-bold">● HIGHWAY PULSE:</span> <span id="highway-status">Transmitting phototrail packets across OpenAny Gateway</span></div>
+        <div id="highway-stats">PACKETS: <span class="text-blue">42 / sec</span> &bull; LOSS: <span class="text-green">0.00%</span> &bull; REPLAY HASH: <span class="text-amber">7f83b165...</span></div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         OPENANY MULTI-MODEL FLEET MATRIX
+         ======================================================== -->
+    <section class="card" id="openany-matrix">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 6px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge" style="background: rgba(0, 71, 255, 0.2); color: #60a5fa;">Ecosystem</span>
+            <span class="mono text-xs text-dim">OPENANY ROUTING CATALYST</span>
+          </div>
+          <h2 style="font-size: 18px; color: #fff; margin-top: 4px;">OpenAny Multi-Model Fleet Matrix</h2>
+          <p class="text-xs text-dim">Access 168+ frontier models and 3,258 tools with one unified key and shared prepaid balance.</p>
+        </div>
+        <button class="btn btn-sm btn-blue" onclick="loadPreset('openany_models')">Discover Full 168+ Catalog &rarr;</button>
+      </div>
+
+      <div class="matrix-grid">
+        <!-- MiniMax M2.5 -->
+        <div class="model-card">
+          <div>
+            <div class="model-head">
+              <div>
+                <div class="model-name">MiniMax-M2.5</div>
+                <div class="model-provider">MiniMax &bull; Fast Reasoning</div>
+              </div>
+              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--green);">Tested Live</span>
+            </div>
+            <p class="text-xs text-dim">Optimized for high-speed chain-of-thought tool calling and reasoning with sub-cent token billing.</p>
+            <div class="model-rates">
+              <div class="rate-pill">Prompt: <span>$0.15/1M</span></div>
+              <div class="rate-pill">Compl: <span>$0.60/1M</span></div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="testModel('MiniMax-M2.5')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+        </div>
+
+        <!-- MiniMax M2.7 -->
+        <div class="model-card">
+          <div>
+            <div class="model-head">
+              <div>
+                <div class="model-name">MiniMax-M2.7</div>
+                <div class="model-provider">MiniMax &bull; Extended Context</div>
+              </div>
+              <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">Frontier</span>
+            </div>
+            <p class="text-xs text-dim">Extended context coding and deep multi-step autonomous agent synthesis.</p>
+            <div class="model-rates">
+              <div class="rate-pill">Prompt: <span>$0.20/1M</span></div>
+              <div class="rate-pill">Compl: <span>$0.80/1M</span></div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="testModel('MiniMax-M2.7')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+        </div>
+
+        <!-- DeepSeek V3 -->
+        <div class="model-card">
+          <div>
+            <div class="model-head">
+              <div>
+                <div class="model-name">DeepSeek-V3</div>
+                <div class="model-provider">DeepSeek &bull; 671B MoE</div>
+              </div>
+              <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: var(--purple);">Ultra-Value</span>
+            </div>
+            <p class="text-xs text-dim">Frontier intelligence at disruptive pricing. 671B MoE architecture with deep coding capabilities.</p>
+            <div class="model-rates">
+              <div class="rate-pill">Prompt: <span>$0.14/1M</span></div>
+              <div class="rate-pill">Compl: <span>$0.28/1M</span></div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="testModel('deepseek/deepseek-chat')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+        </div>
+
+        <!-- Claude 3.7 Sonnet -->
+        <div class="model-card">
+          <div>
+            <div class="model-head">
+              <div>
+                <div class="model-name">Claude 3.7 Sonnet</div>
+                <div class="model-provider">Anthropic &bull; Agentic Flagship</div>
+              </div>
+              <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: var(--amber);">Hybrid CoT</span>
+            </div>
+            <p class="text-xs text-dim">Industry-standard agentic coding with hybrid standard and extended thinking modes.</p>
+            <div class="model-rates">
+              <div class="rate-pill">Prompt: <span>$3.00/1M</span></div>
+              <div class="rate-pill">Compl: <span>$15.00/1M</span></div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="testModel('anthropic/claude-3.7-sonnet')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+        </div>
+
+        <!-- Gemini 2.5 Flash -->
+        <div class="model-card">
+          <div>
+            <div class="model-head">
+              <div>
+                <div class="model-name">Gemini 2.5 Flash</div>
+                <div class="model-provider">Google &bull; 1M Context</div>
+              </div>
+              <span class="badge" style="background: rgba(6, 182, 212, 0.15); color: var(--cyan);">Low Latency</span>
+            </div>
+            <p class="text-xs text-dim">Sub-100ms multi-modal reasoning with massive 1,000,000 token context window.</p>
+            <div class="model-rates">
+              <div class="rate-pill">Prompt: <span>$0.075/1M</span></div>
+              <div class="rate-pill">Compl: <span>$0.30/1M</span></div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="testModel('google/gemini-2.5-flash')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+        </div>
+
+        <!-- Qwen 2.5 Coder 32B -->
+        <div class="model-card">
+          <div>
+            <div class="model-head">
+              <div>
+                <div class="model-name">Qwen 2.5 Coder</div>
+                <div class="model-provider">Alibaba &bull; 32B Code Specialist</div>
+              </div>
+              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--green);">Code MoE</span>
+            </div>
+            <p class="text-xs text-dim">High-density open weights fine-tuned specifically for repository-level code edits and refactoring.</p>
+            <div class="model-rates">
+              <div class="rate-pill">Prompt: <span>$0.20/1M</span></div>
+              <div class="rate-pill">Compl: <span>$0.60/1M</span></div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="testModel('qwen/qwen-2.5-coder-32b-instruct')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         AVIONICS COCKPIT & BLACK-BOX FLIGHT REPLAYER
+         ======================================================== -->
     <section class="card hud-card" id="cockpit-deck">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
         <div>
-          <h2 style="font-size: 17px; color: #fff; display: flex; align-items: center; gap: 8px;">
-            <span style="color: var(--amber);">✈</span> Mission Control & Black-Box Flight Replayer
+          <h2 style="font-size: 18px; color: #fff; display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--amber);">✈</span> Mission Control & Black-Box Flight Deck
           </h2>
           <p class="text-xs text-dim">Deterministic trajectory replay, anti-loop circuit breaker, and live SHA-256 Merkle chain verification.</p>
         </div>
@@ -788,7 +1174,7 @@ def render_developer_portal(
         </div>
 
         <!-- Telemetry Gauges for Active Step -->
-        <div class="flight-step-card" style="background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px;">
+        <div class="flight-step-card" style="background: rgba(0,0,0,0.45); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <span id="step-kind-badge" class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">tool_call</span>
@@ -821,11 +1207,119 @@ def render_developer_portal(
       </div>
     </section>
 
-    <!-- Interactive Schema Doctor & 1-Click Auto-Healer -->
+    <!-- ========================================================
+         CRYPTOGRAPHIC BLACK-BOX FLIGHT RECEIPT (Matching OpenAny)
+         ======================================================== -->
+    <section class="card" id="flight-receipt-section">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge" style="background: rgba(0, 71, 255, 0.2); color: #60a5fa;">Itemized Accounting</span>
+            <span class="mono text-xs text-dim">OPENANY PREPAID BILLED SLIP</span>
+          </div>
+          <h2 style="font-size: 18px; color: #fff; margin-top: 4px;">Cryptographic Flight Usage Receipt</h2>
+          <p class="text-xs text-dim">Monospace itemized breakdown of model tokens, tool executions, and circuit breaker savings.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-sm btn-blue" onclick="printSimulatedReceipt()">⚡ Print / Re-Simulate Slip</button>
+          <button class="btn btn-sm btn-ghost" onclick="copyReceiptText()">Copy Receipt</button>
+        </div>
+      </div>
+
+      <div class="receipt-container" id="receipt-box">
+        <div class="receipt-header">
+          <div class="receipt-title">✈ AGENTFLIGHT CASSETTE FLIGHT RECORD & USAGE SLIP</div>
+          <div class="mono text-xs text-dim" style="margin-top: 4px;">CARRIER: OPENANY MULTI-MODEL ROUTER &bull; PROTOCOL: MCP 2024-11-05</div>
+        </div>
+
+        <div class="receipt-line">
+          <span class="text-muted">FLIGHT IDENTIFIER:</span>
+          <span class="mono font-bold text-amber" id="rcpt-flight-id">AF-101-GOLDEN</span>
+        </div>
+        <div class="receipt-line">
+          <span class="text-muted">ROUTED GATEWAY:</span>
+          <span class="mono" id="rcpt-carrier">OpenAny Unified Gateway (AIephant)</span>
+        </div>
+        <div class="receipt-line">
+          <span class="text-muted">ACTIVE MODEL:</span>
+          <span class="mono text-blue font-bold" id="rcpt-model">MiniMax-M2.5 (Thinking CoT)</span>
+        </div>
+        <div class="receipt-line">
+          <span class="text-muted">CIRCUIT BREAKER:</span>
+          <span class="mono text-green font-bold" id="rcpt-circuit">PASS (0 LOOPS)</span>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <div class="receipt-line" style="font-weight: 600; color: #94a3b8; font-size: 11px;">
+          <span>ITEM / EXECUTION SPAN</span>
+          <span>QUANTITY</span>
+          <span>UNIT RATE</span>
+          <span>BILLED</span>
+        </div>
+
+        <div class="receipt-line" id="rcpt-row-prompt">
+          <span id="rcpt-lbl-prompt">Prompt Tokens</span>
+          <span id="rcpt-qty-prompt">1,420</span>
+          <span>$0.150 / 1M</span>
+          <span id="rcpt-cost-prompt">$0.000213</span>
+        </div>
+
+        <div class="receipt-line" id="rcpt-row-completion">
+          <span id="rcpt-lbl-completion">Completion Tokens</span>
+          <span id="rcpt-qty-completion">384</span>
+          <span>$0.600 / 1M</span>
+          <span id="rcpt-cost-completion">$0.000230</span>
+        </div>
+
+        <div class="receipt-line" id="rcpt-row-tools">
+          <span>MCP Tool Executions</span>
+          <span id="rcpt-qty-tools">3 spans</span>
+          <span>$0.000 / call</span>
+          <span>$0.000000</span>
+        </div>
+
+        <div class="receipt-line" id="rcpt-row-circuit">
+          <span>Anti-Loop Safety Trips</span>
+          <span id="rcpt-qty-circuit">0 severed</span>
+          <span>$0.000</span>
+          <span>$0.000000</span>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <div class="receipt-line receipt-total">
+          <span>TOTAL FLIGHT CHARGE</span>
+          <span id="rcpt-total-cost">$0.000443</span>
+        </div>
+
+        <div class="receipt-line" style="color: var(--amber); margin-top: 4px;">
+          <span>PRE-FLIGHT SPEND SAVINGS (Loops Prevented)</span>
+          <span id="rcpt-savings">+$0.840000</span>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <div style="font-size: 11px; color: var(--text-muted);">
+          <div>IMMUTABLE CASSETTE SEAL (SHA-256):</div>
+          <div class="mono text-cyan" id="rcpt-hash" style="word-break: break-all; margin-top: 2px;">
+            7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069
+          </div>
+        </div>
+
+        <div class="receipt-barcode">
+          ||| | ||||| || |||||| | |||| |||||||| ||| ||||||| | ||
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         MCP TOOL SCHEMA DOCTOR & AUTO-HEALER
+         ======================================================== -->
     <section class="card" id="schema-doctor">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
         <div>
-          <h2 style="font-size: 16px; color: #fff; display: flex; align-items: center; gap: 8px;">
+          <h2 style="font-size: 18px; color: #fff; display: flex; align-items: center; gap: 8px;">
             <span style="color: var(--cyan);">⚡</span> MCP Tool Schema Doctor & Auto-Healer
           </h2>
           <p class="text-xs text-dim">Audit and automatically harden flawed MCP tool schemas into Glama TDQS Gold Standard.</p>
@@ -840,7 +1334,7 @@ def render_developer_portal(
         <div class="pane">
           <div class="pane-head">
             <span class="pane-title">Input Tool Schema (Raw / Smelly)</span>
-            <span id="doc-score-orig" class="badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">Score: 30 &bull; Grade F</span>
+            <span id="doc-score-orig" class="badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">Score: 28 &bull; Grade F</span>
           </div>
           <textarea id="doctor-input" class="code-editor" style="height: 220px;" placeholder="Paste raw tool JSON here..."></textarea>
         </div>
@@ -857,9 +1351,11 @@ def render_developer_portal(
       </div>
     </section>
 
-    <!-- Quick Connect Box -->
-    <section class="card">
-      <h2 style="font-size: 16px; margin-bottom: 12px; color: #fff;">1-Click Client Configuration</h2>
+    <!-- ========================================================
+         1-CLICK CLIENT CONFIGURATION
+         ======================================================== -->
+    <section class="card" id="client-config">
+      <h2 style="font-size: 18px; margin-bottom: 12px; color: #fff;">1-Click Client Configuration</h2>
       <div class="tabs">
         <button class="tab-btn active" onclick="switchTab(this, 'tab-claude-code')">Claude Code</button>
         <button class="tab-btn" onclick="switchTab(this, 'tab-cursor')">Cursor</button>
@@ -918,14 +1414,18 @@ def render_developer_portal(
       </div>
     </section>
 
-    <!-- Interactive JSON-RPC Playground -->
+    <!-- ========================================================
+         INTERACTIVE JSON-RPC PLAYGROUND
+         ======================================================== -->
     <section class="card" id="playground">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
         <div>
-          <h2 style="font-size: 16px; color: #fff;">Interactive JSON-RPC Playground</h2>
-          <p class="text-xs text-dim">Test live serverless MCP execution with sub-millisecond response measurement.</p>
+          <h2 style="font-size: 18px; color: #fff;">Interactive JSON-RPC Playground</h2>
+          <p class="text-xs text-dim">Test live serverless MCP execution and OpenAny model gateways with sub-millisecond measurement.</p>
         </div>
         <div class="preset-bar">
+          <button class="btn btn-sm btn-blue" onclick="loadPreset('openany_models')">OpenAny Models</button>
+          <button class="btn btn-sm btn-blue" onclick="loadPreset('openany_chat')">OpenAny Chat</button>
           <button class="btn btn-sm" onclick="loadPreset('init')">initialize</button>
           <button class="btn btn-sm" onclick="loadPreset('tools_list')">tools/list</button>
           <button class="btn btn-sm" onclick="loadPreset('sample_call')">lint_clean</button>
@@ -942,7 +1442,7 @@ def render_developer_portal(
             <span class="pane-title">Request (JSON-RPC 2.0)</span>
             <div style="display: flex; gap: 8px;">
               <button class="btn btn-sm" id="copy-curl-btn" onclick="copyAsCurl()">Copy as cURL</button>
-              <button class="btn btn-sm btn-amber" id="send-btn" onclick="sendJsonRpc()">Send Request &rarr;</button>
+              <button class="btn btn-sm btn-blue" id="send-btn" onclick="sendJsonRpc()">Send Request &rarr;</button>
             </div>
           </div>
           <textarea id="rpc-request" class="code-editor">{html.escape(sample_call_json)}</textarea>
@@ -960,12 +1460,14 @@ def render_developer_portal(
       </div>
     </section>
 
-    <!-- Capabilities Catalog with Search -->
+    <!-- ========================================================
+         CAPABILITIES CATALOGS WITH SEARCH
+         ======================================================== -->
     <section class="card">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
         <div>
-          <h2 style="font-size: 16px; color: #fff;">Registered Flight Tools ({len(tools)})</h2>
-          <p class="text-xs text-dim">Static tool-smell linters, cassette recorders, and trajectory diff engines.</p>
+          <h2 style="font-size: 18px; color: #fff;">Registered Flight Tools ({len(tools)})</h2>
+          <p class="text-xs text-dim">Static tool-smell linters, OpenAny model routers, and trajectory cassette engines.</p>
         </div>
         <input type="text" class="search-input" placeholder="Search tools by name or description..." oninput="filterTools(this.value)">
       </div>
@@ -973,18 +1475,18 @@ def render_developer_portal(
     </section>
 
     <section class="card">
-      <h2 style="font-size: 16px; margin-bottom: 14px; color: #fff;">Exposed Flight Resources ({len(resources)})</h2>
+      <h2 style="font-size: 18px; margin-bottom: 14px; color: #fff;">Exposed Flight Resources ({len(resources)})</h2>
       <div class="card-list">{resources_html}</div>
     </section>
 
     <section class="card">
-      <h2 style="font-size: 16px; margin-bottom: 14px; color: #fff;">Trajectory Prompts Catalog ({len(prompts)})</h2>
+      <h2 style="font-size: 18px; margin-bottom: 14px; color: #fff;">Trajectory Prompts Catalog ({len(prompts)})</h2>
       <div class="card-list">{prompts_html}</div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-      <div>&copy; 2026 CodeSphere Innovations &bull; AgentFlight &bull; Released under the MIT License</div>
+      <div>&copy; 2026 CodeSphere Innovations &bull; AgentFlight &bull; OpenAny Strategic Partner &bull; MIT License</div>
       <div class="mono">Transport: Streamable HTTP (<code>POST /mcp</code>) + SSE (<code>GET /mcp</code>)</div>
     </footer>
   </div>
@@ -1003,19 +1505,20 @@ def render_developer_portal(
     let playInterval = null;
     let audioEnabled = false;
     let audioCtx = null;
+    let highwayMode = 'full';
 
     // Web Audio Synthesizer (Zero External Dependencies)
     function toggleAudio() {{
       audioEnabled = !audioEnabled;
       const btn = document.getElementById('audio-btn');
       if (audioEnabled) {{
-        btn.innerText = '🔊 Cockpit Sound: ON';
+        btn.innerText = '🔊 Sound: ON';
         btn.style.color = 'var(--green)';
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
         playChime(660, 0.08);
       }} else {{
-        btn.innerText = '🔇 Cockpit Sound: OFF';
+        btn.innerText = '🔇 Sound: OFF';
         btn.style.color = 'var(--text-muted)';
       }}
     }}
@@ -1037,7 +1540,127 @@ def render_developer_portal(
       }} catch (_) {{}}
     }}
 
-    // Canvas Background Radar & Starfield
+    // ========================================================
+    // HERO TRAJECTORY HIGHWAY CANVAS
+    // ========================================================
+    (function initHighwayCanvas() {{
+      const canvas = document.getElementById('highway-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const stage = document.getElementById('highway-stage');
+
+      let w = canvas.width = stage.offsetWidth;
+      let h = canvas.height = stage.offsetHeight;
+
+      window.addEventListener('resize', () => {{
+        if (!stage) return;
+        w = canvas.width = stage.offsetWidth;
+        h = canvas.height = stage.offsetHeight;
+      }});
+
+      // Packets flowing from left to right along bezier curves
+      const packets = [];
+      for (let i = 0; i < 16; i++) {{
+        packets.push({{
+          t: Math.random(),
+          speed: 0.004 + Math.random() * 0.006,
+          radius: 2 + Math.random() * 2,
+          color: Math.random() > 0.4 ? '#3b82f6' : '#f59e0b',
+        }});
+      }}
+
+      function getHighwayPoint(t) {{
+        // Curve 1: Client -> Shield (t: 0 -> 0.5)
+        // Curve 2: Shield -> Gateway (t: 0.5 -> 1.0)
+        const p0 = {{ x: w * 0.16, y: h * 0.5 }};
+        const p1 = {{ x: w * 0.50, y: h * 0.5 }};
+        const p2 = {{ x: w * 0.84, y: h * 0.5 }};
+
+        if (t <= 0.5) {{
+          const u = t * 2;
+          const cp = {{ x: (p0.x + p1.x) / 2, y: h * 0.2 }};
+          const x = (1 - u) * (1 - u) * p0.x + 2 * (1 - u) * u * cp.x + u * u * p1.x;
+          const y = (1 - u) * (1 - u) * p0.y + 2 * (1 - u) * u * cp.y + u * u * p1.y;
+          return {{ x, y }};
+        }} else {{
+          const u = (t - 0.5) * 2;
+          const cp = {{ x: (p1.x + p2.x) / 2, y: h * 0.8 }};
+          const x = (1 - u) * (1 - u) * p1.x + 2 * (1 - u) * u * cp.x + u * u * p2.x;
+          const y = (1 - u) * (1 - u) * p1.y + 2 * (1 - u) * u * cp.y + u * u * p2.y;
+          return {{ x, y }};
+        }}
+      }}
+
+      function drawHighway() {{
+        ctx.clearRect(0, 0, w, h);
+
+        const p0 = {{ x: w * 0.16, y: h * 0.5 }};
+        const p1 = {{ x: w * 0.50, y: h * 0.5 }};
+        const p2 = {{ x: w * 0.84, y: h * 0.5 }};
+
+        // Draw static highway guide lines
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(59, 130, 246, 0.2)';
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.quadraticCurveTo((p0.x + p1.x) / 2, h * 0.2, p1.x, p1.y);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.2)';
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.quadraticCurveTo((p1.x + p2.x) / 2, h * 0.8, p2.x, p2.y);
+        ctx.stroke();
+
+        // Draw flowing packets
+        packets.forEach(p => {{
+          p.t += p.speed;
+          if (p.t > 1) p.t = 0;
+
+          const pt = getHighwayPoint(p.t);
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 8;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }});
+
+        requestAnimationFrame(drawHighway);
+      }}
+      drawHighway();
+    }})();
+
+    function setHighwayMode(mode) {{
+      highwayMode = mode;
+      const status = document.getElementById('highway-status');
+      if (mode === 'full') {{
+        status.innerText = 'Transmitting phototrail packets across OpenAny Gateway (Client -> Shield -> Gateway)';
+        playChime(780, 0.05);
+      }} else if (mode === 'vcr') {{
+        status.innerText = 'Offline Deterministic VCR Mode: Serving spans from Merkle Cassette in < 5 μs';
+        playChime(620, 0.05);
+      }} else {{
+        status.innerText = 'OpenAny Direct Passthrough: Bypassing local cassettes for zero-latency direct routing';
+        playChime(880, 0.05);
+      }}
+    }}
+
+    function selectHighwayNode(node) {{
+      playChime(node === 'client' ? 660 : (node === 'shield' ? 880 : 1020), 0.06);
+      if (node === 'client') {{
+        document.getElementById('client-config').scrollIntoView({{ behavior: 'smooth' }});
+      }} else if (node === 'shield') {{
+        document.getElementById('cockpit-deck').scrollIntoView({{ behavior: 'smooth' }});
+      }} else {{
+        document.getElementById('openany-matrix').scrollIntoView({{ behavior: 'smooth' }});
+      }}
+    }}
+
+    // ========================================================
+    // RADAR BACKGROUND CANVAS
+    // ========================================================
     (function initRadarCanvas() {{
       const canvas = document.getElementById('radar-canvas');
       if (!canvas) return;
@@ -1050,11 +1673,11 @@ def render_developer_portal(
       }});
 
       const waypoints = [
-        {{ x: w * 0.15, y: h * 0.25, vx: 0.1, vy: 0.05, label: 'WP-01' }},
-        {{ x: w * 0.45, y: h * 0.35, vx: -0.08, vy: 0.1, label: 'WP-02' }},
-        {{ x: w * 0.75, y: h * 0.20, vx: 0.05, vy: -0.06, label: 'WP-03' }},
-        {{ x: w * 0.85, y: h * 0.70, vx: -0.04, vy: 0.08, label: 'WP-04' }},
-        {{ x: w * 0.30, y: h * 0.65, vx: 0.07, vy: -0.05, label: 'WP-05' }},
+        {{ x: w * 0.15, y: h * 0.25, vx: 0.1, vy: 0.05, label: 'WP-OPENANY' }},
+        {{ x: w * 0.45, y: h * 0.35, vx: -0.08, vy: 0.1, label: 'WP-FLIGHT' }},
+        {{ x: w * 0.75, y: h * 0.20, vx: 0.05, vy: -0.06, label: 'WP-SHIELD' }},
+        {{ x: w * 0.85, y: h * 0.70, vx: -0.04, vy: 0.08, label: 'WP-ROUTER' }},
+        {{ x: w * 0.30, y: h * 0.65, vx: 0.07, vy: -0.05, label: 'WP-MERKLE' }},
       ];
 
       let sweepAngle = 0;
@@ -1062,9 +1685,8 @@ def render_developer_portal(
       function renderFrame() {{
         ctx.clearRect(0, 0, w, h);
 
-        // Subtle concentric radar circles
-        const cx = w * 0.5, cy = h * 0.4;
-        ctx.strokeStyle = 'rgba(245, 158, 11, 0.04)';
+        const cx = w * 0.5, cy = h * 0.35;
+        ctx.strokeStyle = 'rgba(0, 71, 255, 0.04)';
         ctx.lineWidth = 1;
         for (let r = 80; r < Math.max(w, h); r += 160) {{
           ctx.beginPath();
@@ -1072,12 +1694,12 @@ def render_developer_portal(
           ctx.stroke();
         }}
 
-        // Rotating radar sweep
-        sweepAngle += 0.008;
+        // Sweep
+        sweepAngle += 0.007;
         const sweepX = cx + Math.cos(sweepAngle) * Math.max(w, h);
         const sweepY = cy + Math.sin(sweepAngle) * Math.max(w, h);
         const grad = ctx.createLinearGradient(cx, cy, sweepX, sweepY);
-        grad.addColorStop(0, 'rgba(245, 158, 11, 0.08)');
+        grad.addColorStop(0, 'rgba(0, 71, 255, 0.06)');
         grad.addColorStop(1, 'transparent');
         ctx.fillStyle = grad;
         ctx.beginPath();
@@ -1087,7 +1709,7 @@ def render_developer_portal(
         ctx.fill();
 
         // Vector tracks
-        ctx.strokeStyle = 'rgba(6, 182, 212, 0.08)';
+        ctx.strokeStyle = 'rgba(59, 130, 246, 0.06)';
         ctx.beginPath();
         for (let i = 0; i < waypoints.length; i++) {{
           const next = waypoints[(i + 1) % waypoints.length];
@@ -1096,14 +1718,14 @@ def render_developer_portal(
         }}
         ctx.stroke();
 
-        // Waypoints
+        // Waypoint points
         waypoints.forEach(wp => {{
           wp.x += wp.vx;
           wp.y += wp.vy;
           if (wp.x < 50 || wp.x > w - 50) wp.vx *= -1;
           if (wp.y < 50 || wp.y > h - 50) wp.vy *= -1;
 
-          ctx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+          ctx.fillStyle = 'rgba(0, 71, 255, 0.45)';
           ctx.beginPath();
           ctx.arc(wp.x, wp.y, 2.5, 0, Math.PI * 2);
           ctx.fill();
@@ -1118,7 +1740,42 @@ def render_developer_portal(
       renderFrame();
     }})();
 
-    // Flight Telemetry Replayer
+    // ========================================================
+    // FLIGHT TELEMETRY REPLAYER & RECEIPT SYNC
+    // ========================================================
+    function updateReceiptFromFlight(flightKey) {{
+      const flight = FLIGHTS[flightKey];
+      if (!flight || !flight.receipt) return;
+      const r = flight.receipt;
+
+      const setTxt = (id, val) => {{
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+      }};
+
+      setTxt('rcpt-flight-id', r.flight_no);
+      setTxt('rcpt-carrier', r.carrier);
+      setTxt('rcpt-model', r.model);
+      setTxt('rcpt-circuit', r.circuit_status);
+      setTxt('rcpt-qty-prompt', r.prompt_tokens.toLocaleString());
+      setTxt('rcpt-cost-prompt', '$' + r.prompt_cost.toFixed(6));
+      setTxt('rcpt-qty-completion', r.completion_tokens.toLocaleString());
+      setTxt('rcpt-cost-completion', '$' + r.completion_cost.toFixed(6));
+      setTxt('rcpt-qty-tools', r.tool_calls + ' spans');
+      setTxt('rcpt-total-cost', '$' + r.total_cost.toFixed(6));
+      setTxt('rcpt-savings', '+$' + r.savings.toFixed(6));
+      setTxt('rcpt-hash', r.merkle_hash);
+
+      const circuitEl = document.getElementById('rcpt-circuit');
+      if (circuitEl) {{
+        if (r.circuit_status.includes('TRIPPED')) {{
+          circuitEl.style.color = '#ef4444';
+        }} else {{
+          circuitEl.style.color = 'var(--green)';
+        }}
+      }}
+    }}
+
     function renderFlightStep(flightKey, stepIdx) {{
       const flight = FLIGHTS[flightKey];
       if (!flight) return;
@@ -1243,9 +1900,50 @@ def render_developer_portal(
       if (isPlaying) togglePlay();
       currentFlightKey = key;
       renderFlightStep(currentFlightKey, 0);
+      updateReceiptFromFlight(currentFlightKey);
     }}
 
-    // Schema Doctor & Auto-Healer
+    // ========================================================
+    // PRINT / SIMULATE RECEIPT WITH SOUND
+    // ========================================================
+    function printSimulatedReceipt() {{
+      playChime(1080, 0.08);
+      const box = document.getElementById('receipt-box');
+      box.style.opacity = '0.3';
+      setTimeout(() => {{
+        box.style.transition = 'opacity 0.4s ease';
+        box.style.opacity = '1';
+        playChime(880, 0.05);
+      }}, 250);
+    }}
+
+    function copyReceiptText() {{
+      const r = FLIGHTS[currentFlightKey].receipt;
+      const text = `
+============================================================
+✈ AGENTFLIGHT CASSETTE FLIGHT RECORD & USAGE SLIP
+CARRIER: ${{r.carrier}}
+FLIGHT: ${{r.flight_no}}
+MODEL: ${{r.model}}
+CIRCUIT STATUS: ${{r.circuit_status}}
+------------------------------------------------------------
+PROMPT TOKENS:     ${{r.prompt_tokens.toLocaleString()}}  ($${{r.prompt_cost.toFixed(6)}})
+COMPLETION TOKENS: ${{r.completion_tokens.toLocaleString()}}  ($${{r.completion_cost.toFixed(6)}})
+TOOL SPANS:        ${{r.tool_calls}} calls
+TOTAL CHARGE:      $${{r.total_cost.toFixed(6)}}
+PRE-FLIGHT SAVED: +$${{r.savings.toFixed(6)}}
+MERKLE CASSETTE SEAL: ${{r.merkle_hash}}
+============================================================
+`.trim();
+      navigator.clipboard.writeText(text).then(() => {{
+        alert('Monospace Flight Usage Receipt copied to clipboard!');
+        playChime(980, 0.06);
+      }});
+    }}
+
+    // ========================================================
+    // SCHEMA DOCTOR & AUTO-HEALER
+    // ========================================================
     const SAMPLE_FLAWED_TOOL = {{
       "name": "lookup_customer_order",
       "description": "lookup",
@@ -1275,7 +1973,6 @@ def render_developer_portal(
         return;
       }}
 
-      // Interactive auto-heal logic
       const fixed = JSON.parse(JSON.stringify(tool));
       const name = fixed.name || 'unnamed_tool';
       if (!fixed.description || fixed.description.length < 15) {{
@@ -1317,7 +2014,9 @@ def render_developer_portal(
       }});
     }}
 
-    // Tabs & Copy Functions
+    // ========================================================
+    // TABS & COPY SNIPPET
+    // ========================================================
     function switchTab(btn, paneId) {{
       btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -1363,9 +2062,11 @@ def render_developer_portal(
       try {{
         formatted = JSON.stringify(JSON.parse(raw));
       }} catch (_) {{}}
-      const escaped = formatted.replace(/'/g, "'\\\\''");
+      const escaped = formatted.replace(/'/g, "'\\''");
       const ep = (window.location.origin || '') + '/mcp';
-      const cmd = `curl -X POST "${{ep}}" \\\n  -H "Content-Type: application/json" \\\n  -d '${{escaped}}'`;
+      const cmd = `curl -X POST "${{ep}}" \
+  -H "Content-Type: application/json" \
+  -d '${{escaped}}'`;
       navigator.clipboard.writeText(cmd).then(() => {{
         const btn = document.getElementById('copy-curl-btn');
         const old = btn.innerText;
@@ -1397,7 +2098,26 @@ def render_developer_portal(
       if (PRESETS[kind]) {{
         req.value = JSON.stringify(PRESETS[kind], null, 2);
         playChime(750, 0.04);
+        document.getElementById('send-btn').scrollIntoView({{ behavior: 'smooth', block: 'center' }});
       }}
+    }}
+
+    function testModel(modelName) {{
+      document.getElementById('rpc-request').value = JSON.stringify({{
+        "jsonrpc": "2.0",
+        "id": 100,
+        "method": "tools/call",
+        "params": {{
+          "name": "agentflight_openany_chat",
+          "arguments": {{
+            "model": modelName,
+            "prompt": "Evaluate agent tool safety and circuit breaker parameters for zero runaway loops."
+          }}
+        }}
+      }}, null, 2);
+      playChime(880, 0.05);
+      document.getElementById('send-btn').scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+      sendJsonRpc();
     }}
 
     function loadToolCall(name) {{
@@ -1506,12 +2226,14 @@ def render_developer_portal(
       }}
     }}
 
-    // Initialize telemetry flight player and sample doctor on load
+    // Initialize telemetry flight player, receipt, and sample doctor on load
     document.addEventListener('DOMContentLoaded', () => {{
       renderFlightStep('flight_golden', 0);
+      updateReceiptFromFlight('flight_golden');
       loadDoctorSample('flawed');
     }});
     renderFlightStep('flight_golden', 0);
+    updateReceiptFromFlight('flight_golden');
     loadDoctorSample('flawed');
   </script>
 </body>
