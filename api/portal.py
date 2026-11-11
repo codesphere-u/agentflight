@@ -1,9 +1,10 @@
 """Interactive Developer Portal & Avionics Flight Deck for AgentFlight.
 
-Renders a self-contained, aerospace-grade developer portal matching OpenAny's
-ultra-clean modern aesthetic (typography, hero trajectory highway, monospace
-usage receipts, client command ribbons, electric blue + radar amber palette)
-with live interactive execution, cockpit telemetry replayer, and schema doctor.
+Faithfully reflects the luxury editorial engineering design system of Alvin's
+portfolio (https://alvin.codesphereug.com/): Fraunces serif typography, warm gold
+(#f4b94c) and deep obsidian stage (#14121d), terminal console-bars with traffic light
+dots, pill buttons (.folio-action), and opener eyebrows with line dividers, paired
+with live OpenAny 168+ model routing and aerospace flight telemetry.
 """
 
 from __future__ import annotations
@@ -24,7 +25,7 @@ def render_developer_portal(
     prompts: List[Dict[str, Any]],
     sample_tool_call: Dict[str, Any],
 ) -> str:
-    """Generate a high-performance, responsive HTML avionics cockpit flight dashboard."""
+    """Generate a luxury editorial aerospace cockpit flight dashboard matching Alvin's portfolio."""
 
     safe_name = html.escape(server_name)
     safe_version = html.escape(server_version)
@@ -373,8 +374,8 @@ def render_developer_portal(
             f"""
             <div class="card item-card tool-card-item" data-name="{t_name}" data-desc="{t_desc}">
               <div class="card-head">
-                <span class="mono font-bold text-amber">{t_name}</span>
-                <button class="btn btn-sm btn-ghost" onclick="loadToolCall('{t_name}')">Test &rarr;</button>
+                <span class="mono font-bold text-gold">{t_name}</span>
+                <button class="folio-action-sm" onclick="loadToolCall('{t_name}')">Test &rarr;</button>
               </div>
               <p class="text-sm text-dim">{t_desc}</p>
               <div class="param-row">{param_badges or '<span class="text-xs text-muted">No parameters</span>'}</div>
@@ -394,8 +395,8 @@ def render_developer_portal(
             f"""
             <div class="card item-card resource-card-item" data-uri="{r_uri}">
               <div class="card-head">
-                <span class="mono font-bold text-green">{r_name}</span>
-                <button class="btn btn-sm btn-ghost" onclick="loadResourceRead('{r_uri}')">Read &rarr;</button>
+                <span class="mono font-bold text-mint">{r_name}</span>
+                <button class="folio-action-sm" onclick="loadResourceRead('{r_uri}')">Read &rarr;</button>
               </div>
               <p class="text-sm text-dim">{r_desc}</p>
               <div class="meta-row">
@@ -422,7 +423,7 @@ def render_developer_portal(
             <div class="card item-card prompt-card-item" data-name="{p_name}">
               <div class="card-head">
                 <span class="mono font-bold text-cyan">{p_name}</span>
-                <button class="btn btn-sm btn-ghost" onclick="loadPromptGet('{p_name}')">Render &rarr;</button>
+                <button class="folio-action-sm" onclick="loadPromptGet('{p_name}')">Render &rarr;</button>
               </div>
               <p class="text-sm text-dim">{p_desc}</p>
               <div class="param-row">{arg_badges or '<span class="text-xs text-muted">No arguments</span>'}</div>
@@ -445,54 +446,73 @@ def render_developer_portal(
   <title>{safe_name} &bull; Aerospace Mission Control & Flight Deck</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* --------------------------------------------------------
+       ALVIN'S EDITORIAL LUXURY DESIGN SYSTEM (Codesphere World)
+       -------------------------------------------------------- */
     :root {{
-      --bg: #040711;
-      --bg-alt: #080d1a;
-      --card-bg: rgba(9, 14, 26, 0.72);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-border-glow: rgba(0, 71, 255, 0.35);
-      --openany-blue: #0047ff;
-      --openany-blue-bright: #3b82f6;
-      --openany-blue-glow: rgba(0, 71, 255, 0.28);
-      --amber: #f59e0b;
-      --amber-glow: rgba(245, 158, 11, 0.25);
-      --green: #10b981;
-      --green-glow: rgba(16, 185, 129, 0.25);
-      --cyan: #06b6d4;
-      --cyan-glow: rgba(6, 182, 212, 0.25);
-      --purple: #8b5cf6;
-      --purple-glow: rgba(139, 92, 246, 0.25);
-      --red: #ef4444;
-      --text: #f8fafc;
-      --text-dim: #94a3b8;
-      --text-muted: #64748b;
-      --font-mono: 'JetBrains Mono', monospace;
+      --stage: #14121d;
+      --stage-deep: #0f0d16;
+      --stage-ink: #fff1e2;
+      --stage-muted: #d9cfd8;
+      --stage-quiet: #a395a3;
+      --gold: #f4b94c;
+      --gold-bright: #ffcb8d;
+      --gold-glow: rgba(244, 185, 76, 0.28);
+      --ember: #d0603f;
+      --ember-glow: rgba(208, 96, 63, 0.25);
+      --live-green: #7ed7a1;
+      --live-green-glow: rgba(126, 215, 161, 0.3);
+      --cyan: #53c9ee;
+      --cyan-glow: rgba(83, 201, 238, 0.25);
+      --openany-blue: #3b82f6;
+      --openany-blue-glow: rgba(59, 130, 246, 0.25);
+      
+      --card-bg: rgba(24, 21, 33, 0.82);
+      --card-border: rgba(244, 185, 76, 0.16);
+      --card-border-glow: rgba(244, 185, 76, 0.38);
+      --card-rule: rgba(255, 255, 255, 0.08);
+
+      --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
       --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
     }}
+
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    
     body {{
-      background: var(--bg);
-      color: var(--text);
+      background: var(--stage);
+      background-image: 
+        radial-gradient(120% 95% at 85% 0%, rgba(92, 59, 41, 0.35) 0%, rgba(43, 26, 34, 0.22) 55%, transparent 100%),
+        radial-gradient(55% 85% at 12% 100%, rgba(208, 96, 63, 0.14) 0%, transparent 70%);
+      color: var(--stage-ink);
       font-family: var(--font-body);
-      line-height: 1.5;
-      padding: 0 16px 50px;
+      line-height: 1.6;
+      padding: 0 16px 60px;
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
     }}
+
+    /* Editorial Serif Headings */
     h1, h2, h3, h4 {{
-      font-family: var(--font-sans);
+      font-family: var(--font-display);
+      font-weight: 400;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      color: var(--stage-ink);
     }}
+
     #radar-canvas {{
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
       pointer-events: none;
       z-index: 0;
-      opacity: 0.55;
+      opacity: 0.45;
     }}
+
     .container {{
       max-width: 1240px;
       margin: 0 auto;
@@ -500,116 +520,156 @@ def render_developer_portal(
       z-index: 1;
     }}
     
-    /* Top Ticker */
+    /* Top Ticker: Alvin's Provenance Bar */
     .top-ticker {{
       display: flex; justify-content: space-between; align-items: center;
-      background: rgba(8, 13, 26, 0.85);
+      background: rgba(18, 15, 26, 0.92);
       border-bottom: 1px solid var(--card-border);
-      padding: 9px 18px; margin: 0 -16px 24px -16px;
+      padding: 10px 20px; margin: 0 -16px 26px -16px;
       font-size: 11px; font-family: var(--font-mono);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
     }}
-    .ticker-pulse {{
-      display: inline-block; width: 7px; height: 7px; border-radius: 50%;
-      background: var(--openany-blue-bright); margin-right: 8px;
-      box-shadow: 0 0 10px var(--openany-blue-bright);
-      animation: pulse 2s infinite;
+    .live-dot {{
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--live-green); margin-right: 8px;
+      box-shadow: 0 0 10px var(--live-green-glow);
+      animation: pulse 2.4s infinite;
     }}
     @keyframes pulse {{
       0%, 100% {{ transform: scale(1); opacity: 1; }}
       50% {{ transform: scale(1.3); opacity: 0.6; }}
     }}
 
+    /* Alvin's Signature Opener Eyebrow */
+    .opener-eyebrow {{
+      display: flex; align-items: center; gap: 12px; color: var(--gold);
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+    }}
+    .opener-eyebrow > span {{
+      width: 24px; height: 1px; flex: none; background: currentColor;
+    }}
+
     /* Header */
     .header {{
-      padding: 24px 0 20px;
+      padding: 24px 0 22px;
       border-bottom: 1px solid var(--card-border);
-      margin-bottom: 28px;
+      margin-bottom: 30px;
     }}
     .header-top {{
       display: flex; justify-content: space-between; align-items: flex-start;
-      flex-wrap: wrap; gap: 16px; margin-bottom: 22px;
+      flex-wrap: wrap; gap: 18px; margin-bottom: 24px;
     }}
-    .title-group {{ display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }}
+    .title-group {{ display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }}
     h1 {{
-      font-size: 32px; font-weight: 700; letter-spacing: -0.03em;
+      font-size: 38px;
       display: flex; align-items: center; gap: 12px;
-      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+      background: linear-gradient(135deg, #fff1e2 0%, #ffcb8d 60%, #f4b94c 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }}
     .badge {{
-      font-size: 11px; font-family: var(--font-mono); padding: 3px 9px;
-      border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+      font-size: 11px; font-family: var(--font-mono); padding: 4px 10px;
+      border-radius: 999px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
     }}
-    .badge-ver {{ background: rgba(0, 71, 255, 0.15); color: #60a5fa; border: 1px solid rgba(0, 71, 255, 0.35); }}
-    .badge-live {{ background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.35); }}
-    .badge-proto {{ background: rgba(6, 182, 212, 0.15); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.35); }}
-    .badge-partner {{ background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.35); }}
-    .links {{ display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }}
+    .badge-ver {{ background: rgba(244, 185, 76, 0.15); color: var(--gold-bright); border: 1px solid rgba(244, 185, 76, 0.35); }}
+    .badge-live {{ background: rgba(126, 215, 161, 0.15); color: var(--live-green); border: 1px solid rgba(126, 215, 161, 0.35); }}
+    .badge-proto {{ background: rgba(83, 201, 238, 0.15); color: var(--cyan); border: 1px solid rgba(83, 201, 238, 0.35); }}
+    .badge-suite {{ background: rgba(208, 96, 63, 0.15); color: #ff9d85; border: 1px solid rgba(208, 96, 63, 0.35); }}
+    .links {{ display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }}
     
-    /* Buttons */
-    .btn {{
-      background: rgba(255, 255, 255, 0.05); color: var(--text); border: 1px solid var(--card-border);
-      padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer;
+    /* Alvin's Signature Pill Action Buttons */
+    .folio-action {{
+      background: var(--gold); color: #261904; border: 1px solid var(--gold);
+      border-radius: 999px; padding: 9px 22px; font-size: 13px; font-weight: 700;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-sans); cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 14px rgba(244, 185, 76, 0.2);
+    }}
+    .folio-action:hover {{
+      background: var(--gold-bright); border-color: var(--gold-bright);
+      transform: translateY(-1px); box-shadow: 0 8px 24px var(--gold-glow);
+      color: #191206;
+    }}
+    .folio-action-secondary {{
+      background: transparent; color: var(--stage-ink); border: 1px solid rgba(244, 185, 76, 0.35);
+      border-radius: 999px; padding: 8px 18px; font-size: 13px; font-weight: 600;
       text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      backdrop-filter: blur(8px); font-family: var(--font-sans);
+      font-family: var(--font-sans); cursor: pointer; transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
     }}
-    .btn:hover {{
-      background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.22);
-      transform: translateY(-1px);
+    .folio-action-secondary:hover {{
+      background: rgba(244, 185, 76, 0.12); border-color: var(--gold);
+      transform: translateY(-1px); color: #fff;
     }}
-    .btn:active {{ transform: translateY(0); }}
-    .btn-sm {{ font-size: 12px; padding: 5px 11px; }}
-    .btn-blue {{ background: var(--openany-blue); color: #fff; border-color: var(--openany-blue); font-weight: 600; }}
-    .btn-blue:hover {{ background: #1d4ed8; border-color: #3b82f6; box-shadow: 0 0 18px var(--openany-blue-glow); }}
-    .btn-amber {{ background: var(--amber); color: #000; border-color: var(--amber); font-weight: 600; }}
-    .btn-amber:hover {{ background: #fbbf24; border-color: #fbbf24; box-shadow: 0 0 16px var(--amber-glow); }}
-    .btn-cyan {{ background: var(--cyan); color: #000; border-color: var(--cyan); font-weight: 600; }}
-    .btn-cyan:hover {{ background: #22d3ee; box-shadow: 0 0 16px rgba(6, 182, 212, 0.4); }}
-    .btn-ghost {{ background: transparent; border-color: transparent; color: var(--text-dim); }}
-    .btn-ghost:hover {{ background: rgba(255, 255, 255, 0.05); color: var(--text); }}
+    .folio-action-sm {{
+      background: rgba(244, 185, 76, 0.12); color: var(--gold); border: 1px solid rgba(244, 185, 76, 0.3);
+      border-radius: 999px; padding: 4px 12px; font-size: 11px; font-weight: 600; cursor: pointer;
+      font-family: var(--font-sans); transition: all 0.2s ease;
+    }}
+    .folio-action-sm:hover {{
+      background: var(--gold); color: #261904; border-color: var(--gold);
+    }}
     .audio-toggle {{ font-family: var(--font-mono); font-size: 11px; }}
 
-    /* Cards */
+    /* Cards & Glass Surfaces */
     .card {{
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 12px; padding: 22px;
-      margin-bottom: 24px;
+      border-radius: 14px; padding: 24px;
+      margin-bottom: 26px;
       backdrop-filter: blur(16px);
-      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
       position: relative;
     }}
     
+    /* Console Bar (Alvin's Signature Terminal Header) */
+    .console-bar {{
+      display: flex; align-items: center; gap: 7px;
+      padding: 10px 16px; background: rgba(12, 10, 18, 0.6);
+      border-bottom: 1px solid var(--card-rule);
+      border-top-left-radius: 12px; border-top-right-radius: 12px;
+    }}
+    .console-bar i {{
+      width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+    }}
+    .console-bar i:nth-child(1) {{ background: #ff6b5a; }}
+    .console-bar i:nth-child(2) {{ background: #ffc857; }}
+    .console-bar i:nth-child(3) {{ background: #6fe08a; }}
+    .console-bar span {{
+      margin-left: 10px; color: var(--stage-quiet); font-size: 11px; font-family: var(--font-mono);
+    }}
+
     /* Stats Grid */
     .grid-stats {{
       display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
-      gap: 12px; margin-top: 18px;
+      gap: 14px; margin-top: 20px;
     }}
     .stat-card {{
-      background: rgba(11, 18, 33, 0.55); border: 1px solid var(--card-border);
-      padding: 15px 18px; border-radius: 8px;
+      background: rgba(19, 16, 27, 0.65); border: 1px solid var(--card-border);
+      padding: 16px 20px; border-radius: 10px;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }}
-    .stat-card:hover {{ border-color: var(--openany-blue-bright); transform: translateY(-2px); box-shadow: 0 6px 20px var(--openany-blue-glow); }}
-    .stat-val {{ font-size: 24px; font-weight: 700; font-family: var(--font-mono); }}
-    .stat-lbl {{ font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px; }}
+    .stat-card:hover {{
+      border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 24px var(--gold-glow);
+    }}
+    .stat-val {{ font-size: 26px; font-weight: 700; font-family: var(--font-mono); }}
+    .stat-lbl {{ font-size: 11px; color: var(--stage-quiet); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }}
 
     /* ========================================================
-       HERO TRAJECTORY HIGHWAY (Matching OpenAny routing canvas)
+       HERO TRAJECTORY HIGHWAY
        ======================================================== */
     .hero-highway-card {{
-      border: 1px solid rgba(0, 71, 255, 0.35);
-      background: radial-gradient(ellipse at 50% 0%, rgba(0, 71, 255, 0.12) 0%, rgba(8, 13, 26, 0.8) 70%);
-      box-shadow: 0 0 40px rgba(0, 71, 255, 0.15);
-      padding: 26px;
+      border: 1px solid rgba(244, 185, 76, 0.32);
+      background: radial-gradient(ellipse at 50% 0%, rgba(92, 59, 41, 0.3) 0%, rgba(20, 17, 28, 0.85) 70%);
+      box-shadow: 0 0 45px rgba(244, 185, 76, 0.12);
+      padding: 28px;
     }}
     .highway-stage {{
       position: relative; width: 100%; height: 260px;
-      margin: 18px 0; border-radius: 10px;
-      background: rgba(3, 7, 18, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin: 20px 0; border-radius: 12px;
+      background: rgba(10, 8, 15, 0.7);
+      border: 1px solid rgba(244, 185, 76, 0.14);
       overflow: hidden;
     }}
     #highway-canvas {{
@@ -624,114 +684,114 @@ def render_developer_portal(
     .highway-node {{
       pointer-events: auto; cursor: pointer;
       display: flex; flex-direction: column; align-items: center;
-      background: rgba(10, 16, 30, 0.85);
+      background: rgba(22, 19, 31, 0.88);
       border: 1px solid var(--card-border);
-      border-radius: 10px; padding: 14px 18px;
+      border-radius: 12px; padding: 14px 20px;
       width: 220px; text-align: center;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      box-shadow: 0 8px 26px rgba(0,0,0,0.6);
       transition: all 0.25s ease;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
     }}
     .highway-node:hover {{
       transform: translateY(-3px) scale(1.02);
-      border-color: #60a5fa;
-      box-shadow: 0 12px 30px var(--openany-blue-glow);
+      border-color: var(--gold-bright);
+      box-shadow: 0 12px 32px var(--gold-glow);
     }}
     .highway-node.node-center {{
-      border-color: rgba(245, 158, 11, 0.5);
-      background: radial-gradient(circle at center, rgba(245, 158, 11, 0.15) 0%, rgba(10, 16, 30, 0.9) 70%);
+      border-color: rgba(244, 185, 76, 0.55);
+      background: radial-gradient(circle at center, rgba(244, 185, 76, 0.18) 0%, rgba(22, 19, 31, 0.92) 75%);
     }}
     .highway-node.node-center:hover {{
-      border-color: var(--amber);
-      box-shadow: 0 12px 30px var(--amber-glow);
+      border-color: var(--gold);
+      box-shadow: 0 14px 34px var(--gold-glow);
     }}
     .highway-node.node-right {{
-      border-color: rgba(16, 185, 129, 0.5);
-      background: radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, rgba(10, 16, 30, 0.9) 70%);
+      border-color: rgba(126, 215, 161, 0.5);
+      background: radial-gradient(circle at center, rgba(126, 215, 161, 0.15) 0%, rgba(22, 19, 31, 0.92) 75%);
     }}
     .highway-node.node-right:hover {{
-      border-color: var(--green);
-      box-shadow: 0 12px 30px var(--green-glow);
+      border-color: var(--live-green);
+      box-shadow: 0 14px 34px var(--live-green-glow);
     }}
     .node-icon {{ font-size: 24px; margin-bottom: 6px; }}
-    .node-title {{ font-size: 13px; font-weight: 700; font-family: var(--font-sans); color: #fff; }}
-    .node-sub {{ font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); margin-top: 3px; }}
-    .node-stat {{ font-size: 11px; font-family: var(--font-mono); margin-top: 6px; padding: 2px 6px; border-radius: 4px; }}
+    .node-title {{ font-size: 14px; font-weight: 700; font-family: var(--font-sans); color: #fff; }}
+    .node-sub {{ font-size: 11px; font-family: var(--font-mono); color: var(--stage-quiet); margin-top: 3px; }}
+    .node-stat {{ font-size: 11px; font-family: var(--font-mono); margin-top: 8px; padding: 3px 8px; border-radius: 999px; }}
 
     /* ========================================================
        OPENANY MULTI-MODEL FLEET MATRIX
        ======================================================== */
     .matrix-grid {{
       display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 14px; margin-top: 16px;
+      gap: 16px; margin-top: 18px;
     }}
     .model-card {{
-      background: rgba(11, 18, 33, 0.6);
+      background: rgba(21, 18, 29, 0.7);
       border: 1px solid var(--card-border);
-      border-radius: 10px; padding: 16px;
+      border-radius: 12px; padding: 18px;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex; flex-direction: column; justify-content: space-between;
     }}
     .model-card:hover {{
-      border-color: var(--openany-blue-bright);
+      border-color: var(--gold);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px var(--openany-blue-glow);
+      box-shadow: 0 10px 28px var(--gold-glow);
     }}
     .model-head {{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }}
-    .model-name {{ font-family: var(--font-sans); font-size: 15px; font-weight: 700; color: #fff; }}
-    .model-provider {{ font-size: 11px; font-family: var(--font-mono); color: var(--text-dim); }}
+    .model-name {{ font-family: var(--font-display); font-size: 17px; font-weight: 600; color: #fff; }}
+    .model-provider {{ font-size: 11px; font-family: var(--font-mono); color: var(--stage-muted); }}
     .model-rates {{
-      display: flex; gap: 8px; margin: 10px 0; font-family: var(--font-mono); font-size: 11px;
+      display: flex; gap: 8px; margin: 12px 0; font-family: var(--font-mono); font-size: 11px;
     }}
     .rate-pill {{
-      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 3px 7px; border-radius: 4px;
+      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(244, 185, 76, 0.15);
+      padding: 4px 8px; border-radius: 6px;
     }}
-    .rate-pill span {{ color: var(--green); font-weight: 600; }}
+    .rate-pill span {{ color: var(--gold); font-weight: 600; }}
 
     /* ========================================================
-       CRYPTOGRAPHIC FLIGHT USAGE RECEIPT (Monospace Terminal)
+       CRYPTOGRAPHIC FLIGHT USAGE RECEIPT
        ======================================================== */
     .receipt-container {{
-      background: #020409;
-      border: 1px dashed rgba(255, 255, 255, 0.18);
-      border-radius: 8px;
-      padding: 20px;
+      background: #0d0b13;
+      border: 1px dashed rgba(244, 185, 76, 0.28);
+      border-radius: 10px;
+      padding: 22px;
       font-family: var(--font-mono);
       font-size: 12px;
-      color: #e2e8f0;
+      color: #fff1e2;
       line-height: 1.6;
-      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+      box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.85);
       position: relative;
     }}
     .receipt-header {{
       text-align: center; padding-bottom: 12px; margin-bottom: 12px;
-      border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+      border-bottom: 1px dashed rgba(244, 185, 76, 0.25);
     }}
-    .receipt-title {{ font-size: 14px; font-weight: 700; color: var(--openany-blue-bright); letter-spacing: 0.05em; }}
-    .receipt-line {{ display: flex; justify-content: space-between; margin: 3px 0; }}
-    .receipt-divider {{ border-top: 1px dashed rgba(255, 255, 255, 0.15); margin: 10px 0; }}
-    .receipt-total {{ font-weight: 700; font-size: 13px; color: var(--green); }}
+    .receipt-title {{ font-size: 14px; font-weight: 700; color: var(--gold-bright); letter-spacing: 0.06em; }}
+    .receipt-line {{ display: flex; justify-content: space-between; margin: 4px 0; }}
+    .receipt-divider {{ border-top: 1px dashed rgba(244, 185, 76, 0.2); margin: 12px 0; }}
+    .receipt-total {{ font-weight: 700; font-size: 13px; color: var(--live-green); }}
     .receipt-barcode {{
-      font-family: monospace; letter-spacing: 3px; font-size: 14px;
-      text-align: center; margin-top: 14px; opacity: 0.6;
+      font-family: monospace; letter-spacing: 4px; font-size: 14px;
+      text-align: center; margin-top: 16px; opacity: 0.55; color: var(--gold);
     }}
 
     /* Cockpit HUD */
     .hud-card {{
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      box-shadow: 0 0 30px rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(244, 185, 76, 0.35);
+      box-shadow: 0 0 35px rgba(244, 185, 76, 0.14);
     }}
     .waypoint-track {{
       display: flex; justify-content: space-between; align-items: center;
-      position: relative; margin: 20px 0 14px; padding: 0 20px;
+      position: relative; margin: 22px 0 16px; padding: 0 24px;
     }}
     .waypoint-line {{
-      position: absolute; top: 18px; left: 40px; right: 40px; height: 3px;
+      position: absolute; top: 18px; left: 44px; right: 44px; height: 3px;
       background: rgba(255, 255, 255, 0.1); z-index: 0;
     }}
     .waypoint-line-fill {{
-      height: 100%; background: linear-gradient(90deg, var(--openany-blue), var(--amber), var(--green));
+      height: 100%; background: linear-gradient(90deg, var(--ember), var(--gold), var(--live-green));
       width: 0%; transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }}
     .waypoint-node {{
@@ -740,117 +800,118 @@ def render_developer_portal(
     }}
     .waypoint-node:hover {{ transform: scale(1.1); }}
     .waypoint-dot {{
-      width: 36px; height: 36px; border-radius: 50%; background: #0b1220;
-      border: 2px solid var(--text-muted); display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-family: var(--font-mono); font-weight: 700; color: var(--text-dim);
-      box-shadow: 0 0 10px rgba(0,0,0,0.5); transition: all 0.3s ease;
+      width: 38px; height: 38px; border-radius: 50%; background: #161320;
+      border: 2px solid var(--stage-quiet); display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-family: var(--font-mono); font-weight: 700; color: var(--stage-muted);
+      box-shadow: 0 0 12px rgba(0,0,0,0.6); transition: all 0.3s ease;
     }}
     .waypoint-node.active .waypoint-dot {{
-      border-color: var(--amber); color: #000; background: var(--amber);
-      box-shadow: 0 0 18px var(--amber-glow);
+      border-color: var(--gold); color: #261904; background: var(--gold);
+      box-shadow: 0 0 20px var(--gold-glow);
     }}
     .waypoint-node.passed .waypoint-dot {{
-      border-color: var(--green); color: #fff; background: rgba(16, 185, 129, 0.2);
+      border-color: var(--live-green); color: #fff; background: rgba(126, 215, 161, 0.2);
     }}
     .waypoint-title {{
-      font-size: 11px; font-family: var(--font-mono); color: var(--text-dim);
+      font-size: 11px; font-family: var(--font-mono); color: var(--stage-muted);
       margin-top: 6px; text-align: center; max-width: 110px;
     }}
 
     /* Tabs */
     .tabs {{
-      display: flex; gap: 4px; border-bottom: 1px solid var(--card-border);
-      margin-bottom: 14px; overflow-x: auto;
+      display: flex; gap: 6px; border-bottom: 1px solid var(--card-border);
+      margin-bottom: 16px; overflow-x: auto;
     }}
     .tab-btn {{
-      background: transparent; color: var(--text-dim); border: none;
-      padding: 10px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
+      background: transparent; color: var(--stage-quiet); border: none;
+      padding: 10px 16px; font-size: 13px; font-weight: 500; cursor: pointer;
       border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;
       font-family: var(--font-sans);
     }}
-    .tab-btn:hover {{ color: var(--text); }}
-    .tab-btn.active {{ color: var(--openany-blue-bright); border-bottom-color: var(--openany-blue); font-weight: 600; }}
+    .tab-btn:hover {{ color: #fff; }}
+    .tab-btn.active {{ color: var(--gold); border-bottom-color: var(--gold); font-weight: 700; }}
     
     .snippet-box {{
-      position: relative; background: #02040a; border: 1px solid var(--card-border);
-      border-radius: 8px; padding: 14px 16px; margin-top: 8px;
+      position: relative; background: #0b0912; border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 16px 18px; margin-top: 10px;
     }}
-    pre {{ font-family: var(--font-mono); font-size: 12px; line-height: 1.6; color: #e2e8f0; overflow-x: auto; }}
+    pre {{ font-family: var(--font-mono); font-size: 12px; line-height: 1.6; color: #fff1e2; overflow-x: auto; }}
     .copy-btn {{
-      position: absolute; top: 10px; right: 10px;
-      background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #cbd5e1; font-size: 11px; padding: 4px 10px; border-radius: 4px; cursor: pointer;
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(244, 185, 76, 0.12); border: 1px solid rgba(244, 185, 76, 0.3);
+      color: var(--gold-bright); font-size: 11px; padding: 4px 11px; border-radius: 999px; cursor: pointer;
       transition: all 0.2s; font-family: var(--font-sans);
     }}
-    .copy-btn:hover {{ background: rgba(255, 255, 255, 0.2); color: #fff; }}
-    .copy-btn.copied {{ background: var(--green); color: #000; border-color: var(--green); }}
+    .copy-btn:hover {{ background: var(--gold); color: #261904; }}
+    .copy-btn.copied {{ background: var(--live-green); color: #000; border-color: var(--live-green); }}
 
     /* Playground */
     .playground-grid {{
       display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
-      gap: 16px; margin-top: 14px;
+      gap: 18px; margin-top: 16px;
     }}
     .pane {{
-      background: #02040a; border: 1px solid var(--card-border); border-radius: 8px;
+      background: #0c0a13; border: 1px solid var(--card-border); border-radius: 10px;
       display: flex; flex-direction: column; overflow: hidden;
     }}
     .pane-head {{
       display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 14px; background: rgba(255, 255, 255, 0.02);
+      padding: 10px 16px; background: rgba(255, 255, 255, 0.02);
       border-bottom: 1px solid var(--card-border);
     }}
-    .pane-title {{ font-size: 12px; font-weight: 600; font-family: var(--font-mono); color: var(--text-dim); }}
+    .pane-title {{ font-size: 12px; font-weight: 600; font-family: var(--font-mono); color: var(--stage-muted); }}
     .code-editor {{
       width: 100%; height: 260px; background: transparent; border: none;
-      color: #e2e8f0; font-family: var(--font-mono); font-size: 12px; line-height: 1.6;
+      color: #fff1e2; font-family: var(--font-mono); font-size: 12px; line-height: 1.6;
       padding: 14px; resize: vertical; outline: none;
     }}
     .response-box {{
       width: 100%; height: 260px; padding: 14px; overflow: auto;
-      font-family: var(--font-mono); font-size: 12px; color: #a5f3fc;
+      font-family: var(--font-mono); font-size: 12px; color: #a7f3d0;
     }}
-    .preset-bar {{ display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }}
+    .preset-bar {{ display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }}
 
     /* Card Catalogs */
     .card-list {{
       display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 12px; margin-top: 14px;
+      gap: 14px; margin-top: 16px;
     }}
     .item-card {{
-      padding: 14px 16px; margin-bottom: 0;
+      padding: 16px 18px; margin-bottom: 0;
       transition: all 0.2s ease;
     }}
-    .item-card:hover {{ border-color: var(--openany-blue-bright); transform: translateY(-2px); }}
+    .item-card:hover {{ border-color: var(--gold); transform: translateY(-2px); }}
     .card-head {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }}
     .param-row {{ display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }}
-    .badge.param {{ font-size: 10px; padding: 2px 6px; border-radius: 3px; font-family: var(--font-mono); }}
-    .badge.param.req {{ background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }}
-    .badge.param.opt {{ background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }}
+    .badge.param {{ font-size: 10px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); }}
+    .badge.param.req {{ background: rgba(208, 96, 63, 0.2); color: #ff9d85; border: 1px solid rgba(208, 96, 63, 0.4); }}
+    .badge.param.opt {{ background: rgba(255, 255, 255, 0.06); color: var(--stage-muted); border: 1px solid rgba(255, 255, 255, 0.1); }}
     .meta-row {{ display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }}
-    .badge-sub {{ background: rgba(255, 255, 255, 0.05); color: var(--text-dim); font-size: 10px; }}
+    .badge-sub {{ background: rgba(255, 255, 255, 0.05); color: var(--stage-muted); font-size: 10px; }}
     .search-input {{
-      background: rgba(0, 0, 0, 0.4); border: 1px solid var(--card-border);
-      color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 13px;
+      background: rgba(0, 0, 0, 0.45); border: 1px solid var(--card-border);
+      color: #fff; padding: 9px 16px; border-radius: 999px; font-size: 13px;
       width: 100%; max-width: 320px; outline: none; font-family: var(--font-sans);
     }}
-    .search-input:focus {{ border-color: var(--openany-blue-bright); }}
+    .search-input:focus {{ border-color: var(--gold); }}
 
     /* Footer */
     .footer {{
       display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
-      gap: 12px; padding: 26px 4px; border-top: 1px solid var(--card-border);
-      font-size: 12px; color: var(--text-muted);
+      gap: 14px; padding: 28px 4px; border-top: 1px solid var(--card-border);
+      font-size: 12px; color: var(--stage-quiet);
     }}
-    .footer a {{ color: var(--openany-blue-bright); text-decoration: none; }}
+    .footer a {{ color: var(--gold); text-decoration: none; }}
 
     .mono {{ font-family: var(--font-mono); }}
     .font-bold {{ font-weight: 700; }}
-    .text-blue {{ color: var(--openany-blue-bright); }}
-    .text-amber {{ color: var(--amber); }}
-    .text-green {{ color: var(--green); }}
+    .text-gold {{ color: var(--gold); }}
+    .text-ember {{ color: var(--ember); }}
+    .text-mint {{ color: var(--live-green); }}
     .text-cyan {{ color: var(--cyan); }}
-    .text-dim {{ color: var(--text-dim); }}
-    .text-muted {{ color: var(--text-muted); }}
+    .text-blue {{ color: var(--openany-blue); }}
+    .text-dim {{ color: var(--stage-muted); }}
+    .text-muted {{ color: var(--stage-quiet); }}
     .text-sm {{ font-size: 13px; }}
     .text-xs {{ font-size: 11px; }}
 
@@ -865,15 +926,16 @@ def render_developer_portal(
 <body>
   <canvas id="radar-canvas"></canvas>
 
+  <!-- Top Ticker: Alvin's Provenance Bar -->
   <div class="top-ticker">
-    <div>
-      <span class="ticker-pulse"></span>
-      <span class="text-blue font-bold">OPERATIONAL:</span> AGENTFLIGHT AVIONICS &bull; OPENANY GATEWAY (168+ MODELS) &bull; P50: 2.83 &mu;s
+    <div style="display: flex; align-items: center;">
+      <span class="live-dot"></span>
+      <span class="text-gold font-bold">OPERATIONAL:</span>&nbsp;AGENTFLIGHT BLACK-BOX AVIONICS &bull; OPENANY GATEWAY (168+ MODELS) &bull; P50: 2.83 &mu;s
     </div>
     <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
-      <span class="mono" style="color: #cbd5e1;">ARCHITECT: <a href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener" style="color: var(--openany-blue-bright); text-decoration: none; font-weight: 600;">AKANDWANAHO IVAN (ALVIN)</a> &bull; CODESPHERE</span>
+      <span class="mono" style="color: var(--stage-ink);">ARCHITECT: <a href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener" style="color: var(--gold); text-decoration: none; font-weight: 700;">AKANDWANAHO IVAN (ALVIN)</a> &bull; CODESPHERE INNOVATIONS</span>
       <span class="mono text-muted">| OPENANY CASSETTE: VERIFIED</span>
-      <button class="btn btn-sm btn-ghost audio-toggle" onclick="toggleAudio()" id="audio-btn">🔊 Sound: OFF</button>
+      <button class="folio-action-sm audio-toggle" onclick="toggleAudio()" id="audio-btn">🔊 Sound: OFF</button>
     </div>
   </div>
 
@@ -887,27 +949,25 @@ def render_developer_portal(
             <span class="badge badge-ver">v{safe_version}</span>
             <span class="badge badge-live">Operational</span>
             <span class="badge badge-proto">MCP 2024-11-05</span>
-            <span class="badge badge-partner">OpenAny Partner</span>
-            <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.35);">Codesphere AI Suite</span>
+            <span class="badge badge-suite">Codesphere AI Suite</span>
           </div>
-          <p class="text-sm text-dim" style="margin-top: 8px; max-width: 720px;">{safe_tagline}</p>
+          <p class="text-sm text-dim" style="margin-top: 10px; max-width: 740px;">{safe_tagline}</p>
         </div>
         <div class="links">
-          <a class="btn btn-amber" href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener">Architect Case Study &rarr;</a>
-          <a class="btn btn-blue" href="#openany-matrix">Explore 168+ Models &rarr;</a>
-          <a class="btn" href="{safe_github}" target="_blank" rel="noopener">GitHub</a>
-          <a class="btn" href="/docs" target="_blank" rel="noopener">Swagger UI &rarr;</a>
-          <a class="btn" href="https://glama.ai/mcp" target="_blank" rel="noopener">Glama</a>
+          <a class="folio-action" href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener">Architect Case Study &rarr;</a>
+          <a class="folio-action-secondary" href="#openany-matrix">Explore 168+ Models &rarr;</a>
+          <a class="folio-action-secondary" href="{safe_github}" target="_blank" rel="noopener">GitHub ↗</a>
+          <a class="folio-action-secondary" href="/docs" target="_blank" rel="noopener">Swagger UI ↗</a>
         </div>
       </div>
       
       <div class="grid-stats">
         <div class="stat-card">
-          <div class="stat-val text-amber">2.83 &mu;s</div>
+          <div class="stat-val text-gold">2.83 &mu;s</div>
           <div class="stat-lbl">Span Replay P50</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val text-blue">168 Models</div>
+          <div class="stat-val text-gold">168 Models</div>
           <div class="stat-lbl">OpenAny Multi-Model Gateway</div>
         </div>
         <div class="stat-card">
@@ -915,35 +975,36 @@ def render_developer_portal(
           <div class="stat-lbl">MCP Tool-Smell Linter</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val text-green">353k</div>
+          <div class="stat-val text-mint">353k</div>
           <div class="stat-lbl">Spans / Second</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val" style="color: #a855f7;">$0.00</div>
+          <div class="stat-val" style="color: #ff9d85;">$0.00</div>
           <div class="stat-lbl">Deterministic CI Replay</div>
         </div>
       </div>
     </header>
 
     <!-- ========================================================
-         HERO TRAJECTORY HIGHWAY (Matching OpenAny visual feel)
+         HERO TRAJECTORY HIGHWAY
          ======================================================== -->
     <section class="card hero-highway-card" id="hero-highway">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+      <div class="console-bar" style="margin: -28px -28px 18px -28px;">
+        <i></i><i></i><i></i>
+        <span>agentflight &bull; trajectory-highway.live</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
         <div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="badge badge-ver">Dynamic Routing</span>
-            <span class="mono text-xs text-dim">END-TO-END TELEMETRY</span>
-          </div>
-          <h2 style="font-size: 22px; color: #fff; margin-top: 6px;">The Hero Trajectory Highway</h2>
-          <p class="text-xs text-dim" style="max-width: 640px; margin-top: 4px;">
+          <p class="opener-eyebrow"><span></span>01 / HIGH-SPEED ROUTING HIGHWAY</p>
+          <h2 style="font-size: 26px; margin-top: 6px;">The Hero Trajectory Highway</h2>
+          <p class="text-xs text-dim" style="max-width: 660px; margin-top: 6px;">
             Every agent call travels across our cryptographic highway: from your local agent client, through AgentFlight's anti-loop circuit breaker, directly into OpenAny's multi-model frontier routing gateway.
           </p>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button class="btn btn-sm btn-blue" onclick="setHighwayMode('full')">Full Avionics Route</button>
-          <button class="btn btn-sm" onclick="setHighwayMode('vcr')">Offline VCR Replay</button>
-          <button class="btn btn-sm" onclick="setHighwayMode('direct')">OpenAny Direct</button>
+          <button class="folio-action-sm" onclick="setHighwayMode('full')">Full Avionics Route</button>
+          <button class="folio-action-sm" onclick="setHighwayMode('vcr')">Offline VCR Replay</button>
+          <button class="folio-action-sm" onclick="setHighwayMode('direct')">OpenAny Direct</button>
         </div>
       </div>
 
@@ -955,28 +1016,28 @@ def render_developer_portal(
             <div class="node-icon">💻</div>
             <div class="node-title">Agent Client Fleet</div>
             <div class="node-sub">Claude Code &bull; Cursor &bull; Codex</div>
-            <div class="node-stat" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">MCP 2024-11-05</div>
+            <div class="node-stat" style="background: rgba(83, 201, 238, 0.15); color: var(--cyan);">MCP 2024-11-05</div>
           </div>
 
           <div class="highway-node node-center" id="h-node-shield" onclick="selectHighwayNode('shield')">
             <div class="node-icon">🛡️</div>
             <div class="node-title">AgentFlight Shield</div>
             <div class="node-sub">Anti-Loop Breaker &bull; Merkle Cassette</div>
-            <div class="node-stat" style="background: rgba(245, 158, 11, 0.15); color: var(--amber);">2.83 &mu;s P50 Latency</div>
+            <div class="node-stat" style="background: rgba(244, 185, 76, 0.2); color: var(--gold);">2.83 &mu;s P50 Latency</div>
           </div>
 
           <div class="highway-node node-right" id="h-node-gateway" onclick="selectHighwayNode('gateway')">
             <div class="node-icon">🌐</div>
             <div class="node-title">OpenAny Gateway</div>
             <div class="node-sub">MiniMax &bull; DeepSeek &bull; Claude &bull; 3k APIs</div>
-            <div class="node-stat" style="background: rgba(16, 185, 129, 0.15); color: var(--green);">168+ Live Models</div>
+            <div class="node-stat" style="background: rgba(126, 215, 161, 0.18); color: var(--live-green);">168+ Live Models</div>
           </div>
         </div>
       </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);">
-        <div><span class="text-green font-bold">● HIGHWAY PULSE:</span> <span id="highway-status">Transmitting phototrail packets across OpenAny Gateway</span></div>
-        <div id="highway-stats">PACKETS: <span class="text-blue">42 / sec</span> &bull; LOSS: <span class="text-green">0.00%</span> &bull; REPLAY HASH: <span class="text-amber">7f83b165...</span></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--stage-muted);">
+        <div><span class="text-mint font-bold">● HIGHWAY PULSE:</span> <span id="highway-status">Transmitting phototrail packets across OpenAny Gateway</span></div>
+        <div id="highway-stats">PACKETS: <span class="text-gold">42 / sec</span> &bull; LOSS: <span class="text-mint">0.00%</span> &bull; REPLAY HASH: <span class="text-gold">7f83b165...</span></div>
       </div>
     </section>
 
@@ -984,16 +1045,17 @@ def render_developer_portal(
          OPENANY MULTI-MODEL FLEET MATRIX
          ======================================================== -->
     <section class="card" id="openany-matrix">
+      <div class="console-bar" style="margin: -24px -24px 18px -24px;">
+        <i></i><i></i><i></i>
+        <span>agentflight &bull; openany-matrix.catalog</span>
+      </div>
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 6px;">
         <div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="badge" style="background: rgba(0, 71, 255, 0.2); color: #60a5fa;">Ecosystem</span>
-            <span class="mono text-xs text-dim">OPENANY ROUTING CATALYST</span>
-          </div>
-          <h2 style="font-size: 18px; color: #fff; margin-top: 4px;">OpenAny Multi-Model Fleet Matrix</h2>
+          <p class="opener-eyebrow"><span></span>02 / MULTI-MODEL ECOSYSTEM</p>
+          <h2 style="font-size: 24px; margin-top: 4px;">OpenAny Multi-Model Fleet Matrix</h2>
           <p class="text-xs text-dim">Access 168+ frontier models and 3,258 tools with one unified key and shared prepaid balance.</p>
         </div>
-        <button class="btn btn-sm btn-blue" onclick="loadPreset('openany_models')">Discover Full 168+ Catalog &rarr;</button>
+        <button class="folio-action" onclick="loadPreset('openany_models')">Discover Full 168+ Catalog &rarr;</button>
       </div>
 
       <div class="matrix-grid">
@@ -1005,7 +1067,7 @@ def render_developer_portal(
                 <div class="model-name">MiniMax-M2.5</div>
                 <div class="model-provider">MiniMax &bull; Fast Reasoning</div>
               </div>
-              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--green);">Tested Live</span>
+              <span class="badge" style="background: rgba(126, 215, 161, 0.15); color: var(--live-green);">Tested Live</span>
             </div>
             <p class="text-xs text-dim">Optimized for high-speed chain-of-thought tool calling and reasoning with sub-cent token billing.</p>
             <div class="model-rates">
@@ -1013,7 +1075,7 @@ def render_developer_portal(
               <div class="rate-pill">Compl: <span>$0.60/1M</span></div>
             </div>
           </div>
-          <button class="btn btn-sm btn-ghost" onclick="testModel('MiniMax-M2.5')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+          <button class="folio-action-secondary" onclick="testModel('MiniMax-M2.5')" style="margin-top: 10px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
         </div>
 
         <!-- MiniMax M2.7 -->
@@ -1024,7 +1086,7 @@ def render_developer_portal(
                 <div class="model-name">MiniMax-M2.7</div>
                 <div class="model-provider">MiniMax &bull; Extended Context</div>
               </div>
-              <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">Frontier</span>
+              <span class="badge" style="background: rgba(244, 185, 76, 0.15); color: var(--gold);">Frontier</span>
             </div>
             <p class="text-xs text-dim">Extended context coding and deep multi-step autonomous agent synthesis.</p>
             <div class="model-rates">
@@ -1032,7 +1094,7 @@ def render_developer_portal(
               <div class="rate-pill">Compl: <span>$0.80/1M</span></div>
             </div>
           </div>
-          <button class="btn btn-sm btn-ghost" onclick="testModel('MiniMax-M2.7')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+          <button class="folio-action-secondary" onclick="testModel('MiniMax-M2.7')" style="margin-top: 10px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
         </div>
 
         <!-- DeepSeek V3 -->
@@ -1043,7 +1105,7 @@ def render_developer_portal(
                 <div class="model-name">DeepSeek-V3</div>
                 <div class="model-provider">DeepSeek &bull; 671B MoE</div>
               </div>
-              <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: var(--purple);">Ultra-Value</span>
+              <span class="badge" style="background: rgba(208, 96, 63, 0.15); color: #ff9d85;">Ultra-Value</span>
             </div>
             <p class="text-xs text-dim">Frontier intelligence at disruptive pricing. 671B MoE architecture with deep coding capabilities.</p>
             <div class="model-rates">
@@ -1051,7 +1113,7 @@ def render_developer_portal(
               <div class="rate-pill">Compl: <span>$0.28/1M</span></div>
             </div>
           </div>
-          <button class="btn btn-sm btn-ghost" onclick="testModel('deepseek/deepseek-chat')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+          <button class="folio-action-secondary" onclick="testModel('deepseek/deepseek-chat')" style="margin-top: 10px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
         </div>
 
         <!-- Claude 3.7 Sonnet -->
@@ -1062,7 +1124,7 @@ def render_developer_portal(
                 <div class="model-name">Claude 3.7 Sonnet</div>
                 <div class="model-provider">Anthropic &bull; Agentic Flagship</div>
               </div>
-              <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: var(--amber);">Hybrid CoT</span>
+              <span class="badge" style="background: rgba(244, 185, 76, 0.18); color: var(--gold-bright);">Hybrid CoT</span>
             </div>
             <p class="text-xs text-dim">Industry-standard agentic coding with hybrid standard and extended thinking modes.</p>
             <div class="model-rates">
@@ -1070,7 +1132,7 @@ def render_developer_portal(
               <div class="rate-pill">Compl: <span>$15.00/1M</span></div>
             </div>
           </div>
-          <button class="btn btn-sm btn-ghost" onclick="testModel('anthropic/claude-3.7-sonnet')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+          <button class="folio-action-secondary" onclick="testModel('anthropic/claude-3.7-sonnet')" style="margin-top: 10px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
         </div>
 
         <!-- Gemini 2.5 Flash -->
@@ -1081,7 +1143,7 @@ def render_developer_portal(
                 <div class="model-name">Gemini 2.5 Flash</div>
                 <div class="model-provider">Google &bull; 1M Context</div>
               </div>
-              <span class="badge" style="background: rgba(6, 182, 212, 0.15); color: var(--cyan);">Low Latency</span>
+              <span class="badge" style="background: rgba(83, 201, 238, 0.15); color: var(--cyan);">Low Latency</span>
             </div>
             <p class="text-xs text-dim">Sub-100ms multi-modal reasoning with massive 1,000,000 token context window.</p>
             <div class="model-rates">
@@ -1089,7 +1151,7 @@ def render_developer_portal(
               <div class="rate-pill">Compl: <span>$0.30/1M</span></div>
             </div>
           </div>
-          <button class="btn btn-sm btn-ghost" onclick="testModel('google/gemini-2.5-flash')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+          <button class="folio-action-secondary" onclick="testModel('google/gemini-2.5-flash')" style="margin-top: 10px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
         </div>
 
         <!-- Qwen 2.5 Coder 32B -->
@@ -1100,7 +1162,7 @@ def render_developer_portal(
                 <div class="model-name">Qwen 2.5 Coder</div>
                 <div class="model-provider">Alibaba &bull; 32B Code Specialist</div>
               </div>
-              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--green);">Code MoE</span>
+              <span class="badge" style="background: rgba(126, 215, 161, 0.15); color: var(--live-green);">Code MoE</span>
             </div>
             <p class="text-xs text-dim">High-density open weights fine-tuned specifically for repository-level code edits and refactoring.</p>
             <div class="model-rates">
@@ -1108,7 +1170,7 @@ def render_developer_portal(
               <div class="rate-pill">Compl: <span>$0.60/1M</span></div>
             </div>
           </div>
-          <button class="btn btn-sm btn-ghost" onclick="testModel('qwen/qwen-2.5-coder-32b-instruct')" style="margin-top: 8px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
+          <button class="folio-action-secondary" onclick="testModel('qwen/qwen-2.5-coder-32b-instruct')" style="margin-top: 10px; justify-content: center; width: 100%;">Test in Playground &rarr;</button>
         </div>
       </div>
     </section>
@@ -1117,16 +1179,19 @@ def render_developer_portal(
          AVIONICS COCKPIT & BLACK-BOX FLIGHT REPLAYER
          ======================================================== -->
     <section class="card hud-card" id="cockpit-deck">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+      <div class="console-bar" style="margin: -24px -24px 18px -24px;">
+        <i></i><i></i><i></i>
+        <span>agentflight &bull; cockpit-replayer.flight.json</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <div>
-          <h2 style="font-size: 18px; color: #fff; display: flex; align-items: center; gap: 8px;">
-            <span style="color: var(--amber);">✈</span> Mission Control & Black-Box Flight Deck
-          </h2>
+          <p class="opener-eyebrow"><span></span>03 / DETERMINISTIC COCKPIT DECK</p>
+          <h2 style="font-size: 24px; margin-top: 4px;">Mission Control & Black-Box Flight Deck</h2>
           <p class="text-xs text-dim">Deterministic trajectory replay, anti-loop circuit breaker, and live SHA-256 Merkle chain verification.</p>
         </div>
         <div style="display: flex; gap: 8px;">
-          <button class="btn btn-sm btn-amber" onclick="testLintGoodTool()">Lint Clean Tool &rarr;</button>
-          <button class="btn btn-sm" onclick="testLintSmellyTool()">Lint Smelly Tool &rarr;</button>
+          <button class="folio-action" onclick="testLintGoodTool()">Lint Clean Tool &rarr;</button>
+          <button class="folio-action-secondary" onclick="testLintSmellyTool()">Lint Smelly Tool &rarr;</button>
         </div>
       </div>
 
@@ -1154,44 +1219,44 @@ def render_developer_portal(
       </div>
 
       <!-- Flight Replayer Controls -->
-      <div class="player-controls" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+      <div class="player-controls" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--card-rule);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="mono text-xs font-bold" style="color: var(--amber);">ACTIVE FLIGHT:</span>
-            <select id="flight-select" class="btn btn-sm" onchange="changeFlight(this.value)" style="background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); color: #fff; cursor: pointer;">
+            <span class="mono text-xs font-bold text-gold">ACTIVE FLIGHT:</span>
+            <select id="flight-select" class="folio-action-secondary" onchange="changeFlight(this.value)" style="background: rgba(0,0,0,0.5); cursor: pointer;">
               <option value="flight_golden">Flight #101: Clean Multi-Step Checkout (4 Golden Spans)</option>
               <option value="flight_incident">Flight #204: Oscillating Loop Incident (Circuit Tripped)</option>
               <option value="flight_openany">Flight #305: OpenAny Multi-Model Gateway Chain</option>
             </select>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <button class="btn btn-sm" onclick="prevStep()">◀ Prev</button>
-            <button class="btn btn-sm btn-amber" id="play-btn" onclick="togglePlay()">▶ Play</button>
-            <button class="btn btn-sm" onclick="nextStep()">Next ▶</button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="folio-action-secondary" onclick="prevStep()">◀ Prev</button>
+            <button class="folio-action" id="play-btn" onclick="togglePlay()">▶ Play</button>
+            <button class="folio-action-secondary" onclick="nextStep()">Next ▶</button>
             <span id="step-counter" class="mono text-xs text-dim" style="margin-left: 8px;">Step 1 / 4</span>
           </div>
         </div>
 
-        <div style="margin-bottom: 14px;">
-          <input type="range" id="flight-scrubber" min="0" max="3" value="0" style="width: 100%; accent-color: var(--amber); cursor: pointer;" oninput="scrubStep(parseInt(this.value))">
+        <div style="margin-bottom: 16px;">
+          <input type="range" id="flight-scrubber" min="0" max="3" value="0" style="width: 100%; accent-color: var(--gold); cursor: pointer;" oninput="scrubStep(parseInt(this.value))">
         </div>
 
         <!-- Telemetry Gauges for Active Step -->
-        <div class="flight-step-card" style="background: rgba(0,0,0,0.45); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+        <div class="flight-step-card" style="background: rgba(12, 10, 18, 0.6); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span id="step-kind-badge" class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">tool_call</span>
+              <span id="step-kind-badge" class="badge" style="background: rgba(83, 201, 238, 0.2); color: var(--cyan);">tool_call</span>
               <span id="step-actor" class="mono font-bold" style="color: #fff; font-size: 14px;">search_catalog</span>
-              <span id="step-status-badge" class="badge" style="background: rgba(74, 222, 128, 0.2); color: #4ade80;">200 OK</span>
+              <span id="step-status-badge" class="badge" style="background: rgba(126, 215, 161, 0.2); color: var(--live-green);">200 OK</span>
             </div>
-            <div class="mono text-xs" id="step-metrics" style="color: var(--text-dim);">
-              <span style="color: var(--amber);">14.2 ms</span> &bull; 
-              <span style="color: var(--green);">$0.0003</span> &bull; 
+            <div class="mono text-xs" id="step-metrics" style="color: var(--stage-muted);">
+              <span style="color: var(--gold);">14.2 ms</span> &bull; 
+              <span style="color: var(--live-green);">$0.0003</span> &bull; 
               <span>120 Tokens</span>
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
             <div>
               <div class="mono text-xs text-muted" style="margin-bottom: 4px;">INPUT ARGUMENTS</div>
               <pre id="step-input" class="response-box" style="margin: 0; max-height: 120px; font-size: 11px;"></pre>
@@ -1202,30 +1267,31 @@ def render_developer_portal(
             </div>
           </div>
           
-          <div id="step-hash-bar" class="mono text-xs" style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); color: var(--text-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
-            <span>CHAIN HASH: <span id="step-hash" style="color: var(--amber);">e3b0c442...</span></span>
-            <span style="color: #4ade80;">✔ SHA-256 MERKLE INTEGRITY SEALED</span>
+          <div id="step-hash-bar" class="mono text-xs" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); color: var(--stage-quiet); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+            <span>CHAIN HASH: <span id="step-hash" style="color: var(--gold);">e3b0c442...</span></span>
+            <span style="color: var(--live-green);">✔ SHA-256 MERKLE INTEGRITY SEALED</span>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ========================================================
-         CRYPTOGRAPHIC BLACK-BOX FLIGHT RECEIPT (Matching OpenAny)
+         CRYPTOGRAPHIC BLACK-BOX FLIGHT RECEIPT
          ======================================================== -->
     <section class="card" id="flight-receipt-section">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+      <div class="console-bar" style="margin: -24px -24px 18px -24px;">
+        <i></i><i></i><i></i>
+        <span>agentflight &bull; black-box-receipt.accounting</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
         <div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="badge" style="background: rgba(0, 71, 255, 0.2); color: #60a5fa;">Itemized Accounting</span>
-            <span class="mono text-xs text-dim">OPENANY PREPAID BILLED SLIP</span>
-          </div>
-          <h2 style="font-size: 18px; color: #fff; margin-top: 4px;">Cryptographic Flight Usage Receipt</h2>
+          <p class="opener-eyebrow"><span></span>04 / ITEMIZED TELEMETRY SLIP</p>
+          <h2 style="font-size: 24px; margin-top: 4px;">Cryptographic Flight Usage Receipt</h2>
           <p class="text-xs text-dim">Monospace itemized breakdown of model tokens, tool executions, and circuit breaker savings.</p>
         </div>
         <div style="display: flex; gap: 8px;">
-          <button class="btn btn-sm btn-blue" onclick="printSimulatedReceipt()">⚡ Print / Re-Simulate Slip</button>
-          <button class="btn btn-sm btn-ghost" onclick="copyReceiptText()">Copy Receipt</button>
+          <button class="folio-action" onclick="printSimulatedReceipt()">⚡ Print / Re-Simulate Slip</button>
+          <button class="folio-action-secondary" onclick="copyReceiptText()">Copy Receipt</button>
         </div>
       </div>
 
@@ -1237,7 +1303,7 @@ def render_developer_portal(
 
         <div class="receipt-line">
           <span class="text-muted">FLIGHT IDENTIFIER:</span>
-          <span class="mono font-bold text-amber" id="rcpt-flight-id">AF-101-GOLDEN</span>
+          <span class="mono font-bold text-gold" id="rcpt-flight-id">AF-101-GOLDEN</span>
         </div>
         <div class="receipt-line">
           <span class="text-muted">ROUTED GATEWAY:</span>
@@ -1245,16 +1311,16 @@ def render_developer_portal(
         </div>
         <div class="receipt-line">
           <span class="text-muted">ACTIVE MODEL:</span>
-          <span class="mono text-blue font-bold" id="rcpt-model">MiniMax-M2.5 (Thinking CoT)</span>
+          <span class="mono text-gold font-bold" id="rcpt-model">MiniMax-M2.5 (Thinking CoT)</span>
         </div>
         <div class="receipt-line">
           <span class="text-muted">CIRCUIT BREAKER:</span>
-          <span class="mono text-green font-bold" id="rcpt-circuit">PASS (0 LOOPS)</span>
+          <span class="mono text-mint font-bold" id="rcpt-circuit">PASS (0 LOOPS)</span>
         </div>
 
         <div class="receipt-divider"></div>
 
-        <div class="receipt-line" style="font-weight: 600; color: #94a3b8; font-size: 11px;">
+        <div class="receipt-line" style="font-weight: 600; color: #d9cfd8; font-size: 11px;">
           <span>ITEM / EXECUTION SPAN</span>
           <span>QUANTITY</span>
           <span>UNIT RATE</span>
@@ -1296,14 +1362,14 @@ def render_developer_portal(
           <span id="rcpt-total-cost">$0.000443</span>
         </div>
 
-        <div class="receipt-line" style="color: var(--amber); margin-top: 4px;">
+        <div class="receipt-line" style="color: var(--gold); margin-top: 4px;">
           <span>PRE-FLIGHT SPEND SAVINGS (Loops Prevented)</span>
           <span id="rcpt-savings">+$0.840000</span>
         </div>
 
         <div class="receipt-divider"></div>
 
-        <div style="font-size: 11px; color: var(--text-muted);">
+        <div style="font-size: 11px; color: var(--stage-quiet);">
           <div>IMMUTABLE CASSETTE SEAL (SHA-256):</div>
           <div class="mono text-cyan" id="rcpt-hash" style="word-break: break-all; margin-top: 2px;">
             7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069
@@ -1320,16 +1386,19 @@ def render_developer_portal(
          MCP TOOL SCHEMA DOCTOR & AUTO-HEALER
          ======================================================== -->
     <section class="card" id="schema-doctor">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+      <div class="console-bar" style="margin: -24px -24px 18px -24px;">
+        <i></i><i></i><i></i>
+        <span>agentflight &bull; schema-doctor.auto-heal</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
         <div>
-          <h2 style="font-size: 18px; color: #fff; display: flex; align-items: center; gap: 8px;">
-            <span style="color: var(--cyan);">⚡</span> MCP Tool Schema Doctor & Auto-Healer
-          </h2>
+          <p class="opener-eyebrow"><span></span>05 / SCHEMA HEALTH</p>
+          <h2 style="font-size: 24px; margin-top: 4px;">MCP Tool Schema Doctor & Auto-Healer</h2>
           <p class="text-xs text-dim">Audit and automatically harden flawed MCP tool schemas into Glama TDQS Gold Standard.</p>
         </div>
         <div style="display: flex; gap: 8px;">
-          <button class="btn btn-sm" onclick="loadDoctorSample('flawed')">Load Smelly Tool</button>
-          <button class="btn btn-sm btn-cyan" onclick="healCurrentSchema()">⚡ Auto-Heal with AgentFlight Fix</button>
+          <button class="folio-action-secondary" onclick="loadDoctorSample('flawed')">Load Smelly Tool</button>
+          <button class="folio-action" onclick="healCurrentSchema()">⚡ Auto-Heal with AgentFlight Fix</button>
         </div>
       </div>
 
@@ -1337,7 +1406,7 @@ def render_developer_portal(
         <div class="pane">
           <div class="pane-head">
             <span class="pane-title">Input Tool Schema (Raw / Smelly)</span>
-            <span id="doc-score-orig" class="badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">Score: 28 &bull; Grade F</span>
+            <span id="doc-score-orig" class="badge" style="background: rgba(208, 96, 63, 0.2); color: #ff9d85;">Score: 28 &bull; Grade F</span>
           </div>
           <textarea id="doctor-input" class="code-editor" style="height: 220px;" placeholder="Paste raw tool JSON here..."></textarea>
         </div>
@@ -1345,8 +1414,8 @@ def render_developer_portal(
           <div class="pane-head">
             <span class="pane-title">Hardened Schema (Glama TDQS Compliant)</span>
             <div style="display: flex; gap: 6px; align-items: center;">
-              <span id="doc-score-fixed" class="badge" style="background: rgba(16, 185, 129, 0.2); color: #4ade80;">Score: 98 &bull; Grade A+</span>
-              <button class="btn btn-sm btn-ghost" onclick="copyDoctorOutput()">Copy</button>
+              <span id="doc-score-fixed" class="badge" style="background: rgba(126, 215, 161, 0.2); color: var(--live-green);">Score: 98 &bull; Grade A+</span>
+              <button class="folio-action-sm" onclick="copyDoctorOutput()">Copy</button>
             </div>
           </div>
           <pre id="doctor-output" class="response-box" style="height: 220px;">// Click "Auto-Heal with AgentFlight Fix" to harden schema</pre>
@@ -1358,7 +1427,12 @@ def render_developer_portal(
          1-CLICK CLIENT CONFIGURATION
          ======================================================== -->
     <section class="card" id="client-config">
-      <h2 style="font-size: 18px; margin-bottom: 12px; color: #fff;">1-Click Client Configuration</h2>
+      <div class="console-bar" style="margin: -24px -24px 18px -24px;">
+        <i></i><i></i><i></i>
+        <span>agentflight &bull; client-integration.sh</span>
+      </div>
+      <p class="opener-eyebrow"><span></span>06 / CLIENT INTEGRATION</p>
+      <h2 style="font-size: 24px; margin-top: 4px; margin-bottom: 14px;">1-Click Client Configuration</h2>
       <div class="tabs">
         <button class="tab-btn active" onclick="switchTab(this, 'tab-claude-code')">Claude Code</button>
         <button class="tab-btn" onclick="switchTab(this, 'tab-cursor')">Cursor</button>
@@ -1421,21 +1495,26 @@ def render_developer_portal(
          INTERACTIVE JSON-RPC PLAYGROUND
          ======================================================== -->
     <section class="card" id="playground">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+      <div class="console-bar" style="margin: -24px -24px 18px -24px;">
+        <i></i><i></i><i></i>
+        <span>agentflight &bull; json-rpc.playground</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
         <div>
-          <h2 style="font-size: 18px; color: #fff;">Interactive JSON-RPC Playground</h2>
+          <p class="opener-eyebrow"><span></span>07 / LIVE RPC PLAYGROUND</p>
+          <h2 style="font-size: 24px; margin-top: 4px;">Interactive JSON-RPC Playground</h2>
           <p class="text-xs text-dim">Test live serverless MCP execution and OpenAny model gateways with sub-millisecond measurement.</p>
         </div>
         <div class="preset-bar">
-          <button class="btn btn-sm btn-blue" onclick="loadPreset('openany_models')">OpenAny Models</button>
-          <button class="btn btn-sm btn-blue" onclick="loadPreset('openany_chat')">OpenAny Chat</button>
-          <button class="btn btn-sm" onclick="loadPreset('init')">initialize</button>
-          <button class="btn btn-sm" onclick="loadPreset('tools_list')">tools/list</button>
-          <button class="btn btn-sm" onclick="loadPreset('sample_call')">lint_clean</button>
-          <button class="btn btn-sm" onclick="loadPreset('lint_smelly')">lint_smelly</button>
-          <button class="btn btn-sm" onclick="loadPreset('res_list')">resources/list</button>
-          <button class="btn btn-sm" onclick="loadPreset('res_templates')">resources/templates</button>
-          <button class="btn btn-sm" onclick="loadPreset('prompts_list')">prompts/list</button>
+          <button class="folio-action-sm" onclick="loadPreset('openany_models')">OpenAny Models</button>
+          <button class="folio-action-sm" onclick="loadPreset('openany_chat')">OpenAny Chat</button>
+          <button class="folio-action-sm" onclick="loadPreset('init')">initialize</button>
+          <button class="folio-action-sm" onclick="loadPreset('tools_list')">tools/list</button>
+          <button class="folio-action-sm" onclick="loadPreset('sample_call')">lint_clean</button>
+          <button class="folio-action-sm" onclick="loadPreset('lint_smelly')">lint_smelly</button>
+          <button class="folio-action-sm" onclick="loadPreset('res_list')">resources/list</button>
+          <button class="folio-action-sm" onclick="loadPreset('res_templates')">resources/templates</button>
+          <button class="folio-action-sm" onclick="loadPreset('prompts_list')">prompts/list</button>
         </div>
       </div>
 
@@ -1444,8 +1523,8 @@ def render_developer_portal(
           <div class="pane-head">
             <span class="pane-title">Request (JSON-RPC 2.0)</span>
             <div style="display: flex; gap: 8px;">
-              <button class="btn btn-sm" id="copy-curl-btn" onclick="copyAsCurl()">Copy as cURL</button>
-              <button class="btn btn-sm btn-blue" id="send-btn" onclick="sendJsonRpc()">Send Request &rarr;</button>
+              <button class="folio-action-sm" id="copy-curl-btn" onclick="copyAsCurl()">Copy cURL</button>
+              <button class="folio-action" id="send-btn" onclick="sendJsonRpc()">Send Request &rarr;</button>
             </div>
           </div>
           <textarea id="rpc-request" class="code-editor">{html.escape(sample_call_json)}</textarea>
@@ -1454,7 +1533,7 @@ def render_developer_portal(
           <div class="pane-head">
             <span class="pane-title">Response</span>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <button class="btn btn-sm btn-ghost" id="copy-resp-btn" onclick="copyResponse()">Copy</button>
+              <button class="folio-action-sm" id="copy-resp-btn" onclick="copyResponse()">Copy</button>
               <span id="rpc-meta" class="text-xs mono text-muted">Ready</span>
             </div>
           </div>
@@ -1467,29 +1546,44 @@ def render_developer_portal(
          CAPABILITIES CATALOGS WITH SEARCH
          ======================================================== -->
     <section class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+      <div class="console-bar" style="margin: -24px -24px 18px -24px;">
+        <i></i><i></i><i></i>
+        <span>agentflight &bull; capabilities.tools</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
         <div>
-          <h2 style="font-size: 18px; color: #fff;">Registered Flight Tools ({len(tools)})</h2>
+          <p class="opener-eyebrow"><span></span>08 / REGISTERED FLIGHT TOOLS</p>
+          <h2 style="font-size: 24px; margin-top: 4px;">Registered Flight Tools ({len(tools)})</h2>
           <p class="text-xs text-dim">Static tool-smell linters, OpenAny model routers, and trajectory cassette engines.</p>
         </div>
-        <input type="text" class="search-input" placeholder="Search tools by name or description..." oninput="filterTools(this.value)">
+        <input type="text" class="search-input" placeholder="Search tools by name..." oninput="filterTools(this.value)">
       </div>
       <div class="card-list" id="tools-list">{tools_html}</div>
     </section>
 
     <section class="card">
-      <h2 style="font-size: 18px; margin-bottom: 14px; color: #fff;">Exposed Flight Resources ({len(resources)})</h2>
+      <div class="console-bar" style="margin: -24px -24px 18px -24px;">
+        <i></i><i></i><i></i>
+        <span>agentflight &bull; capabilities.resources</span>
+      </div>
+      <p class="opener-eyebrow"><span></span>09 / FLIGHT RESOURCES</p>
+      <h2 style="font-size: 24px; margin-top: 4px; margin-bottom: 14px;">Exposed Flight Resources ({len(resources)})</h2>
       <div class="card-list">{resources_html}</div>
     </section>
 
     <section class="card">
-      <h2 style="font-size: 18px; margin-bottom: 14px; color: #fff;">Trajectory Prompts Catalog ({len(prompts)})</h2>
+      <div class="console-bar" style="margin: -24px -24px 18px -24px;">
+        <i></i><i></i><i></i>
+        <span>agentflight &bull; capabilities.prompts</span>
+      </div>
+      <p class="opener-eyebrow"><span></span>10 / TRAJECTORY PROMPTS</p>
+      <h2 style="font-size: 24px; margin-top: 4px; margin-bottom: 14px;">Trajectory Prompts Catalog ({len(prompts)})</h2>
       <div class="card-list">{prompts_html}</div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-      <div>&copy; 2026 CodeSphere Innovations &bull; Architect: <a href="https://alvin.codesphereug.com" target="_blank" rel="noopener" style="color: var(--openany-blue-bright); font-weight: 600; text-decoration: none;">Akandwanaho Ivan (Alvin)</a> &bull; <a href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener" style="color: var(--amber); text-decoration: none;">System Case Study</a> &bull; OpenAny Strategic Partner &bull; MIT License</div>
+      <div>&copy; 2026 CodeSphere Innovations &bull; Architect: <a href="https://alvin.codesphereug.com" target="_blank" rel="noopener" style="color: var(--gold); font-weight: 700;">Akandwanaho Ivan (Alvin)</a> &bull; <a href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener" style="color: var(--gold-bright);">System Case Study</a> &bull; OpenAny Strategic Partner &bull; MIT License</div>
       <div class="mono">Transport: Streamable HTTP (<code>POST /mcp</code>) + SSE (<code>GET /mcp</code>)</div>
     </footer>
   </div>
@@ -1510,19 +1604,19 @@ def render_developer_portal(
     let audioCtx = null;
     let highwayMode = 'full';
 
-    // Web Audio Synthesizer (Zero External Dependencies)
+    // Web Audio Synthesizer
     function toggleAudio() {{
       audioEnabled = !audioEnabled;
       const btn = document.getElementById('audio-btn');
       if (audioEnabled) {{
         btn.innerText = '🔊 Sound: ON';
-        btn.style.color = 'var(--green)';
+        btn.style.color = 'var(--live-green)';
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
         playChime(660, 0.08);
       }} else {{
         btn.innerText = '🔇 Sound: OFF';
-        btn.style.color = 'var(--text-muted)';
+        btn.style.color = 'var(--stage-quiet)';
       }}
     }}
 
@@ -1561,20 +1655,17 @@ def render_developer_portal(
         h = canvas.height = stage.offsetHeight;
       }});
 
-      // Packets flowing from left to right along bezier curves
       const packets = [];
       for (let i = 0; i < 16; i++) {{
         packets.push({{
           t: Math.random(),
           speed: 0.004 + Math.random() * 0.006,
-          radius: 2 + Math.random() * 2,
-          color: Math.random() > 0.4 ? '#3b82f6' : '#f59e0b',
+          radius: 2.5 + Math.random() * 2,
+          color: Math.random() > 0.4 ? '#f4b94c' : '#7ed7a1',
         }});
       }}
 
       function getHighwayPoint(t) {{
-        // Curve 1: Client -> Shield (t: 0 -> 0.5)
-        // Curve 2: Shield -> Gateway (t: 0.5 -> 1.0)
         const p0 = {{ x: w * 0.16, y: h * 0.5 }};
         const p1 = {{ x: w * 0.50, y: h * 0.5 }};
         const p2 = {{ x: w * 0.84, y: h * 0.5 }};
@@ -1601,21 +1692,19 @@ def render_developer_portal(
         const p1 = {{ x: w * 0.50, y: h * 0.5 }};
         const p2 = {{ x: w * 0.84, y: h * 0.5 }};
 
-        // Draw static highway guide lines
         ctx.lineWidth = 2;
-        ctx.strokeStyle = 'rgba(59, 130, 246, 0.2)';
+        ctx.strokeStyle = 'rgba(244, 185, 76, 0.2)';
         ctx.beginPath();
         ctx.moveTo(p0.x, p0.y);
         ctx.quadraticCurveTo((p0.x + p1.x) / 2, h * 0.2, p1.x, p1.y);
         ctx.stroke();
 
-        ctx.strokeStyle = 'rgba(16, 185, 129, 0.2)';
+        ctx.strokeStyle = 'rgba(126, 215, 161, 0.2)';
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
         ctx.quadraticCurveTo((p1.x + p2.x) / 2, h * 0.8, p2.x, p2.y);
         ctx.stroke();
 
-        // Draw flowing packets
         packets.forEach(p => {{
           p.t += p.speed;
           if (p.t > 1) p.t = 0;
@@ -1676,10 +1765,10 @@ def render_developer_portal(
       }});
 
       const waypoints = [
-        {{ x: w * 0.15, y: h * 0.25, vx: 0.1, vy: 0.05, label: 'WP-OPENANY' }},
+        {{ x: w * 0.15, y: h * 0.25, vx: 0.1, vy: 0.05, label: 'WP-CODESPHERE' }},
         {{ x: w * 0.45, y: h * 0.35, vx: -0.08, vy: 0.1, label: 'WP-FLIGHT' }},
         {{ x: w * 0.75, y: h * 0.20, vx: 0.05, vy: -0.06, label: 'WP-SHIELD' }},
-        {{ x: w * 0.85, y: h * 0.70, vx: -0.04, vy: 0.08, label: 'WP-ROUTER' }},
+        {{ x: w * 0.85, y: h * 0.70, vx: -0.04, vy: 0.08, label: 'WP-OPENANY' }},
         {{ x: w * 0.30, y: h * 0.65, vx: 0.07, vy: -0.05, label: 'WP-MERKLE' }},
       ];
 
@@ -1689,7 +1778,7 @@ def render_developer_portal(
         ctx.clearRect(0, 0, w, h);
 
         const cx = w * 0.5, cy = h * 0.35;
-        ctx.strokeStyle = 'rgba(0, 71, 255, 0.04)';
+        ctx.strokeStyle = 'rgba(244, 185, 76, 0.04)';
         ctx.lineWidth = 1;
         for (let r = 80; r < Math.max(w, h); r += 160) {{
           ctx.beginPath();
@@ -1697,12 +1786,11 @@ def render_developer_portal(
           ctx.stroke();
         }}
 
-        // Sweep
         sweepAngle += 0.007;
         const sweepX = cx + Math.cos(sweepAngle) * Math.max(w, h);
         const sweepY = cy + Math.sin(sweepAngle) * Math.max(w, h);
         const grad = ctx.createLinearGradient(cx, cy, sweepX, sweepY);
-        grad.addColorStop(0, 'rgba(0, 71, 255, 0.06)');
+        grad.addColorStop(0, 'rgba(244, 185, 76, 0.06)');
         grad.addColorStop(1, 'transparent');
         ctx.fillStyle = grad;
         ctx.beginPath();
@@ -1711,8 +1799,7 @@ def render_developer_portal(
         ctx.closePath();
         ctx.fill();
 
-        // Vector tracks
-        ctx.strokeStyle = 'rgba(59, 130, 246, 0.06)';
+        ctx.strokeStyle = 'rgba(244, 185, 76, 0.05)';
         ctx.beginPath();
         for (let i = 0; i < waypoints.length; i++) {{
           const next = waypoints[(i + 1) % waypoints.length];
@@ -1721,20 +1808,19 @@ def render_developer_portal(
         }}
         ctx.stroke();
 
-        // Waypoint points
         waypoints.forEach(wp => {{
           wp.x += wp.vx;
           wp.y += wp.vy;
           if (wp.x < 50 || wp.x > w - 50) wp.vx *= -1;
           if (wp.y < 50 || wp.y > h - 50) wp.vy *= -1;
 
-          ctx.fillStyle = 'rgba(0, 71, 255, 0.45)';
+          ctx.fillStyle = 'rgba(244, 185, 76, 0.4)';
           ctx.beginPath();
           ctx.arc(wp.x, wp.y, 2.5, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.font = '9px monospace';
-          ctx.fillStyle = 'rgba(148, 163, 184, 0.3)';
+          ctx.fillStyle = 'rgba(217, 207, 216, 0.3)';
           ctx.fillText(wp.label, wp.x + 6, wp.y + 3);
         }});
 
@@ -1772,9 +1858,9 @@ def render_developer_portal(
       const circuitEl = document.getElementById('rcpt-circuit');
       if (circuitEl) {{
         if (r.circuit_status.includes('TRIPPED')) {{
-          circuitEl.style.color = '#ef4444';
+          circuitEl.style.color = 'var(--ember)';
         }} else {{
-          circuitEl.style.color = 'var(--green)';
+          circuitEl.style.color = 'var(--live-green)';
         }}
       }}
     }}
@@ -1806,24 +1892,24 @@ def render_developer_portal(
       if (statBadge) {{
         if (span.status === 'ok') {{
           statBadge.innerText = '200 OK';
-          statBadge.style.color = '#4ade80';
-          statBadge.style.background = 'rgba(74, 222, 128, 0.2)';
+          statBadge.style.color = 'var(--live-green)';
+          statBadge.style.background = 'rgba(126, 215, 161, 0.2)';
         }} else if (span.status === 'tripped') {{
           statBadge.innerText = '⚡ CIRCUIT TRIPPED';
-          statBadge.style.color = '#f87171';
-          statBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+          statBadge.style.color = '#ff9d85';
+          statBadge.style.background = 'rgba(208, 96, 63, 0.2)';
         }} else {{
           statBadge.innerText = '❌ ERROR';
-          statBadge.style.color = '#f87171';
-          statBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+          statBadge.style.color = '#ff9d85';
+          statBadge.style.background = 'rgba(208, 96, 63, 0.2)';
         }}
       }}
 
       const metricsEl = document.getElementById('step-metrics');
       if (metricsEl) {{
         metricsEl.innerHTML = `
-          <span style="color: var(--amber);">${{span.latency_ms}} ms</span> &bull; 
-          <span style="color: var(--green);">$${{span.cost_usd.toFixed(4)}}</span> &bull; 
+          <span style="color: var(--gold);">${{span.latency_ms}} ms</span> &bull; 
+          <span style="color: var(--live-green);">$${{span.cost_usd.toFixed(4)}}</span> &bull; 
           <span>${{span.tokens}} Tokens</span>
         `;
       }}
@@ -1837,7 +1923,6 @@ def render_developer_portal(
       const hashEl = document.getElementById('step-hash');
       if (hashEl) hashEl.innerText = span.hash ? span.hash.substring(0, 16) + '...' : 'GENESIS';
 
-      // Update Waypoints Track
       const trackFill = document.getElementById('track-fill');
       if (trackFill && spans.length > 1) {{
         trackFill.style.width = ((stepIdx / (spans.length - 1)) * 100) + '%';
@@ -1879,15 +1964,11 @@ def render_developer_portal(
         isPlaying = false;
         if (btn) {{
           btn.innerText = '▶ Play';
-          btn.classList.remove('btn-cyan');
-          btn.classList.add('btn-amber');
         }}
       }} else {{
         isPlaying = true;
         if (btn) {{
           btn.innerText = '⏸ Pause';
-          btn.classList.remove('btn-amber');
-          btn.classList.add('btn-cyan');
         }}
         playInterval = setInterval(() => {{
           const flight = FLIGHTS[currentFlightKey];
@@ -1906,9 +1987,6 @@ def render_developer_portal(
       updateReceiptFromFlight(currentFlightKey);
     }}
 
-    // ========================================================
-    // PRINT / SIMULATE RECEIPT WITH SOUND
-    // ========================================================
     function printSimulatedReceipt() {{
       playChime(1080, 0.08);
       const box = document.getElementById('receipt-box');
@@ -1962,8 +2040,8 @@ MERKLE CASSETTE SEAL: ${{r.merkle_hash}}
     function loadDoctorSample(kind) {{
       document.getElementById('doctor-input').value = JSON.stringify(SAMPLE_FLAWED_TOOL, null, 2);
       document.getElementById('doc-score-orig').innerText = 'Score: 28 • Grade F';
-      document.getElementById('doc-score-orig').style.background = 'rgba(239, 68, 68, 0.2)';
-      document.getElementById('doc-score-orig').style.color = '#f87171';
+      document.getElementById('doc-score-orig').style.background = 'rgba(208, 96, 63, 0.2)';
+      document.getElementById('doc-score-orig').style.color = '#ff9d85';
     }}
 
     function healCurrentSchema() {{
@@ -2005,8 +2083,8 @@ MERKLE CASSETTE SEAL: ${{r.merkle_hash}}
       document.getElementById('doctor-output').textContent = JSON.stringify(fixed, null, 2);
       const scoreEl = document.getElementById('doc-score-fixed');
       scoreEl.innerText = 'Score: 98 • Grade A+';
-      scoreEl.style.background = 'rgba(16, 185, 129, 0.2)';
-      scoreEl.style.color = '#4ade80';
+      scoreEl.style.background = 'rgba(126, 215, 161, 0.2)';
+      scoreEl.style.color = 'var(--live-green)';
       playChime(880, 0.12);
     }}
 
@@ -2216,12 +2294,12 @@ MERKLE CASSETTE SEAL: ${{r.merkle_hash}}
         }});
         const dur = (performance.now() - t0).toFixed(1);
         const data = await res.json();
-        meta.innerHTML = `<span style="color: var(--green);">${{res.status}} OK</span> &bull; ${{dur}} ms`;
+        meta.innerHTML = `<span style="color: var(--live-green);">${{res.status}} OK</span> &bull; ${{dur}} ms`;
         respBox.textContent = JSON.stringify(data, null, 2);
         playChime(1040, 0.08);
       }} catch (err) {{
         const dur = (performance.now() - t0).toFixed(1);
-        meta.innerHTML = `<span style="color: var(--red);">Error</span> &bull; ${{dur}} ms`;
+        meta.innerHTML = `<span style="color: var(--ember);">Error</span> &bull; ${{dur}} ms`;
         respBox.textContent = String(err);
       }} finally {{
         btn.disabled = false;
