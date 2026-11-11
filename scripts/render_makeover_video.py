@@ -3,24 +3,31 @@
 scripts.render_makeover_video
 =============================
 Produces a cinematic, studio-grade makeover demonstration video of the
-AgentFlight × OpenAny commercial integration with:
-- Synchronized voiceover narration (Mac audio synthesizer)
-- Ambient sci-fi synthesizer score + UI sound effects
+AgentFlight × OpenAny integration featuring:
+- Ultra-human neural African voiceover narration (en-KE-ChilembaNeural / Tessa en_ZA fallback)
+- Pure technical focus with commercial revenue shares discreetly omitted
+- Real-world live execution data (Request ID 0743400fadffb4e5fa37eacbe28eb0fa, latency 1,767 ms, spend $0.000025)
+- Real pre-execution circuit breaker block ($0.009891 vs $0.000001 budget, zero egress)
+- Real offline replay at 0.083 μs/span (11,276,474 spans/sec, zero network cost)
+- Real remote MCP tool audit across rules TS001-TS010 (50 tools, up to 78% context pruning)
+- Ambient sci-fi synthesizer score + tactile cybernetic UI sound effects
 - Ken Burns 3D camera pan/zoom on cinematic mission control hero art
 - Dynamic terminal character-by-character typing animations
 - Real-time HUD telemetry, pulsing attribution badges & flashing circuit breaker shields
 - Synchronized on-screen closed captions / subtitles
 
 Outputs:
-- marketing/openany-launch/agentflight_openany_makeover_demo.mp4 (Full 1080p/720p HD with AAC audio)
-- marketing/openany-launch/agentflight_openany_demo.mp4 (Updated master)
-- marketing/openany-launch/agentflight_openany_demo.gif (Updated GIF preview)
+- marketing/openany-launch/agentflight_openany_makeover_demo.mp4 (Full HD with AAC audio)
+- marketing/openany-launch/agentflight_openany_demo.mp4 (Master demo MP4)
+- marketing/openany-launch/agentflight_openany_demo.gif (Animated preview GIF)
 """
 
 from __future__ import annotations
 
+import asyncio
 import math
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -61,34 +68,86 @@ HERO_IMG = get_hero_image()
 
 
 # ---------------------------------------------------------------------------
-# Audio Production Engine (Voice + Ambient Synth + UI SFX)
+# Audio Production Engine (Human African Voice + Ambient Synth + UI SFX)
 # ---------------------------------------------------------------------------
 
 SCENE_SCRIPTS = [
-    ("scene_0", "What happens when the fastest AI flight recorder meets an open marketplace of 128 models and 3,200 APIs? Total reliability.", 10.5),
-    ("scene_1", "With AgentFlight, connect to OpenAny in seconds. Discover models, inspect context windows, and query real-time per-token pricing directly from your terminal.", 11.5),
-    ("scene_2", "Every request transmits our verified partner attribution header: X OpenAny Partner Id: agentflight. Powers a permanent 30 percent revenue share, while strictly isolating your credentials.", 13.0),
-    ("scene_3", "Never burn through API credits on runaway calls again. AgentFlight’s pre-execution circuit breaker calculates costs before dispatch and halts expensive requests before they leave your machine.", 12.5),
-    ("scene_4", "Recursive loops and ping-pong tool cycles are stopped at step two. Your spend is protected; your agents stay on course.", 8.0),
-    ("scene_5", "Every step is recorded into a tamper-evident cryptographic cassette. Replay entire 50-step trajectories in your CI suite at 0.08 microseconds per span — completely offline, with zero network calls and zero cost.", 15.5),
-    ("scene_6", "Audit OpenAny remote MCP tools against 10 ergonomics rules, trimming prompt schemas by up to 78 percent for maximum function-calling precision.", 10.5),
-    ("scene_7", "AgentFlight: The black-box telemetry and cost control plane for the agentic web. Available now on PyPI and GitHub.", 8.5),
+    (
+        "scene_0",
+        "What happens when the fastest autonomous AI flight recorder meets an open marketplace of over 128 production models? Total reliability. Welcome to AgentFlight integrated live with OpenAny.",
+        14.0,
+    ),
+    (
+        "scene_1",
+        "With AgentFlight, connect to OpenAny in seconds. Query the entire live fleet of 128 models, inspect context windows up to one million tokens, and track real-time per-token pricing directly in your terminal.",
+        14.5,
+    ),
+    (
+        "scene_2",
+        "Every request transmits our verified partner header: X OpenAny Partner Id: agentflight. Watch this live call to MiniMax-M2.5 complete in 1,767 milliseconds, costing just 0.000025 dollars.",
+        17.0,
+    ),
+    (
+        "scene_3",
+        "Never burn through API credits on runaway calls again. AgentFlight pre-execution circuit breaker calculates costs before dispatch and halts expensive requests before they leave your machine.",
+        12.0,
+    ),
+    (
+        "scene_4",
+        "Autonomous agents trapped in recursive loops or ping-pong tool cycles are stopped dead at step two. Your credit balance is protected, and your systems stay safe.",
+        11.0,
+    ),
+    (
+        "scene_5",
+        "Every step is recorded into a tamper-evident cryptographic cassette. Replay entire 50-step trajectories in your CI suite at 0.08 microseconds per span, completely offline, with zero network calls and zero cost.",
+        15.0,
+    ),
+    (
+        "scene_6",
+        "Audit OpenAny remote MCP tools against 10 static ergonomics rules. AgentFlight compiles schemas to reduce prompt overhead by up to 78 percent for maximum function calling precision.",
+        13.0,
+    ),
+    (
+        "scene_7",
+        "AgentFlight: The black-box telemetry, circuit breaker, and replay platform for production AI agents. Available now on PyPI and GitHub. Start recording your agent trajectories today.",
+        13.5,
+    ),
 ]
 
 
-def build_master_audio(work_dir: str, ffmpeg_bin: str) -> str:
-    """Generate voice segments, synthesize ambient sci-fi music & SFX, and mix master stereo WAV."""
-    voice = "Daniel"
-    rate = 180
-    voice_wavs = []
+async def generate_neural_speech_async(name: str, text: str, mp3_path: str, voice: str = "en-KE-ChilembaNeural") -> bool:
+    """Generate high-fidelity human speech using edge-tts neural voice."""
+    try:
+        import edge_tts
+        tts = edge_tts.Communicate(text, voice)
+        await tts.save(mp3_path)
+        return os.path.exists(mp3_path) and os.path.getsize(mp3_path) > 1000
+    except Exception as exc:
+        print(f"    [TTS Warning] edge-tts error for {name}: {exc}")
+        return False
 
-    print("  [Audio] Generating speech synthesis with Daniel (en_GB)...")
+
+def build_master_audio(work_dir: str, ffmpeg_bin: str) -> str:
+    """Generate human African voiceover, synthesize ambient sci-fi music & SFX, and mix master stereo WAV."""
+    voice_wavs = []
+    print("  [Audio] Generating human African voiceover (en-KE-ChilembaNeural)...")
+
     for name, text, target_dur in SCENE_SCRIPTS:
-        aiff_p = os.path.join(work_dir, f"{name}.aiff")
+        mp3_p = os.path.join(work_dir, f"{name}.mp3")
         wav_p = os.path.join(work_dir, f"{name}.wav")
         padded_wav_p = os.path.join(work_dir, f"{name}_padded.wav")
-        subprocess.run(["say", "-v", voice, "-r", str(rate), text, "-o", aiff_p], check=True)
-        subprocess.run([ffmpeg_bin, "-y", "-i", aiff_p, "-ar", str(SAMPLE_RATE), "-ac", "2", wav_p], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        success = asyncio.run(generate_neural_speech_async(name, text, mp3_p, voice="en-KE-ChilembaNeural"))
+        if not success:
+            # Fallback to macOS Tessa (South African English)
+            print(f"    [Fallback] Using macOS Tessa (en_ZA) for {name}...")
+            aiff_p = os.path.join(work_dir, f"{name}.aiff")
+            subprocess.run(["say", "-v", "Tessa", "-r", "175", text, "-o", aiff_p], check=True)
+            subprocess.run([ffmpeg_bin, "-y", "-i", aiff_p, "-ar", str(SAMPLE_RATE), "-ac", "2", wav_p],
+                           check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        else:
+            subprocess.run([ffmpeg_bin, "-y", "-i", mp3_p, "-ar", str(SAMPLE_RATE), "-ac", "2", wav_p],
+                           check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         # Pad or trim to match exact target duration
         subprocess.run([
@@ -106,7 +165,8 @@ def build_master_audio(work_dir: str, ffmpeg_bin: str) -> str:
             f.write(f"file '{p}'\n")
 
     voice_master = os.path.join(work_dir, "voice_master.wav")
-    subprocess.run([ffmpeg_bin, "-y", "-f", "concat", "-safe", "0", "-i", concat_txt, "-c", "copy", voice_master], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run([ffmpeg_bin, "-y", "-f", "concat", "-safe", "0", "-i", concat_txt, "-c", "copy", voice_master],
+                   check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     total_duration = sum(d for _, _, d in SCENE_SCRIPTS)
     print(f"  [Audio] Master voice track assembled: {total_duration:.1f} seconds")
@@ -132,16 +192,17 @@ def build_master_audio(work_dir: str, ffmpeg_bin: str) -> str:
             st = np.linspace(0, dur_s, n, endpoint=False)
             sfx[idx:idx+n] += vol * np.sin(2 * np.pi * freq * st) * np.exp(-st * 8)
 
+    # Scene boundaries: 0.0, 14.0, 28.5, 45.5, 57.5, 68.5, 83.5, 96.5, 110.0
     add_tone(0.2, 587.33, 0.5, 0.12)
     add_tone(0.4, 880.0, 0.6, 0.10)
-    add_tone(10.5, 1200.0, 0.1, 0.08)
-    add_tone(22.0, 1046.5, 0.4, 0.15)  # Attribution lock ping
-    add_tone(35.0, 220.0, 0.8, 0.25)   # Circuit breaker buzz
-    add_tone(35.2, 330.0, 0.6, 0.20)
-    add_tone(47.5, 440.0, 0.3, 0.12)
-    add_tone(55.5, 1760.0, 0.4, 0.18)  # High speed replay swoosh
-    add_tone(71.0, 880.0, 0.2, 0.12)
-    add_tone(81.5, 1046.5, 0.8, 0.15)  # Outro chord
+    add_tone(14.2, 1200.0, 0.15, 0.08)
+    add_tone(29.0, 1046.5, 0.45, 0.15)  # Attribution lock ping
+    add_tone(46.0, 220.0, 0.8, 0.25)    # Circuit breaker buzz
+    add_tone(46.2, 330.0, 0.6, 0.20)
+    add_tone(58.0, 440.0, 0.35, 0.12)
+    add_tone(69.0, 1760.0, 0.4, 0.18)   # High speed replay swoosh
+    add_tone(84.0, 880.0, 0.25, 0.12)
+    add_tone(97.0, 1046.5, 0.8, 0.15)   # Outro chord
 
     music_mix = np.clip(synth + sfx, -0.9, 0.9)
     music_pcm = (music_mix * 32767).astype(np.int16)
@@ -159,7 +220,7 @@ def build_master_audio(work_dir: str, ffmpeg_bin: str) -> str:
         ffmpeg_bin, "-y",
         "-i", voice_master,
         "-i", music_path,
-        "-filter_complex", "[0:a]volume=1.0[v];[1:a]volume=0.22[m];[v][m]amix=inputs=2:duration=longest",
+        "-filter_complex", "[0:a]volume=1.0[v];[1:a]volume=0.20[m];[v][m]amix=inputs=2:duration=longest",
         final_audio
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
@@ -175,15 +236,15 @@ def draw_top_and_bottom_bars(draw: ImageDraw.Draw, scene_title: str, subheader: 
     draw.rectangle([(0, 0), (WIDTH, 56)], fill=(12, 18, 34))
     draw.line([(0, 56), (WIDTH, 56)], fill=(30, 41, 59), width=1)
     draw.text((24, 14), "✈️  AGENTFLIGHT × OPENANY", font=FONT_TITLE, fill=(255, 255, 255))
-    draw.text((430, 22), "COMMERCIAL LAUNCH DEMO", font=FONT_MONO_SM, fill=(148, 163, 184))
+    draw.text((430, 22), "PRODUCTION INTEGRATION DEMO", font=FONT_MONO_SM, fill=(148, 163, 184))
 
-    # Pulsing Pill
-    draw.rounded_rectangle([(780, 12), (1030, 44)], radius=6, fill=(16, 24, 48), outline=(0, 71, 255), width=1)
-    draw.text((792, 21), "X-OpenAny-Partner-Id: agentflight", font=FONT_MONO_SM, fill=(96, 165, 250))
+    # Header Pill 1: Partner Attribution Header
+    draw.rounded_rectangle([(770, 12), (1030, 44)], radius=6, fill=(16, 24, 48), outline=(0, 71, 255), width=1)
+    draw.text((782, 21), "X-OpenAny-Partner-Id: agentflight", font=FONT_MONO_SM, fill=(96, 165, 250))
 
-    # Revenue Share Pill
-    draw.rounded_rectangle([(1045, 12), (1256, 44)], radius=6, fill=(16, 36, 28), outline=(16, 185, 129), width=1)
-    draw.text((1058, 21), "30% PERMANENT REV SHARE", font=FONT_MONO_SM, fill=(52, 211, 153))
+    # Header Pill 2: Operational Status (Discreet - NO revenue share percentage)
+    draw.rounded_rectangle([(1045, 12), (1256, 44)], radius=6, fill=(16, 32, 28), outline=(16, 185, 129), width=1)
+    draw.text((1062, 21), "STATUS: VERIFIED (v1.2.0)", font=FONT_MONO_SM, fill=(52, 211, 153))
 
     # Sub-header
     draw.rectangle([(24, 66), (1256, 100)], fill=(15, 23, 42))
@@ -200,15 +261,13 @@ def draw_top_and_bottom_bars(draw: ImageDraw.Draw, scene_title: str, subheader: 
 
 def draw_subtitle_bar(draw: ImageDraw.Draw, text: str):
     """Render high-contrast closed caption subtitle at the bottom center."""
-    draw.rounded_rectangle([(80, HEIGHT - 84), (WIDTH - 80, HEIGHT - 46)], radius=6, fill=(0, 0, 0, 220), outline=(59, 130, 246), width=1)
-    # Highlight keywords
+    draw.rounded_rectangle([(80, HEIGHT - 84), (WIDTH - 80, HEIGHT - 46)], radius=6, fill=(0, 0, 0, 225), outline=(59, 130, 246), width=1)
     draw.text((WIDTH // 2, HEIGHT - 66), text, font=FONT_CAPTION, fill=(255, 255, 255), anchor="mm")
 
 
 def render_scene_0_frame(frame_idx: int, total_frames: int) -> Image.Image:
     """Scene 0: Ken Burns zoom on cinematic 3D hero art + glassmorphic title card."""
     progress = frame_idx / max(1, total_frames)
-    # Slow subtle zoom from 1.0 to 1.06
     scale = 1.0 + 0.06 * progress
     w_crop = int(WIDTH / scale)
     h_crop = int(HEIGHT / scale)
@@ -228,10 +287,10 @@ def render_scene_0_frame(frame_idx: int, total_frames: int) -> Image.Image:
     draw.text((180, 150), "AgentFlight × OpenAny", font=FONT_BIG, fill=(255, 255, 255))
     draw.text((180, 205), "Autonomous AI Flight Recorder meets 128+ Multi-Model Marketplace", font=FONT_SUB, fill=(203, 213, 225))
 
-    # 3 Cards
+    # 3 Cards (Discreet technical focus)
     draw.rounded_rectangle([(180, 245), (460, 460)], radius=10, fill=(15, 23, 42), outline=(59, 130, 246), width=1)
-    draw.text((196, 260), "01 / COMMERCIAL SHARE", font=FONT_MONO_BOLD, fill=(96, 165, 250))
-    draw.text((196, 290), "• 30% Permanent Revenue\n• Header: X-OpenAny-Partner-Id\n• Verified Backend Ledger\n• Lifetime Partner Attribution", font=FONT_MONO_SM, fill=(203, 213, 225))
+    draw.text((196, 260), "01 / GATEWAY ATTRIBUTION", font=FONT_MONO_BOLD, fill=(96, 165, 250))
+    draw.text((196, 290), "• Header: X-OpenAny-Partner-Id\n• 128 Model Gateway Routing\n• Strict Credential Isolation\n• Verified Backend Attributed", font=FONT_MONO_SM, fill=(203, 213, 225))
 
     draw.rounded_rectangle([(490, 245), (770, 460)], radius=10, fill=(15, 23, 42), outline=(245, 158, 11), width=1)
     draw.text((506, 260), "02 / ZERO-CREDIT SHIELD", font=FONT_MONO_BOLD, fill=(251, 191, 36))
@@ -243,8 +302,8 @@ def render_scene_0_frame(frame_idx: int, total_frames: int) -> Image.Image:
 
     draw.text((180, 500), "Creator & Owner: Akandwanaho Ivan Alvin  •  Commercial Partner: OpenAny (Pistis)", font=FONT_MONO_SM, fill=(148, 163, 184))
 
-    draw_top_and_bottom_bars(draw, "00: Aerospace Mission Control", "Official Commercial Architecture (v1.2.0)")
-    draw_subtitle_bar(draw, "What happens when the fastest AI flight recorder meets an open marketplace of 128 models? Total reliability.")
+    draw_top_and_bottom_bars(draw, "00: Aerospace Mission Control", "Production Integration & Telemetry (v1.2.0)")
+    draw_subtitle_bar(draw, "What happens when the fastest autonomous AI flight recorder meets an open marketplace of over 128 models? Total reliability.")
     return img
 
 
@@ -259,7 +318,6 @@ def render_scene_1_frame(frame_idx: int, total_frames: int) -> Image.Image:
     cursor = "_" if (frame_idx // 12) % 2 == 0 else " "
     typed = cmd_text[:chars_to_show] + cursor
 
-    # Terminal Lines
     lines = [
         (f"$ {typed}", (255, 255, 255)),
     ]
@@ -317,7 +375,7 @@ def render_scene_1_frame(frame_idx: int, total_frames: int) -> Image.Image:
 
 
 def render_scene_2_frame(frame_idx: int, total_frames: int) -> Image.Image:
-    """Scene 2: Outbound HTTP Header Attribution & Live Execution."""
+    """Scene 2: Outbound HTTP Header Attribution & Real Live Execution."""
     img = Image.new("RGB", (WIDTH, HEIGHT), color=(7, 10, 19))
     draw = ImageDraw.Draw(img)
 
@@ -335,13 +393,13 @@ def render_scene_2_frame(frame_idx: int, total_frames: int) -> Image.Image:
         ("    POST /v1/chat/completions HTTP/1.1", (203, 213, 225)),
         ("    Host: api.openany.si", (148, 163, 184)),
         ("    Authorization: Bearer ale-P4...7ydY", (148, 163, 184)),
-        ("    X-OpenAny-Partner-Id: agentflight  <-- [VERIFIED 30% REVENUE SHARE]", hdr_color),
+        ("    X-OpenAny-Partner-Id: agentflight  <-- [VERIFIED ATTRIBUTION]", hdr_color),
         ("    User-Agent: agentflight/1.2.0 (partner=openany)", (148, 163, 184)),
         ("", (0, 0, 0)),
         ("<<< HTTP 200 OK (Latency: 1,767.89 ms)", (52, 211, 153)),
         ("Response ID: 0743400fadffb4e5fa37eacbe28eb0fa", (203, 213, 225)),
         ("Assistant: 'An AI flight recorder captures non-deterministic steps...'", (255, 255, 255)),
-        ("Tokens: 60 total (52 prompt + 8 completion) | Spend: $0.000025 USD", (251, 191, 36)),
+        ("Tokens: 60 total (38 prompt + 22 completion) | Spend: $0.000025 USD", (251, 191, 36)),
         ("✓ Flight recorded: tests/cassettes/openany_live_attribution.flight.json", (52, 211, 153)),
     ]
 
@@ -361,7 +419,7 @@ def render_scene_2_frame(frame_idx: int, total_frames: int) -> Image.Image:
         ("MODEL", "MiniMax-M2.5", (251, 191, 36)),
         ("ROUNDTRIP TIME", "1,767 ms", (56, 189, 248)),
         ("BILLED SPEND", "$0.000025 USD", (52, 211, 153)),
-        ("REVENUE SHARE", "30% Permanent Lifetime", (96, 165, 250)),
+        ("ATTRIBUTION", "Verified (agentflight)", (96, 165, 250)),
     ]
     hy = 160
     for lbl, val, col in hud_items:
@@ -370,7 +428,7 @@ def render_scene_2_frame(frame_idx: int, total_frames: int) -> Image.Image:
         hy += 52
 
     draw_top_and_bottom_bars(draw, "02: Live Execution & Verified Attribution", "Attribution Header: X-OpenAny-Partner-Id: agentflight")
-    draw_subtitle_bar(draw, "Every request transmits our verified partner header: X-OpenAny-Partner-Id. Powers a permanent 30% revenue share.")
+    draw_subtitle_bar(draw, "Every request transmits our verified partner header: X-OpenAny-Partner-Id. Watch this live call complete in 1,767 milliseconds.")
     return img
 
 
@@ -468,7 +526,7 @@ def render_scene_4_frame(frame_idx: int, total_frames: int) -> Image.Image:
         hy += 52
 
     draw_top_and_bottom_bars(draw, "04: Runaway Loop Interruption", "Halts Cyclic Oscillations & Consecutive Error Storms")
-    draw_subtitle_bar(draw, "Recursive loops and ping-pong tool cycles are stopped at step two. Your spend is protected; your agents stay on course.")
+    draw_subtitle_bar(draw, "Autonomous agents trapped in recursive loops or tool cycles are stopped at step two. Your credit balance is protected.")
     return img
 
 
@@ -490,7 +548,7 @@ def render_scene_5_frame(frame_idx: int, total_frames: int) -> Image.Image:
         ("$ agentflight openany replay --cassette session.flight.json", (255, 255, 255)),
         ("Loading cryptographic flight cassette: session.flight.json", (148, 163, 184)),
         ("", (0, 0, 0)),
-        ("Verified SHA-256 Hash Chain: 48c8c8a71ea94eae0029372af6bcd6f2b6...", (52, 211, 153)),
+        ("Verified SHA-256 Hash Chain: 7d6396e480dfae9a8976214dbf220817c1bf20ff22aa5925e523f20ba8f36294...", (52, 211, 153)),
         ("Replaying 50 recorded spans in offline sandbox...", (148, 163, 184)),
         ("  Step 0: [llm_turn]  openany:MiniMax-M2.5  -> status=ok ($0.000030)", (203, 213, 225)),
         ("  Step 1: [tool_call] openany:mcp:lookup    -> status=ok ($0.000000)", (203, 213, 225)),
@@ -525,7 +583,7 @@ def render_scene_5_frame(frame_idx: int, total_frames: int) -> Image.Image:
         hy += 52
 
     draw_top_and_bottom_bars(draw, "05: Cassette & 0.08 μs Offline Replay", "Deterministic $0.00 CI/CD Testing via CassetteReplayer")
-    draw_subtitle_bar(draw, "Replay entire 50-step trajectories in your CI suite at 0.08 microseconds per span — completely offline, zero cost.")
+    draw_subtitle_bar(draw, "Replay entire 50-step trajectories in your CI suite at 0.08 microseconds per span — completely offline, with zero cost.")
     return img
 
 
@@ -575,7 +633,7 @@ def render_scene_6_frame(frame_idx: int, total_frames: int) -> Image.Image:
         hy += 52
 
     draw_top_and_bottom_bars(draw, "06: Remote MCP Tool Ergonomics", "TS001-TS010 Static Linting & Token Pruning")
-    draw_subtitle_bar(draw, "Audit OpenAny remote MCP tools against 10 ergonomics rules, trimming prompt schemas by up to 78% for maximum precision.")
+    draw_subtitle_bar(draw, "Audit OpenAny remote MCP tools against 10 ergonomics rules, reducing prompt overhead by up to 78%.")
     return img
 
 
@@ -598,8 +656,8 @@ def render_scene_7_frame(frame_idx: int, total_frames: int) -> Image.Image:
     draw.text((180, 150), "AgentFlight v1.2.0", font=FONT_BIG, fill=(255, 255, 255))
     draw.text((180, 205), "The Black-Box Flight Recorder & Cost Control Plane for AI Agents", font=FONT_SUB, fill=(52, 211, 153))
 
-    draw.text((180, 255), "COMMERCIAL LAUNCH HIGHLIGHTS:", font=FONT_MONO_BOLD, fill=(251, 191, 36))
-    draw.text((180, 285), "✔ Confirmed 30% Permanent Revenue Share on Attributed Usage\n✔ Outbound Header: X-OpenAny-Partner-Id: agentflight\n✔ Pre-Execution Cost Circuit Breakers (Zero-Credit Defense)\n✔ 0.08 μs Offline Replay & MCP Ergonomics Linter\n✔ 132/132 Tests Passed with Zero Regressions", font=FONT_MONO, fill=(203, 213, 225))
+    draw.text((180, 255), "PRODUCTION LAUNCH HIGHLIGHTS:", font=FONT_MONO_BOLD, fill=(251, 191, 36))
+    draw.text((180, 285), "✔ Verified Request Attribution Header (X-OpenAny-Partner-Id)\n✔ Outbound Header: X-OpenAny-Partner-Id: agentflight\n✔ Pre-Execution Cost Circuit Breakers (Zero-Credit Defense)\n✔ 0.08 μs Offline Replay & MCP Ergonomics Linter\n✔ 132/132 Tests Passed with Zero Regressions", font=FONT_MONO, fill=(203, 213, 225))
 
     draw.rounded_rectangle([(180, 420), (1100, 485)], radius=8, fill=(15, 23, 42), outline=(59, 130, 246), width=1)
     draw.text((200, 432), "INSTALL VIA PYPI:", font=FONT_MONO_SM, fill=(148, 163, 184))
@@ -608,7 +666,7 @@ def render_scene_7_frame(frame_idx: int, total_frames: int) -> Image.Image:
     draw.text((180, 510), "Owner: Akandwanaho Ivan Alvin  •  Live Portal: https://agentflight-tau.vercel.app", font=FONT_MONO_SM, fill=(148, 163, 184))
 
     draw_top_and_bottom_bars(draw, "Ready for Commercial Launch", "Available on PyPI and GitHub")
-    draw_subtitle_bar(draw, "AgentFlight: The black-box telemetry and cost control plane for the agentic web. Available now on PyPI and GitHub.")
+    draw_subtitle_bar(draw, "AgentFlight: The black-box telemetry and cost control plane for production AI agents. Available now on PyPI and GitHub.")
     return img
 
 
@@ -688,7 +746,6 @@ def main() -> int:
         ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         # Update master demo file
-        import shutil
         shutil.copy2(final_makeover_mp4, final_master_mp4)
         if os.path.exists(raw_video):
             os.remove(raw_video)
@@ -711,7 +768,7 @@ def main() -> int:
     print(f"• Makeover Video  : {final_makeover_mp4}")
     print(f"• Animated GIF    : {final_gif}")
     print(f"• Duration        : {total_frames / FPS:.1f} seconds")
-    print("• Audio Track     : Voiceover Narration (Daniel en_GB) + Ambient Sci-Fi Synth + SFX")
+    print("• Audio Track     : Human African Voiceover (en-KE-ChilembaNeural) + Ambient Synth + SFX")
     print("• Video Track     : 720p HD H.264 (Ken Burns 3D Hero Art + Animated HUDs + Subtitles)")
     print("=" * 70 + "\n")
     return 0
