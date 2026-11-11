@@ -870,8 +870,9 @@ def render_developer_portal(
       <span class="ticker-pulse"></span>
       <span class="text-blue font-bold">OPERATIONAL:</span> AGENTFLIGHT AVIONICS &bull; OPENANY GATEWAY (168+ MODELS) &bull; P50: 2.83 &mu;s
     </div>
-    <div style="display: flex; gap: 14px; align-items: center;">
-      <span class="mono text-muted">OPENANY REPLAY CASSETTE: VERIFIED</span>
+    <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+      <span class="mono" style="color: #cbd5e1;">ARCHITECT: <a href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener" style="color: var(--openany-blue-bright); text-decoration: none; font-weight: 600;">AKANDWANAHO IVAN (ALVIN)</a> &bull; CODESPHERE</span>
+      <span class="mono text-muted">| OPENANY CASSETTE: VERIFIED</span>
       <button class="btn btn-sm btn-ghost audio-toggle" onclick="toggleAudio()" id="audio-btn">🔊 Sound: OFF</button>
     </div>
   </div>
@@ -887,10 +888,12 @@ def render_developer_portal(
             <span class="badge badge-live">Operational</span>
             <span class="badge badge-proto">MCP 2024-11-05</span>
             <span class="badge badge-partner">OpenAny Partner</span>
+            <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.35);">Codesphere AI Suite</span>
           </div>
           <p class="text-sm text-dim" style="margin-top: 8px; max-width: 720px;">{safe_tagline}</p>
         </div>
         <div class="links">
+          <a class="btn btn-amber" href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener">Architect Case Study &rarr;</a>
           <a class="btn btn-blue" href="#openany-matrix">Explore 168+ Models &rarr;</a>
           <a class="btn" href="{safe_github}" target="_blank" rel="noopener">GitHub</a>
           <a class="btn" href="/docs" target="_blank" rel="noopener">Swagger UI &rarr;</a>
@@ -1486,7 +1489,7 @@ def render_developer_portal(
 
     <!-- Footer -->
     <footer class="footer">
-      <div>&copy; 2026 CodeSphere Innovations &bull; AgentFlight &bull; OpenAny Strategic Partner &bull; MIT License</div>
+      <div>&copy; 2026 CodeSphere Innovations &bull; Architect: <a href="https://alvin.codesphereug.com" target="_blank" rel="noopener" style="color: var(--openany-blue-bright); font-weight: 600; text-decoration: none;">Akandwanaho Ivan (Alvin)</a> &bull; <a href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener" style="color: var(--amber); text-decoration: none;">System Case Study</a> &bull; OpenAny Strategic Partner &bull; MIT License</div>
       <div class="mono">Transport: Streamable HTTP (<code>POST /mcp</code>) + SSE (<code>GET /mcp</code>)</div>
     </footer>
   </div>

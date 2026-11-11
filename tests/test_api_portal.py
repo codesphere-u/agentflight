@@ -43,4 +43,8 @@ def test_portal_html_render():
     assert "receipt-box" in html
     assert "AGENTFLIGHT CASSETTE FLIGHT RECORD & USAGE SLIP" in html
     assert "rcpt-total-cost" in html
+    # Architect provenance and portfolio case study links
+    assert "alvin.codesphereug.com/work/agentflight.html" in html
+    assert "Akandwanaho Ivan (Alvin)" in html
+    assert "Codesphere AI Suite" in html
 
