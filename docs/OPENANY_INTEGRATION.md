@@ -1,6 +1,14 @@
 # OpenAny Provider Integration for AgentFlight
 
-> **Official Provider Integration Guide**: Seamlessly connect OpenAny's 168+ AI models and 3,200+ external APIs with AgentFlight black-box flight recording, pre-execution cost circuit breaking, loop protection, and $0.00 sub-millisecond deterministic replay.
+> **Official Provider Integration Guide**: Seamlessly connect OpenAny's 128+ AI models and 3,200+ external APIs with AgentFlight black-box flight recording, pre-execution cost circuit breaking, loop protection, and sub-microsecond deterministic replay.
+>
+> **Project**: AgentFlight  
+> **Creator & Owner**: Akandwanaho Ivan Alvin  
+> **Project Status**: Independently owned open-source AI infrastructure  
+> **Commercial Integration Partner**: OpenAny (`https://openany.si`)  
+> **Attribution Header**: `X-OpenAny-Partner-Id: agentflight`  
+>
+> *Disclosure: AgentFlight may earn a commission from OpenAny usage through our partnership, at no additional cost to you where confirmed by OpenAny.*
 
 ---
 
@@ -191,11 +199,11 @@ agentflight openany replay --cassette rfc.flight.json
 
 ### Draft Announcement: AgentFlight + OpenAny
 
-> **Headline: AgentFlight Partners with OpenAny to Bring Deterministic Trajectory Replay and Zero-Overhead Cost Guardrails to 168+ AI Models**
+> **Headline: AgentFlight Partners with OpenAny to Bring Deterministic Trajectory Replay and Zero-Overhead Cost Guardrails to 128+ AI Models**
 >
-> *San Francisco & Global Developer Community* — Today, Codesphere Innovations and OpenAny announced an official integration between AgentFlight, the open-source black-box flight recorder for AI agents, and OpenAny, the open marketplace connecting AI agents to 168+ models and 3,200+ APIs.
+> *San Francisco & Global Developer Community* — Today, Akandwanaho Ivan Alvin, creator and owner of AgentFlight, and Pistis, founder of OpenAny, announced an official commercial integration between AgentFlight, the independently owned open-source black-box flight recorder for AI agents, and OpenAny, the open marketplace connecting AI agents to 128+ models and 3,200+ APIs.
 >
-> With this integration, developers building on OpenAny gain instant pre-execution cost circuit breaking, automated tool-smell linting, and $0.00 deterministic replay. Developers can now debug complex multi-step agent trajectories with mathematical certainty, eliminating runaway spending loops and non-deterministic failures.
+> With this integration, developers building on OpenAny gain instant pre-execution cost circuit breaking, automated tool-smell linting, and $0.00 deterministic replay. Every outbound request carries `X-OpenAny-Partner-Id: agentflight`, powering a permanent 30% revenue sharing partnership between the platforms.
 >
 > Learn more at [https://openany.si](https://openany.si) and [https://github.com/codesphere-u/agentflight](https://github.com/codesphere-u/agentflight).
 

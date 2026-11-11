@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#04060a"/>
+      <stop offset="50%" stop-color="#080e1a"/>
+      <stop offset="100%" stop-color="#030508"/>
+    </linearGradient>
+    <linearGradient id="blueGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0047ff"/>
+      <stop offset="100%" stop-color="#00d4ff"/>
+    </linearGradient>
+    <linearGradient id="amberGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="680" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Grid Lines -->
+  <g stroke="rgba(255,255,255,0.03)" stroke-width="1">
+    <path d="M0 80 H1200 M0 160 H1200 M0 240 H1200 M0 320 H1200 M0 400 H1200 M0 480 H1200 M0 560 H1200 M0 640 H1200"/>
+    <path d="M120 0 V680 M240 0 V680 M360 0 V680 M480 0 V680 M600 0 V680 M720 0 V680 M840 0 V680 M960 0 V680 M1080 0 V680"/>
+  </g>
+
+  <!-- Header -->
+  <g transform="translate(60, 50)">
+    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="28" fill="#ffffff" letter-spacing="-0.5">
+      AgentFlight <tspan fill="#f59e0b">×</tspan> OpenAny
+    </text>
+    <text x="0" y="24" font-family="monospace" font-size="13" fill="#64748b" letter-spacing="1">
+      COMMERCIAL INTEGRATION &amp; REVENUE ATTRIBUTION ARCHITECTURE (v1.2.0)
+    </text>
+  </g>
+
+  <!-- Status Badges -->
+  <g transform="translate(850, 40)">
+    <rect x="0" y="0" width="140" height="28" rx="14" fill="rgba(0,71,255,0.12)" stroke="#0047ff" stroke-width="1"/>
+    <text x="70" y="18" font-family="monospace" font-size="11" fill="#60a5fa" text-anchor="middle" font-weight="bold">30% REV SHARE</text>
+    
+    <rect x="150" y="0" width="140" height="28" rx="14" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-width="1"/>
+    <text x="220" y="18" font-family="monospace" font-size="11" fill="#34d399" text-anchor="middle" font-weight="bold">HEADER VERIFIED</text>
+  </g>
+
+  <!-- Column 1: AgentFlight Core Control Plane -->
+  <g transform="translate(60, 110)">
+    <rect width="330" height="500" rx="16" fill="rgba(15,23,42,0.6)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <rect x="1" y="1" width="328" height="48" rx="15" fill="rgba(0,71,255,0.08)"/>
+    <text x="20" y="30" font-family="-apple-system, sans-serif" font-weight="700" font-size="16" fill="#f8fafc">AgentFlight Client Runtime</text>
+    <text x="20" y="44" font-family="monospace" font-size="10" fill="#94a3b8">Akandwanaho Ivan Alvin (Owner)</text>
+
+    <!-- Component: OpenAnyProvider -->
+    <g transform="translate(20, 70)">
+      <rect width="290" height="90" rx="10" fill="rgba(30,41,59,0.5)" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="16" y="28" font-family="-apple-system, sans-serif" font-weight="700" font-size="14" fill="#60a5fa">OpenAnyProvider</text>
+      <text x="16" y="48" font-family="monospace" font-size="11" fill="#cbd5e1">Attribution Header Construction</text>
+      <rect x="16" y="58" width="258" height="22" rx="4" fill="#0b1329" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+      <text x="24" y="73" font-family="monospace" font-size="10" fill="#38bdf8">X-OpenAny-Partner-Id: agentflight</text>
+    </g>
+
+    <!-- Component: TrajectoryCircuitBreaker -->
+    <g transform="translate(20, 180)">
+      <rect width="290" height="135" rx="10" fill="rgba(30,41,59,0.5)" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="16" y="28" font-family="-apple-system, sans-serif" font-weight="700" font-size="14" fill="#fbbf24">TrajectoryCircuitBreaker</text>
+      <text x="16" y="48" font-family="monospace" font-size="11" fill="#e2e8f0">• Pre-Execution Cost Estimator</text>
+      <text x="16" y="68" font-family="monospace" font-size="11" fill="#e2e8f0">• Thread-Safe Budget Reservation</text>
+      <text x="16" y="88" font-family="monospace" font-size="11" fill="#e2e8f0">• Loop &amp; Ping-Pong Oscillation Guard</text>
+      <rect x="16" y="100" width="258" height="22" rx="4" fill="#2d1502" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+      <text x="24" y="115" font-family="monospace" font-size="10" fill="#f59e0b">Shield: Zero-Credit Spent on Block</text>
+    </g>
+
+    <!-- Component: FlightRecorder & Cassettes -->
+    <g transform="translate(20, 335)">
+      <rect width="290" height="145" rx="10" fill="rgba(30,41,59,0.5)" stroke="#10b981" stroke-width="1.5"/>
+      <text x="16" y="28" font-family="-apple-system, sans-serif" font-weight="700" font-size="14" fill="#34d399">FlightRecorder &amp; Replayer</text>
+      <text x="16" y="48" font-family="monospace" font-size="11" fill="#cbd5e1">• Tamper-Evident SHA-256 Cassette</text>
+      <text x="16" y="68" font-family="monospace" font-size="11" fill="#cbd5e1">• Recursive API Key Redaction</text>
+      <text x="16" y="88" font-family="monospace" font-size="11" fill="#cbd5e1">• Deterministic Replay (0.08 μs/span)</text>
+      <rect x="16" y="102" width="258" height="28" rx="4" fill="#042319" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+      <text x="24" y="120" font-family="monospace" font-size="10" fill="#6ee7b7">Cassette: .flight.json ($0.00 Replay)</text>
+    </g>
+  </g>
+
+  <!-- Central Bridge / Gateway Connectors -->
+  <g transform="translate(410, 240)">
+    <!-- Arrow 1: Dispatch -->
+    <line x1="0" y1="40" x2="110" y2="40" stroke="#0047ff" stroke-width="2.5" stroke-dasharray="6,4"/>
+    <polygon points="110,40 100,34 100,46" fill="#0047ff"/>
+    <rect x="10" y="15" width="90" height="18" rx="4" fill="#0f172a" stroke="#0047ff" stroke-width="1"/>
+    <text x="55" y="27" font-family="monospace" font-size="9" fill="#93c5fd" text-anchor="middle">HTTPS POST</text>
+
+    <!-- Arrow 2: Telemetry -->
+    <line x1="110" y1="120" x2="0" y2="120" stroke="#10b981" stroke-width="2.5" stroke-dasharray="6,4"/>
+    <polygon points="0,120 10,114 10,126" fill="#10b981"/>
+    <rect x="10" y="95" width="90" height="18" rx="4" fill="#0f172a" stroke="#10b981" stroke-width="1"/>
+    <text x="55" y="107" font-family="monospace" font-size="9" fill="#6ee7b7" text-anchor="middle">200 OK + STREAM</text>
+
+    <!-- Header Pill Callout -->
+    <g transform="translate(-10, 160)">
+      <rect width="130" height="50" rx="8" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>
+      <text x="65" y="20" font-family="monospace" font-size="9" fill="#a5b4fc" text-anchor="middle" font-weight="bold">INSPECTION</text>
+      <text x="65" y="36" font-family="monospace" font-size="8" fill="#e0e7ff" text-anchor="middle">X-OpenAny-Partner-Id</text>
+    </g>
+  </g>
+
+  <!-- Column 2: OpenAny Cloud Infrastructure -->
+  <g transform="translate(540, 110)">
+    <rect width="600" height="500" rx="16" fill="rgba(15,23,42,0.6)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <rect x="1" y="1" width="598" height="48" rx="15" fill="rgba(245,158,11,0.08)"/>
+    <text x="24" y="30" font-family="-apple-system, sans-serif" font-weight="700" font-size="16" fill="#f8fafc">OpenAny Production Gateway &amp; Marketplace</text>
+    <text x="24" y="44" font-family="monospace" font-size="10" fill="#94a3b8">Founded by Pistis • https://openany.si</text>
+
+    <!-- Component: Ingestion & Partner Accounting -->
+    <g transform="translate(24, 70)">
+      <rect width="552" height="110" rx="10" fill="rgba(30,41,59,0.5)" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="20" y="28" font-family="-apple-system, sans-serif" font-weight="700" font-size="14" fill="#a5b4fc">AIephant AI Agent Gateway &amp; Partner Router</text>
+      <text x="20" y="48" font-family="monospace" font-size="11" fill="#cbd5e1">1. Reads incoming attribution: header.get('X-OpenAny-Partner-Id') == 'agentflight'</text>
+      <text x="20" y="68" font-family="monospace" font-size="11" fill="#cbd5e1">2. Allocates 30% permanent revenue credit to AgentFlight partner ledger</text>
+      <text x="20" y="88" font-family="monospace" font-size="11" fill="#cbd5e1">3. Aggregates metrics into forthcoming Partner Dashboard (2-3 days)</text>
+    </g>
+
+    <!-- Subgrid: 128+ Models & 3,200+ MCP Tools -->
+    <g transform="translate(24, 200)">
+      <!-- Left Box: Model Hub -->
+      <g transform="translate(0, 0)">
+        <rect width="266" height="280" rx="10" fill="rgba(30,41,59,0.4)" stroke="#38bdf8" stroke-width="1"/>
+        <text x="16" y="26" font-family="-apple-system, sans-serif" font-weight="700" font-size="13" fill="#38bdf8">128+ AI Models (/v1/models)</text>
+        <text x="16" y="44" font-family="monospace" font-size="10" fill="#94a3b8">Multi-Provider Intelligent Routing</text>
+        
+        <g transform="translate(16, 60)" font-family="monospace" font-size="11" fill="#cbd5e1">
+          <text x="0" y="0">• MiniMax-M2.5 (200k Ctx)</text>
+          <text x="0" y="24">• claude-sonnet-4-6 (1M Ctx)</text>
+          <text x="0" y="48">• DeepSeek-R1 (Reasoning)</text>
+          <text x="0" y="72">• Qwen-2.5-Coder-32B</text>
+          <text x="0" y="96">• Midjourney-v7 / v8.1</text>
+          <text x="0" y="120">• Hy-Image-3.5-Preview</text>
+          <text x="0" y="144">• Llama-3.3-70B-Instruct</text>
+          <text x="0" y="168">• Mistral-Large-2411</text>
+        </g>
+      </g>
+
+      <!-- Right Box: MCP Toolset -->
+      <g transform="translate(286, 0)">
+        <rect width="266" height="280" rx="10" fill="rgba(30,41,59,0.4)" stroke="#f43f5e" stroke-width="1"/>
+        <text x="16" y="26" font-family="-apple-system, sans-serif" font-weight="700" font-size="13" fill="#fb7185">3,200+ Remote APIs (/mcp)</text>
+        <text x="16" y="44" font-family="monospace" font-size="10" fill="#94a3b8">Streamable JSON-RPC 2.0</text>
+
+        <g transform="translate(16, 60)" font-family="monospace" font-size="11" fill="#cbd5e1">
+          <text x="0" y="0">• Accurlex Legal Search &amp; QA</text>
+          <text x="0" y="24">• AIHot Trending Agent Stats</text>
+          <text x="0" y="48">• Real-time Web Search &amp; Scrape</text>
+          <text x="0" y="72">• Financial Market Quotes</text>
+          <text x="0" y="96">• Code Sandbox Execution</text>
+        </g>
+
+        <!-- Ergonomics Linting Callout -->
+        <g transform="translate(14, 175)">
+          <rect width="238" height="88" rx="6" fill="#1c1917" stroke="#f59e0b" stroke-width="1"/>
+          <text x="10" y="20" font-family="-apple-system, sans-serif" font-weight="700" font-size="11" fill="#fbbf24">AgentFlight Tool Ergonomics:</text>
+          <text x="10" y="38" font-family="monospace" font-size="9" fill="#d6d3d1">• TS001-TS010 Static Linting</text>
+          <text x="10" y="54" font-family="monospace" font-size="9" fill="#d6d3d1">• 28.6k token schema pruned</text>
+          <text x="10" y="70" font-family="monospace" font-size="9" fill="#10b981">• Up to 78% context savings</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(60, 640)">
+    <text x="0" y="0" font-family="monospace" font-size="11" fill="#64748b">
+      Project: AgentFlight • Independently Created &amp; Owned by Akandwanaho Ivan Alvin • Commercial Partner: OpenAny
+    </text>
+    <text x="1080" y="0" font-family="monospace" font-size="11" fill="#0047ff" text-anchor="end" font-weight="bold">
+      https://agentflight-tau.vercel.app
+    </text>
+  </g>
+</svg>

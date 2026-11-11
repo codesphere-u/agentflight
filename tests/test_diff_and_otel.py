@@ -56,8 +56,8 @@ def _build_baseline_cassette() -> FlightRecorder:
     return rec
 
 
-def test_version_is_1_1_0() -> None:
-    assert __version__ == "1.1.0"
+def test_version_is_current() -> None:
+    assert __version__ == "1.2.0"
 
 
 def test_levenshtein_and_lcs_primitives() -> None:

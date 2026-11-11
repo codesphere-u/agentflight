@@ -253,7 +253,7 @@ def test_chat_completion_success_and_recording() -> None:
 
     # Verify partner attribution header was transmitted
     req = transport.recorded_requests[-1]
-    assert req.headers.get("X-partner-id") == "agentflight"
+    assert req.headers.get("X-openany-partner-id") == "agentflight"
 
 
 def test_chat_completion_auth_error() -> None:
@@ -441,3 +441,169 @@ def test_openany_tool_smell_linting() -> None:
     # TS001 (missing description) and TS007 (missing required array) should be detected
     rule_ids = {f.rule_id for f in report.findings}
     assert "TS001" in rule_ids or "TS007" in rule_ids
+
+
+def test_partner_attribution_header_model_requests() -> None:
+    """Verify that model completion requests include confirmed X-OpenAny-Partner-Id: agentflight."""
+    transport = MockHTTPTransport()
+    provider = OpenAnyProvider(
+        config=OpenAnyConfig(api_key="sk-test", partner_id="agentflight"),
+        http_client=transport.execute,
+    )
+    provider.chat_completion(messages=[{"role": "user", "content": "ping"}])
+    assert len(transport.recorded_requests) >= 1
+    req = transport.recorded_requests[-1]
+    assert req.headers.get("X-openany-partner-id") == "agentflight"
+    assert req.headers.get("Authorization") == "Bearer sk-test"
+
+
+def test_partner_attribution_header_streaming_requests() -> None:
+    """Verify that streaming chat completion requests include X-OpenAny-Partner-Id: agentflight."""
+    recorded_urls = []
+    recorded_headers = []
+
+    def mock_stream(url: str, payload: Dict[str, Any], headers: Optional[Dict[str, str]] = None):
+        recorded_urls.append(url)
+        built_hdrs = provider._build_headers(target_url=url, custom_headers=headers)
+        recorded_headers.append(built_hdrs)
+        yield 'data: {"choices": [{"delta": {"content": "Streamed "}}]}'
+        yield 'data: {"choices": [{"delta": {"content": "response."}}]}'
+        yield "data: [DONE]"
+
+    provider = OpenAnyProvider(
+        config=OpenAnyConfig(api_key="sk-stream-key", partner_id="agentflight"),
+        stream_client=mock_stream,
+    )
+    chunks = list(provider.stream_chat(messages=[{"role": "user", "content": "Stream please"}]))
+    assert len(chunks) == 2
+    assert len(recorded_headers) == 1
+    hdrs = recorded_headers[0]
+    assert hdrs.get("X-OpenAny-Partner-Id") == "agentflight"
+    assert hdrs.get("Authorization") == "Bearer sk-stream-key"
+
+
+def test_partner_attribution_header_mcp_requests() -> None:
+    """Verify that MCP tool discovery and invocation include X-OpenAny-Partner-Id: agentflight."""
+    transport = MockHTTPTransport()
+    transport.queue_response(200, {"jsonrpc": "2.0", "id": 1, "result": {"tools": []}})
+    transport.queue_response(200, {"jsonrpc": "2.0", "id": 2, "result": {"content": [{"text": "ok"}]}})
+
+    provider = OpenAnyProvider(
+        config=OpenAnyConfig(api_key="sk-mcp-key", partner_id="agentflight"),
+        http_client=transport.execute,
+    )
+    # 1. tools/list
+    provider.discover_mcp_tools()
+    req_list = transport.recorded_requests[-1]
+    assert req_list.headers.get("X-openany-partner-id") == "agentflight"
+
+    # 2. tools/call
+    provider.call_mcp_tool(name="test_tool", arguments={"val": 42})
+    req_call = transport.recorded_requests[-1]
+    assert req_call.headers.get("X-openany-partner-id") == "agentflight"
+
+
+def test_partner_attribution_preserved_across_retries(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify that retried requests consistently preserve X-OpenAny-Partner-Id."""
+    monkeypatch.setattr("time.sleep", lambda s: None)
+    transport = MockHTTPTransport()
+    # 1st call fails 503, 2nd call succeeds 200
+    transport.queue_response(503, {"error": {"message": "Gateway temporarily overloaded"}}, path_suffix="/chat/completions")
+    transport.queue_response(200, {
+        "id": "cmpl-retry-ok",
+        "choices": [{"message": {"role": "assistant", "content": "Recovered!"}}],
+        "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
+    }, path_suffix="/chat/completions")
+
+    provider = OpenAnyProvider(
+        config=OpenAnyConfig(api_key="sk-retry-key", max_retries=1, partner_id="agentflight"),
+        http_client=transport.execute,
+    )
+    resp = provider.chat_completion(messages=[{"role": "user", "content": "test retry"}])
+    assert resp["choices"][0]["message"]["content"] == "Recovered!"
+
+    # Verify BOTH the initial and retried request contained X-OpenAny-Partner-Id
+    chat_reqs = [r for r in transport.recorded_requests if r.full_url.endswith("/chat/completions")]
+    assert len(chat_reqs) == 2
+    for r in chat_reqs:
+        assert r.headers.get("X-openany-partner-id") == "agentflight"
+        assert r.headers.get("Authorization") == "Bearer sk-retry-key"
+
+
+def test_partner_attribution_domain_isolation_no_leakage() -> None:
+    """
+    CRITICAL SECURITY TEST:
+    Verify that X-OpenAny-Partner-Id and Authorization are NEVER leaked to unrelated third-party domains.
+    """
+    from agentflight.providers.openany import is_openany_domain
+
+    provider = OpenAnyProvider(
+        config=OpenAnyConfig(api_key="sk-secret-openany-key", partner_id="agentflight"),
+    )
+
+    # 1. OpenAny official domains - allowed
+    assert is_openany_domain("https://api.openany.si/v1/chat/completions") is True
+    assert is_openany_domain("https://mcp.openany.si/mcp") is True
+    assert is_openany_domain("https://custom.openany.si/api") is True
+
+    openany_headers = provider._build_headers(target_url="https://api.openany.si/v1/chat/completions")
+    assert openany_headers.get("X-OpenAny-Partner-Id") == "agentflight"
+    assert openany_headers.get("Authorization") == "Bearer sk-secret-openany-key"
+
+    # 2. Third-party domains - STRICTLY BLOCKED from receiving partner header or secret key
+    third_party_urls = [
+        "https://api.openai.com/v1/chat/completions",
+        "https://api.anthropic.com/v1/messages",
+        "https://malicious-external-proxy.com/v1",
+        "http://untrusted-server.org/sink",
+    ]
+    for url in third_party_urls:
+        assert is_openany_domain(url) is False
+        hdrs = provider._build_headers(target_url=url)
+        assert "X-OpenAny-Partner-Id" not in hdrs
+        assert "Authorization" not in hdrs
+        assert "sk-secret-openany-key" not in str(hdrs)
+
+
+def test_concurrent_budget_reservation_circuit_breaker() -> None:
+    """
+    CONCURRENCY TEST:
+    Verify that thread-safe budget reservations prevent parallel requests
+    from independently exceeding the same remaining budget.
+    """
+    import threading
+
+    # Budget cap: $0.0020
+    guard = TrajectoryCircuitBreaker(max_cost_usd=0.0020)
+
+    # Each request estimates $0.0012
+    # Two requests in flight would total $0.0024 > $0.0020, so the 2nd MUST be rejected!
+    reservation1 = guard.reserve_budget(0.0012)
+    assert guard.stats.reserved_cost_usd == 0.0012
+
+    # Second concurrent reservation should trip circuit breaker
+    with pytest.raises(CircuitBreakerTripped) as exc_info:
+        guard.reserve_budget(0.0012)
+    assert exc_info.value.reason == "cost_budget_exceeded"
+
+    # Releasing reservation1 should free the budget pool
+    reservation1.release()
+    assert guard.stats.reserved_cost_usd == 0.0
+
+    # Now a reservation succeeds
+    reservation2 = guard.reserve_budget(0.0015)
+    assert guard.stats.reserved_cost_usd == 0.0015
+    reservation2.commit(0.0014)
+    assert guard.stats.reserved_cost_usd == 0.0
+
+
+def test_partner_referral_configuration_and_disclosure(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify partner referral config handling and transparent revenue disclosure."""
+    # When no referral link is provided by OpenAny yet, it defaults to None (tracked as pending blocker)
+    cfg = OpenAnyConfig.from_env()
+    assert cfg.referral_url is None
+
+    # When OPENANY_REFERRAL_URL is set in environment, it is loaded cleanly
+    monkeypatch.setenv("OPENANY_REFERRAL_URL", "https://openany.si/?ref=agentflight-commercial-official")
+    cfg_with_ref = OpenAnyConfig.from_env()
+    assert cfg_with_ref.referral_url == "https://openany.si/?ref=agentflight-commercial-official"
