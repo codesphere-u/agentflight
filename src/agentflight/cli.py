@@ -21,6 +21,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
+from ._version import __version__
 from .diff import compare_cassettes
 from .eval import TrajectoryEvaluator
 from .guard import CircuitBreakerTripped, TrajectoryCircuitBreaker
@@ -32,6 +33,7 @@ from .linter import (
 from .mcp_server import AgentFlightMCPServer
 from .otel_export import export_cassette_to_otel
 from .recorder import CassetteReplayer, FlightRecorder, verify_cassette
+from .redact import REDACTED
 
 
 def _run_lint_command(args: argparse.Namespace) -> int:
@@ -544,6 +546,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_fix.add_argument("--in-place", "-i", action="store_true", help="Overwrite input file with hardened schemas.")
     p_fix.set_defaults(func=_run_fix_command)
 
+    p_doctor = sub.add_parser(
+        "doctor",
+        help="Run offline production self-checks (stdlib core, pytest11 entry point, SHA-256 chain, redaction, circuit breaker).",
+    )
+    p_doctor.add_argument("--json", action="store_true", help="Output structured JSON diagnostics.")
+    p_doctor.set_defaults(func=_run_doctor_command)
+
     return parser
 
 
@@ -803,6 +812,118 @@ def _run_fix_command(args: argparse.Namespace) -> int:
     print(f"✅ Successfully hardened {len(tools)} tool definitions into {target_path}")
     print(f"   Resolved {total_smells_resolved} tool smells. Meets Glama TDQS Gold Standard.")
     return 0
+
+
+def _run_doctor_command(args: argparse.Namespace) -> int:
+    import importlib
+    import importlib.util
+
+    t0 = time.perf_counter()
+    checks: List[Dict[str, Any]] = []
+
+    def add_check(name: str, ok: bool, detail: str) -> None:
+        checks.append({"name": name, "ok": bool(ok), "detail": detail})
+
+    # 1. Python version >= 3.10
+    py_ver = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    add_check(
+        "python_version",
+        sys.version_info >= (3, 10),
+        f"Python {py_ver} (>=3.10 required)",
+    )
+
+    # 2. Core stdlib-only imports
+    core_modules = (
+        "agentflight.recorder",
+        "agentflight.guard",
+        "agentflight.linter",
+        "agentflight.diff",
+        "agentflight.eval",
+        "agentflight.redact",
+        "agentflight.telemetry",
+        "agentflight.wrappers",
+        "agentflight.mcp_server",
+        "agentflight.http_server",
+    )
+    try:
+        for mod in core_modules:
+            importlib.import_module(mod)
+        add_check("stdlib_core", True, f"All {len(core_modules)} core stdlib modules loaded cleanly")
+    except Exception as exc:  # pragma: no cover
+        add_check("stdlib_core", False, f"Core module import failed: {exc}")
+
+    # 3. Pytest plugin shim availability
+    plugin_spec = importlib.util.find_spec("_agentflight_pytest")
+    add_check(
+        "pytest_plugin",
+        plugin_spec is not None,
+        "_agentflight_pytest lazy entry point available" if plugin_spec else "_agentflight_pytest missing from sys.path",
+    )
+
+    # 4. FlightRecorder SHA-256 + secret redaction self-test
+    try:
+        rec = FlightRecorder("doctor-self-test")
+        probe_secret = "sk-doctor-probe-secret-987654"
+        rec.record(
+            "llm_turn",
+            "gpt-4o",
+            {"api_key": probe_secret, "prompt": "healthcheck"},
+            {"reply": "ok", "auth_header": f"Bearer {probe_secret}"},
+            latency_ms=0.5,
+        )
+        cassette = rec.to_cassette_dict()
+        verify_cassette(cassette)
+        serialized = json.dumps(cassette)
+        redacted_ok = probe_secret not in serialized and REDACTED in serialized
+        add_check(
+            "recorder_and_redaction",
+            redacted_ok,
+            "SHA-256 hash chain verified & secret redaction active" if redacted_ok else "Secret leak detected in cassette!",
+        )
+    except Exception as exc:  # pragma: no cover
+        add_check("recorder_and_redaction", False, f"Recorder self-test failed: {exc}")
+
+    # 5. Circuit breaker self-test
+    try:
+        cb = TrajectoryCircuitBreaker(max_identical_repeats=2)
+        cb.observe(actor="probe_tool", input_payload={"x": 1})
+        tripped = False
+        try:
+            cb.observe(actor="probe_tool", input_payload={"x": 1})
+        except CircuitBreakerTripped:
+            tripped = True
+        add_check(
+            "circuit_breaker",
+            tripped,
+            "Loop detection tripped at max_identical_repeats=2 as expected" if tripped else "Circuit breaker did not trip",
+        )
+    except Exception as exc:  # pragma: no cover
+        add_check("circuit_breaker", False, f"Circuit breaker error: {exc}")
+
+    duration_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+    healthy = all(c["ok"] for c in checks)
+
+    if getattr(args, "json", False):
+        print(
+            json.dumps(
+                {
+                    "healthy": healthy,
+                    "version": __version__,
+                    "python": py_ver,
+                    "duration_ms": duration_ms,
+                    "checks": checks,
+                },
+                indent=2,
+            )
+        )
+    else:
+        status_label = "PASS" if healthy else "FAIL"
+        print(f"agentflight doctor v{__version__} [{status_label}] ({duration_ms:.2f} ms)")
+        for item in checks:
+            mark = "OK  " if item["ok"] else "FAIL"
+            print(f"  [{mark}] {item['name']}: {item['detail']}")
+
+    return 0 if healthy else 1
 
 
 def _run_serve_mcp_command(args: argparse.Namespace) -> int:

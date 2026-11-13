@@ -15,6 +15,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import TYPE_CHECKING, Any
 
 from ._version import __version__
+from .telemetry import ServerMetrics, resolve_request_id
 
 if TYPE_CHECKING:  # pragma: no cover
     from agentflight.mcp_server import AgentFlightMCPServer
@@ -24,6 +25,7 @@ logger = logging.getLogger("agentflight.http_server")
 DEFAULT_MAX_BODY_BYTES = 1_048_576
 PARSE_ERROR = -32700
 INVALID_REQUEST = -32600
+_DEFAULT_METRICS = ServerMetrics(service_name="agentflight", version=__version__, runtime="http-server")
 
 
 def _max_body_bytes() -> int:
@@ -38,9 +40,18 @@ def _cors_origin() -> str:
 
 
 class AgentFlightHTTPHandler(BaseHTTPRequestHandler):
-    """HTTP request handler supporting JSON-RPC 2.0 POST, SSE stream, and health probes."""
+    """HTTP request handler supporting JSON-RPC 2.0 POST, SSE stream, /metrics, and health probes."""
 
     server_instance: AgentFlightMCPServer
+    metrics_registry: ServerMetrics = _DEFAULT_METRICS
+
+    def _current_request_id(self) -> str:
+        cached = getattr(self, "_cached_req_id", None)
+        if isinstance(cached, str) and cached:
+            return cached
+        req_id = resolve_request_id(self.headers.get("X-Request-ID"))
+        self._cached_req_id = req_id
+        return req_id
 
     def do_OPTIONS(self) -> None:
         """Handle CORS pre-flight requests."""
@@ -48,9 +59,34 @@ class AgentFlightHTTPHandler(BaseHTTPRequestHandler):
         self._send_security_and_cors_headers()
         self.end_headers()
 
-    def do_GET(self) -> None:
-        """Handle GET requests: /health, /healthz, /sse, /mcp, and root info."""
+    def do_HEAD(self) -> None:
+        """Respond cleanly to liveness/readiness HEAD probes."""
         path = self.path.split("?")[0]
+        if path in ("/health", "/healthz", "/", "/info", "/metrics"):
+            self.metrics_registry.inc_request(200)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self._send_security_and_cors_headers()
+            self.end_headers()
+            return
+        self.metrics_registry.inc_request(404)
+        self.send_response(404)
+        self._send_security_and_cors_headers()
+        self.end_headers()
+
+    def do_GET(self) -> None:
+        """Handle GET requests: /health, /healthz, /metrics, /sse, /mcp, and root info."""
+        path = self.path.split("?")[0]
+
+        if path == "/metrics":
+            accept = self.headers.get("Accept", "")
+            if "application/json" in accept:
+                body = json.dumps(self.metrics_registry.snapshot()).encode("utf-8")
+                self._write_json_bytes(200, body)
+            else:
+                body = self.metrics_registry.to_prometheus().encode("utf-8")
+                self._write_bytes(200, body, "text/plain; version=0.0.4; charset=utf-8")
+            return
 
         if path in ("/health", "/healthz", "/", "/info"):
             body = json.dumps(
@@ -127,9 +163,13 @@ class AgentFlightHTTPHandler(BaseHTTPRequestHandler):
             responses = []
             for item in payload:
                 resp = self.server_instance.handle_request(item)
+                method = str(item.get("method", "")) if isinstance(item, dict) else ""
+                is_err = bool(resp and resp.get("error"))
+                self.metrics_registry.inc_mcp(method, is_error=is_err)
                 if resp is not None:
                     responses.append(resp)
             if not responses:
+                self.metrics_registry.inc_request(202)
                 self.send_response(202)
                 self._send_security_and_cors_headers()
                 self.end_headers()
@@ -137,7 +177,12 @@ class AgentFlightHTTPHandler(BaseHTTPRequestHandler):
             response_body = json.dumps(responses).encode("utf-8")
         elif isinstance(payload, dict):
             resp = self.server_instance.handle_request(payload)
+            self.metrics_registry.inc_mcp(
+                str(payload.get("method", "")),
+                is_error=bool(resp and resp.get("error")),
+            )
             if resp is None:
+                self.metrics_registry.inc_request(202)
                 self.send_response(202)
                 self._send_security_and_cors_headers()
                 self.end_headers()
@@ -149,10 +194,11 @@ class AgentFlightHTTPHandler(BaseHTTPRequestHandler):
 
         self._write_json_bytes(200, response_body)
 
-    def _write_json_bytes(self, status: int, body: bytes) -> None:
+    def _write_bytes(self, status: int, body: bytes, content_type: str) -> None:
+        self.metrics_registry.inc_request(status)
         try:
             self.send_response(status)
-            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(body)))
             self.send_header("Cache-Control", "no-store")
             self._send_security_and_cors_headers()
@@ -162,14 +208,18 @@ class AgentFlightHTTPHandler(BaseHTTPRequestHandler):
         except (BrokenPipeError, ConnectionResetError):
             return
 
+    def _write_json_bytes(self, status: int, body: bytes) -> None:
+        self._write_bytes(status, body, "application/json")
+
     def _send_security_and_cors_headers(self) -> None:
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("X-Frame-Options", "DENY")
         self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
+        self.send_header("X-Request-ID", self._current_request_id())
         self.send_header("Access-Control-Allow-Origin", _cors_origin())
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, Mcp-Session-Id")
-        self.send_header("Access-Control-Expose-Headers", "Mcp-Session-Id")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, Mcp-Session-Id, X-Request-ID")
+        self.send_header("Access-Control-Expose-Headers", "Mcp-Session-Id, X-Request-ID")
 
     def _send_jsonrpc_error(self, http_status: int, rpc_code: int, message: str) -> None:
         body = json.dumps(
@@ -196,5 +246,10 @@ def run_http_server(
     """Instantiate and bind the ThreadingHTTPServer with AgentFlightHTTPHandler."""
     handler = AgentFlightHTTPHandler
     handler.server_instance = server_instance
+    handler.metrics_registry = ServerMetrics(
+        service_name="agentflight",
+        version=__version__,
+        runtime="http-server",
+    )
     httpd = ThreadingHTTPServer((host, port), handler)
     return httpd

@@ -48,6 +48,7 @@ from .recorder import (
     canonical_json,
     verify_cassette,
 )
+from .redact import contains_sensitive_data, redact_cassette, redact_sensitive
 from .schema_optimizer import SchemaOptimizationResult, ToolSchemaOptimizer
 from .testing import FlightSession, flight_test
 from .wrappers import FlightCallbackHandler, wrap_anthropic, wrap_callable, wrap_openai
@@ -105,4 +106,7 @@ __all__ = [
     "wrap_openai",
     "wrap_anthropic",
     "wrap_callable",
+    "redact_sensitive",
+    "redact_cassette",
+    "contains_sensitive_data",
 ]

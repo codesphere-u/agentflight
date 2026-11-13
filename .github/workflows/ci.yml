@@ -40,10 +40,11 @@ jobs:
 
       - name: Run pytest suite with coverage
         run: |
-          pytest -v --cov=agentflight --cov-report=term-missing --cov-fail-under=80
+          pytest -v --cov=agentflight --cov-report=term-missing --cov-fail-under=90
 
       - name: Execute CLI showcase & MCP tool-smell linter gate
         run: |
+          agentflight doctor --json
           agentflight lint
           agentflight demo
 

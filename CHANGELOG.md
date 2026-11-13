@@ -2,6 +2,19 @@
 
 All notable changes to `agentflight` are documented in this file.
 
+## [1.4.0] - 2026-11-13
+
+### Enterprise & Operational Readiness
+- **Automatic PII & Secret Redaction (`src/agentflight/redact.py`, `src/agentflight/recorder.py`)**:
+  - Added pure-stdlib secret scrubber (`redact_sensitive`, `redact_text`, `redact_cassette`, `contains_sensitive_data`) removing API keys (`sk-...`, `sk-ant-...`, `sk-proj-...`, `oa_...`, `ghp_...`, `AKIA...`), Bearer tokens, JWTs, URL basic-auth credentials, cookies, and auth headers while preserving token-count metrics and JSON schemas.
+  - Enabled `FlightRecorder(..., redact_secrets=True)` by default BEFORE SHA-256 chain hashing and updated `CassetteReplayer.replay_step()` to match both raw and redacted input digests for deterministic key-rotated replay.
+- **Prometheus `/metrics`, Request Tracing & Distributed Rate Limiting (`src/agentflight/telemetry.py`, `api/index.py`, `src/agentflight/http_server.py`)**:
+  - Added shared thread-safe `ServerMetrics` exposed at `GET /metrics` (Prometheus text exposition or JSON when `Accept: application/json`) across both Vercel ASGI and standalone HTTP servers.
+  - Propagated validated `X-Request-ID` headers (`resolve_request_id`), added `HEAD` readiness responses on health/metrics endpoints, opt-in structured JSON logging (`AGENTFLIGHT_LOG_JSON=1`), and optional zero-dep Upstash Redis REST distributed rate limiting (`UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`) with automatic fail-open memory fallback.
+- **Self-Diagnostics & Robustness (`src/agentflight/cli.py`, `src/agentflight/wrappers.py`, `src/agentflight/linter.py`, `.github/workflows/smoke-production.yml`)**:
+  - Added `agentflight doctor [--json]` verifying Python version, zero-dep stdlib core imports, lazy `pytest11` plugin registration, SHA-256 chain + redaction integrity, and circuit breaker tripping.
+  - Coalesced streamed OpenAI `tool_calls` deltas by index (`_merge_tool_call_deltas`) inside `_StreamAccumulator`, guarded `_normalize_tool_def` against malformed non-dict schemas, fixed `.github/workflows/smoke-production.yml` triggers, and raised CI coverage gate to `--cov-fail-under=90` (`167` passing tests, `90.57%` coverage).
+
 ## [1.3.1] - 2026-11-13
 
 ### Production Hardening

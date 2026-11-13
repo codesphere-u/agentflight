@@ -222,12 +222,14 @@ def _normalize_tool_def(raw: Dict[str, Any]) -> Tuple[str, str, Dict[str, Any]]:
         fn = raw["function"]
         name = str(fn.get("name", "unnamed_tool"))
         desc = str(fn.get("description") or "")
-        schema = dict(fn.get("parameters") or {})
+        raw_params = fn.get("parameters")
+        schema = dict(raw_params) if isinstance(raw_params, dict) else {}
         return name, desc, schema
 
     name = str(raw.get("name", "unnamed_tool"))
     desc = str(raw.get("description") or "")
-    schema = dict(raw.get("inputSchema") or raw.get("input_schema") or raw.get("parameters") or {})
+    raw_schema = raw.get("inputSchema") or raw.get("input_schema") or raw.get("parameters")
+    schema = dict(raw_schema) if isinstance(raw_schema, dict) else {}
     return name, desc, schema
 
 

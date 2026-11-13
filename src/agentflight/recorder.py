@@ -21,6 +21,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
+from .redact import redact_sensitive
+
 SpanKind = Literal["llm_turn", "tool_call", "mcp_rpc", "state_checkpoint"]
 SpanStatus = Literal["ok", "error", "skipped"]
 
@@ -192,9 +194,15 @@ class FlightRecorder:
         agent_id: str = "default-agent",
         metadata: Optional[Dict[str, Any]] = None,
         spans: Optional[Sequence[TrajectorySpan]] = None,
+        *,
+        redact_secrets: bool = True,
     ) -> None:
         self.agent_id = agent_id
-        self.metadata: Dict[str, Any] = dict(metadata or {})
+        self.redact_secrets = bool(redact_secrets)
+        raw_meta = dict(metadata or {})
+        self.metadata: Dict[str, Any] = (
+            redact_sensitive(raw_meta) if self.redact_secrets else raw_meta
+        )
         self._lock = threading.RLock()
         self._spans: List[TrajectorySpan] = []
         if spans:
@@ -257,15 +265,19 @@ class FlightRecorder:
         completion_tokens: int = 0,
         cost_usd: float = 0.0,
         status: SpanStatus = "ok",
+        redact_secrets: Optional[bool] = None,
     ) -> TrajectorySpan:
         """Record a single trajectory span and chain its SHA-256 digest thread-safely."""
+        should_redact = self.redact_secrets if redact_secrets is None else redact_secrets
+        stored_in = dict(redact_sensitive(input_payload) if should_redact else input_payload)
+        stored_out = dict(redact_sensitive(output_payload) if should_redact else output_payload)
         with self._lock:
             raw_span = TrajectorySpan(
                 step_index=len(self._spans),
                 kind=kind,
                 actor=actor,
-                input_payload=dict(input_payload),
-                output_payload=dict(output_payload),
+                input_payload=stored_in,
+                output_payload=stored_out,
                 latency_ms=float(latency_ms),
                 prompt_tokens=int(prompt_tokens),
                 completion_tokens=int(completion_tokens),
@@ -574,6 +586,9 @@ class CassetteReplayer:
         actual_in_hash = canonical_hash(
             {"kind": kind, "actor": actor, "input_payload": input_payload}
         )
+        redacted_in_hash = canonical_hash(
+            {"kind": kind, "actor": actor, "input_payload": redact_sensitive(input_payload)}
+        )
 
         with self._lock:
             if self.strict_order:
@@ -590,7 +605,7 @@ class CassetteReplayer:
                 if (
                     expected.kind != kind
                     or expected.actor != actor
-                    or expected.compute_input_hash() != actual_in_hash
+                    or expected.compute_input_hash() not in (actual_in_hash, redacted_in_hash)
                 ):
                     diff = _compute_payload_diff(expected.input_payload, input_payload)
                     raise TrajectoryDivergenceError(
@@ -610,6 +625,9 @@ class CassetteReplayer:
             # Unordered lookup mode by (kind, actor, canonical_input_hash)
             key = (kind, actor, actual_in_hash)
             candidates = self._lookup.get(key)
+            if not candidates and redacted_in_hash != actual_in_hash:
+                key = (kind, actor, redacted_in_hash)
+                candidates = self._lookup.get(key)
             if not candidates:
                 # Find closest actor match to produce an informative structural diff
                 same_actor = [s for s in self._spans if s.kind == kind and s.actor == actor]

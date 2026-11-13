@@ -25,11 +25,12 @@ import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List, Literal, Optional, Sequence, Tuple, cast
+from typing import Any, Callable, Dict, Iterator, List, Literal, Optional, Tuple, cast
 
 from ..guard import CircuitBreakerTripped, TrajectoryCircuitBreaker
 from ..linter import ToolLintReport, ToolSmellLinter
 from ..recorder import FlightRecorder
+from ..redact import redact_sensitive
 from . import register_provider
 
 # ---------------------------------------------------------------------------
@@ -174,45 +175,6 @@ def is_openany_domain(url: str, base_url: str = "https://api.openany.si/v1", mcp
         return False
     except Exception:
         return False
-
-
-def redact_sensitive(data: Any, secrets: Optional[Sequence[str]] = None) -> Any:
-    """
-    Recursively redact API keys, Authorization headers, and sensitive tokens
-    from dictionaries, lists, and strings before logging or recording in cassettes.
-    """
-    secret_set = {s for s in (secrets or []) if s and len(s) >= 4}
-
-    if isinstance(data, dict):
-        redacted: Dict[str, Any] = {}
-        for k, v in data.items():
-            k_lower = str(k).lower()
-            is_sensitive_key = (
-                any(term in k_lower for term in ("api_key", "secret", "auth", "credential", "password", "bearer"))
-                or ("key" in k_lower and not k_lower.endswith("_key_id"))
-                or ("token" in k_lower and not any(metric in k_lower for metric in ("prompt_tokens", "completion_tokens", "total_tokens", "max_tokens", "reasoning_tokens", "cached_tokens")))
-            )
-            if is_sensitive_key:
-                redacted[k] = "[REDACTED]"
-            else:
-                redacted[k] = redact_sensitive(v, secrets)
-        return redacted
-
-    if isinstance(data, list):
-        return [redact_sensitive(item, secrets) for item in data]
-
-    if isinstance(data, str):
-        val = data
-        for sec in secret_set:
-            if sec in val:
-                val = val.replace(sec, "[REDACTED]")
-        # Redact generic Bearer patterns
-        if "Bearer " in val:
-            import re
-            val = re.sub(r"Bearer\s+([A-Za-z0-9_\-\.]{6,})", "Bearer [REDACTED]", val)
-        return val
-
-    return data
 
 
 # ---------------------------------------------------------------------------

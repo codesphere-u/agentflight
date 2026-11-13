@@ -16,10 +16,12 @@ import json
 import os
 import sys
 import time
+import urllib.parse
+import urllib.request
 import uuid
 from collections import defaultdict, deque
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT_DIR / "src"
@@ -33,6 +35,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from agentflight._version import __version__
 from agentflight.mcp_server import AgentFlightMCPServer
+from agentflight.telemetry import ServerMetrics, emit_structured_log, resolve_request_id
 
 try:
     from portal import render_developer_portal
@@ -52,6 +55,47 @@ ALLOWED_ORIGINS = [
 # bounds abuse of a warm instance but is not a global quota (use Vercel Firewall for that).
 RATE_LIMIT_PER_MIN = int(os.environ.get("MCP_RATE_LIMIT_PER_MIN", "60"))
 _hits: Dict[str, deque] = defaultdict(deque)
+metrics = ServerMetrics(service_name=SERVER_NAME, version=SERVER_VERSION, runtime="vercel-serverless")
+
+
+def _check_upstash_rate_limit(ip: str, limit: int) -> Tuple[bool, Optional[int]]:
+    """
+    Optional zero-dep Upstash Redis REST distributed rate limiter.
+    Returns `(handled, retry_after_seconds)` and fails open to local memory on error.
+    """
+    url = os.environ.get("UPSTASH_REDIS_REST_URL", "").strip().rstrip("/")
+    token = os.environ.get("UPSTASH_REDIS_REST_TOKEN", "").strip()
+    if not url or not token:
+        return False, None
+
+    parsed = urllib.parse.urlparse(url)
+    is_local_http = parsed.scheme == "http" and parsed.hostname in ("localhost", "127.0.0.1")
+    if parsed.scheme != "https" and not is_local_http:
+        return False, None
+
+    bucket = int(time.time() // 60)
+    key = f"agentflight:rl:{ip}:{bucket}"
+    payload = json.dumps([["INCR", key], ["EXPIRE", key, "120"]]).encode("utf-8")
+    req = urllib.request.Request(
+        f"{url}/pipeline",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=1.5) as resp:  # noqa: S310
+            data = json.loads(resp.read().decode("utf-8"))
+        if isinstance(data, list) and data and isinstance(data[0], dict):
+            count = int(data[0]["result"])
+            if count > limit:
+                return True, max(1, 60 - int(time.time() % 60))
+            return True, None
+    except Exception:
+        return False, None
+    return False, None
 
 
 def _rate_limited(request: Request) -> Optional[int]:
@@ -60,6 +104,11 @@ def _rate_limited(request: Request) -> Optional[int]:
         return None
     fwd = request.headers.get("x-forwarded-for", "")
     ip = fwd.split(",")[0].strip() or (request.client.host if request.client else "unknown")
+
+    handled, retry_after = _check_upstash_rate_limit(ip, RATE_LIMIT_PER_MIN)
+    if handled:
+        return retry_after
+
     now = time.monotonic()
     q = _hits[ip]
     while q and now - q[0] > 60:
@@ -106,18 +155,31 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=False,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "HEAD", "OPTIONS"],
     allow_headers=["*"],
-    expose_headers=["Mcp-Session-Id"],
+    expose_headers=["Mcp-Session-Id", "X-Request-ID"],
 )
 
 
 @app.middleware("http")
 async def _security_headers_middleware(request: Request, call_next: Any) -> Response:
+    req_id = resolve_request_id(request.headers.get("x-request-id"))
+    start = time.monotonic()
     response: Response = await call_next(request)
+    elapsed_ms = (time.monotonic() - start) * 1000.0
+    metrics.inc_request(response.status_code)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers["X-Request-ID"] = req_id
+    if os.environ.get("AGENTFLIGHT_LOG_JSON") == "1":
+        emit_structured_log(
+            request_id=req_id,
+            method=request.method,
+            path=request.url.path,
+            status=response.status_code,
+            latency_ms=elapsed_ms,
+        )
     return response
 
 
@@ -186,12 +248,19 @@ def _dispatch(message: Any) -> Optional[Dict[str, Any]]:
     try:
         response = mcp_engine.handle_request(message)
     except Exception:  # noqa: BLE001 - never leak internals to public callers
+        metrics.inc_mcp(method, is_error=True)
         if is_notification:
             return None
         return {"jsonrpc": "2.0", "id": req_id, "error": {"code": INTERNAL_ERROR, "message": "Internal server error."}}
 
     if response is None or is_notification:
+        metrics.inc_mcp(method, is_error=False)
         return None
+
+    is_err = bool(response.get("error")) or bool(
+        isinstance(response.get("result"), dict) and response["result"].get("isError")
+    )
+    metrics.inc_mcp(method, is_error=is_err)
 
     if method == "tools/list" and isinstance(response.get("result"), dict):
         response["result"]["tools"] = _sanitize_tools(response["result"].get("tools", []))
@@ -237,8 +306,22 @@ async def health_check(request: Request):
 @app.head("/health")
 @app.head("/healthz")
 @app.head("/api/health")
+@app.head("/metrics")
 async def health_head() -> Response:
     return Response(status_code=200, media_type="application/json")
+
+
+@app.get("/metrics")
+@app.get("/api/metrics")
+async def server_metrics(request: Request) -> Response:
+    accept = request.headers.get("accept", "")
+    if "application/json" in accept:
+        return JSONResponse(content=metrics.snapshot())
+    return Response(
+        content=metrics.to_prometheus(),
+        media_type="text/plain; version=0.0.4; charset=utf-8",
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @app.get("/mcp")
@@ -273,6 +356,7 @@ async def sse_legacy(request: Request):
 async def handle_jsonrpc(request: Request):
     retry = _rate_limited(request)
     if retry is not None:
+        metrics.inc_rate_limited()
         resp = _error(-32000, "Rate limit exceeded. Slow down or self-host.", status=429)
         resp.headers["Retry-After"] = str(retry)
         return resp

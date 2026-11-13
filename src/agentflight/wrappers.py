@@ -272,6 +272,30 @@ class _NamespaceProxy:
         return getattr(self._target, name)
 
 
+def _merge_tool_call_deltas(deltas: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Coalesce OpenAI-style streamed tool_call deltas by index into complete tool calls."""
+    merged: Dict[int, Dict[str, Any]] = {}
+    for item in deltas:
+        raw_idx = item.get("index")
+        idx = int(raw_idx) if isinstance(raw_idx, int) else (max(merged.keys()) + 1 if merged else 0)
+        entry = merged.setdefault(
+            idx,
+            {"index": idx, "type": "function", "function": {"name": "", "arguments": ""}},
+        )
+        if item.get("id"):
+            entry["id"] = item["id"]
+        if item.get("type"):
+            entry["type"] = item["type"]
+        fn = item.get("function")
+        if isinstance(fn, Mapping):
+            fn_entry = entry["function"]
+            if fn.get("name"):
+                fn_entry["name"] = str(fn["name"])
+            if fn.get("arguments"):
+                fn_entry["arguments"] = f"{fn_entry['arguments']}{fn['arguments']}"
+    return [merged[k] for k in sorted(merged)]
+
+
 class _StreamAccumulator:
     """Shared accumulator for OpenAI / Anthropic / Responses streaming responses."""
 
@@ -381,7 +405,7 @@ class _StreamAccumulator:
             "usage": {"prompt_tokens": pt, "completion_tokens": ct, "total_tokens": pt + ct},
         }
         if self.tool_call_deltas:
-            output_payload["tool_calls"] = self.tool_call_deltas
+            output_payload["tool_calls"] = _merge_tool_call_deltas(self.tool_call_deltas)
 
         span = self.recorder.record(
             kind="llm_turn",
