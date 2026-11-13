@@ -36,11 +36,11 @@ jobs:
       - name: Run Ruff lint & Mypy static type-check gates
         run: |
           ruff check src tests api
-          mypy src/agentflight
+          mypy src/agentflight api
 
       - name: Run pytest suite with coverage
         run: |
-          pytest -v --cov=agentflight --cov-report=term-missing
+          pytest -v --cov=agentflight --cov-report=term-missing --cov-fail-under=80
 
       - name: Execute CLI showcase & MCP tool-smell linter gate
         run: |

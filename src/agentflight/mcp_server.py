@@ -16,6 +16,7 @@ import json
 import sys
 from typing import IO, Any, Dict, List, Optional
 
+from ._version import __version__
 from .diff import compare_cassettes
 from .linter import RULE_CATALOG, SHOWCASE_HARDENED_MCP_TOOLS, ToolSmellLinter
 from .otel_export import export_cassette_to_otel
@@ -23,7 +24,7 @@ from .recorder import FlightRecorder, verify_cassette
 
 MCP_PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "agentflight-mcp"
-SERVER_VERSION = "1.1.0"
+SERVER_VERSION = __version__
 
 PARSE_ERROR = -32700
 INVALID_REQUEST = -32600
@@ -558,7 +559,14 @@ class AgentFlightMCPServer:
         method = message.get("method")
         msg_id = message.get("id")
         is_notification = "id" not in message
-        params = message.get("params") or {}
+        raw_params = message.get("params")
+        if raw_params is not None and not isinstance(raw_params, dict):
+            return {
+                "jsonrpc": "2.0",
+                "id": msg_id,
+                "error": {"code": INVALID_PARAMS, "message": "Field 'params' must be a JSON object."},
+            }
+        params: Dict[str, Any] = raw_params or {}
 
         if not isinstance(method, str):
             return {

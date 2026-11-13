@@ -18,11 +18,12 @@ from __future__ import annotations
 
 import functools
 import inspect
+import threading
 import time
 from types import SimpleNamespace
-from typing import Any, Callable, Dict, Mapping, Optional, Tuple, cast
+from typing import Any, AsyncIterator, Callable, Dict, Iterator, List, Mapping, Optional, Tuple, cast
 
-from agentflight.guard import TrajectoryCircuitBreaker
+from agentflight.guard import BudgetReservation, TrajectoryCircuitBreaker
 from agentflight.recorder import CassetteReplayer, FlightRecorder, SpanKind
 
 # Conservative USD per 1M tokens: (prompt_per_1m, completion_per_1m)
@@ -271,6 +272,279 @@ class _NamespaceProxy:
         return getattr(self._target, name)
 
 
+class _StreamAccumulator:
+    """Shared accumulator for OpenAI / Anthropic / Responses streaming responses."""
+
+    def __init__(
+        self,
+        *,
+        actor: str,
+        model: str,
+        input_payload: Dict[str, Any],
+        recorder: FlightRecorder,
+        guard: TrajectoryCircuitBreaker,
+        reservation: BudgetReservation,
+        model_pricing: Optional[Mapping[str, Tuple[float, float]]],
+        t0: float,
+    ) -> None:
+        self.actor = actor
+        self.model = model
+        self.input_payload = input_payload
+        self.recorder = recorder
+        self.guard = guard
+        self.reservation = reservation
+        self.model_pricing = model_pricing
+        self.t0 = t0
+        self.text_parts: List[str] = []
+        self.chunk_count = 0
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self.explicit_cost: Optional[float] = None
+        self.tool_call_deltas: List[Dict[str, Any]] = []
+        self._finalized = False
+
+    def observe_chunk(self, chunk: Any) -> None:
+        self.chunk_count += 1
+        chunk_dict = _to_plain_dict(chunk)
+
+        # Extract token usage across OpenAI Chat, Responses, and Anthropic SSE events
+        pt, ct, ec = _extract_usage_tokens(chunk_dict)
+        if pt:
+            self.prompt_tokens = pt
+        if ct:
+            self.completion_tokens = ct
+        if ec is not None:
+            self.explicit_cost = ec
+
+        message = chunk_dict.get("message")
+        if isinstance(message, Mapping):
+            mpt, mct, mec = _extract_usage_tokens(dict(message))
+            if mpt:
+                self.prompt_tokens = mpt
+            if mct:
+                self.completion_tokens = mct
+            if mec is not None:
+                self.explicit_cost = mec
+
+        resp_obj = chunk_dict.get("response")
+        if isinstance(resp_obj, Mapping):
+            rpt, rct, rec = _extract_usage_tokens(dict(resp_obj))
+            if rpt:
+                self.prompt_tokens = rpt
+            if rct:
+                self.completion_tokens = rct
+            if rec is not None:
+                self.explicit_cost = rec
+
+        # Extract streamed text deltas
+        choices = chunk_dict.get("choices")
+        if isinstance(choices, list) and choices:
+            first = choices[0] if isinstance(choices[0], Mapping) else {}
+            raw_delta = first.get("delta")
+            delta_map: Mapping[str, Any] = raw_delta if isinstance(raw_delta, Mapping) else {}
+            content = delta_map.get("content")
+            if isinstance(content, str):
+                self.text_parts.append(content)
+            tc = delta_map.get("tool_calls")
+            if isinstance(tc, list):
+                for item in tc:
+                    if isinstance(item, Mapping):
+                        self.tool_call_deltas.append(dict(item))
+            return
+
+        delta = chunk_dict.get("delta")
+        if isinstance(delta, str):
+            self.text_parts.append(delta)
+        elif isinstance(delta, Mapping):
+            for key in ("text", "partial_json"):
+                val = delta.get(key)
+                if isinstance(val, str):
+                    self.text_parts.append(val)
+
+    def finalize_ok(self) -> None:
+        if self._finalized:
+            return
+        self._finalized = True
+        full_text = "".join(self.text_parts)
+        pt = self.prompt_tokens
+        ct = self.completion_tokens or (max(1, len(full_text) // 4) if full_text else 0)
+        resolved_cost = (
+            self.explicit_cost
+            if self.explicit_cost is not None
+            else _estimate_cost_usd(self.model, pt, ct, model_pricing=self.model_pricing)
+        )
+        self.reservation.commit(resolved_cost)
+        output_payload: Dict[str, Any] = {
+            "text": full_text,
+            "chunks": self.chunk_count,
+            "stream": True,
+            "usage": {"prompt_tokens": pt, "completion_tokens": ct, "total_tokens": pt + ct},
+        }
+        if self.tool_call_deltas:
+            output_payload["tool_calls"] = self.tool_call_deltas
+
+        span = self.recorder.record(
+            kind="llm_turn",
+            actor=self.actor,
+            input_payload=self.input_payload,
+            output_payload=output_payload,
+            latency_ms=(time.perf_counter() - self.t0) * 1000.0,
+            prompt_tokens=pt,
+            completion_tokens=ct,
+            cost_usd=resolved_cost,
+            status="ok",
+        )
+        self.guard.observe_span(span)
+
+    def finalize_error(self, exc: BaseException) -> None:
+        if self._finalized:
+            return
+        self._finalized = True
+        self.reservation.release()
+        span = self.recorder.record(
+            kind="llm_turn",
+            actor=self.actor,
+            input_payload=self.input_payload,
+            output_payload={
+                "error": str(exc),
+                "error_type": type(exc).__name__,
+                "partial_text": "".join(self.text_parts),
+                "chunks": self.chunk_count,
+                "stream": True,
+            },
+            latency_ms=(time.perf_counter() - self.t0) * 1000.0,
+            status="error",
+        )
+        self.guard.observe_span(span)
+
+
+class _SyncStreamWrapper:
+    """Transparent proxy around synchronous LLM stream iterators."""
+
+    def __init__(self, stream: Any, acc: _StreamAccumulator) -> None:
+        self._stream = stream
+        self._iterator = iter(stream)
+        self._acc = acc
+
+    def __iter__(self) -> Iterator[Any]:
+        return self
+
+    def __next__(self) -> Any:
+        try:
+            chunk = next(self._iterator)
+        except StopIteration:
+            self._acc.finalize_ok()
+            raise
+        except Exception as exc:
+            self._acc.finalize_error(exc)
+            raise
+        self._acc.observe_chunk(chunk)
+        return chunk
+
+    def close(self) -> None:
+        try:
+            closer = getattr(self._stream, "close", None)
+            if callable(closer):
+                closer()
+        finally:
+            self._acc.finalize_ok()
+
+    def __enter__(self) -> "_SyncStreamWrapper":
+        enter = getattr(self._stream, "__enter__", None)
+        if callable(enter):
+            enter()
+        return self
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        exit_fn = getattr(self._stream, "__exit__", None)
+        try:
+            if callable(exit_fn):
+                exit_fn(exc_type, exc_val, exc_tb)
+        finally:
+            if exc_val is not None:
+                self._acc.finalize_error(exc_val)
+            else:
+                self._acc.finalize_ok()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._stream, name)
+
+
+class _AsyncStreamWrapper:
+    """Transparent proxy around asynchronous LLM stream iterators."""
+
+    def __init__(self, stream: Any, acc: _StreamAccumulator) -> None:
+        self._stream = stream
+        self._iterator = stream.__aiter__()
+        self._acc = acc
+
+    def __aiter__(self) -> AsyncIterator[Any]:
+        return self
+
+    async def __anext__(self) -> Any:
+        try:
+            chunk = await self._iterator.__anext__()
+        except StopAsyncIteration:
+            self._acc.finalize_ok()
+            raise
+        except Exception as exc:
+            self._acc.finalize_error(exc)
+            raise
+        self._acc.observe_chunk(chunk)
+        return chunk
+
+    async def aclose(self) -> None:
+        try:
+            closer = getattr(self._stream, "aclose", None) or getattr(self._stream, "close", None)
+            if callable(closer):
+                res = closer()
+                if inspect.isawaitable(res):
+                    await res
+        finally:
+            self._acc.finalize_ok()
+
+    async def __aenter__(self) -> "_AsyncStreamWrapper":
+        enter = getattr(self._stream, "__aenter__", None)
+        if callable(enter):
+            res = enter()
+            if inspect.isawaitable(res):
+                await res
+        return self
+
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        exit_fn = getattr(self._stream, "__aexit__", None)
+        try:
+            if callable(exit_fn):
+                res = exit_fn(exc_type, exc_val, exc_tb)
+                if inspect.isawaitable(res):
+                    await res
+        finally:
+            if exc_val is not None:
+                self._acc.finalize_error(exc_val)
+            else:
+                self._acc.finalize_ok()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._stream, name)
+
+
+def _replay_stream_chunks(replayed: Dict[str, Any]) -> Iterator[Any]:
+    """Emit synthetic OpenAI/Anthropic-shaped stream chunks from a replayed cassette span."""
+    text = str(replayed.get("text") or "")
+    usage = replayed.get("usage")
+    yield _ReplayNode(
+        choices=[_ReplayNode(index=0, delta=_ReplayNode(role="assistant", content=text))],
+        delta=_ReplayNode(text=text),
+        usage=_reconstruct_replay_object(usage) if isinstance(usage, Mapping) else None,
+    )
+
+
+async def _async_replay_stream_chunks(replayed: Dict[str, Any]) -> AsyncIterator[Any]:
+    """Emit async synthetic stream chunks from a replayed cassette span."""
+    for chunk in _replay_stream_chunks(replayed):
+        yield chunk
+
+
 def _wrap_llm_create(
     orig_create: Callable[..., Any],
     *,
@@ -340,21 +614,39 @@ def _wrap_llm_create(
         @functools.wraps(orig_create)
         async def _async_create(*args: Any, **kwargs: Any) -> Any:
             actor, model, input_payload = _prepare(args, kwargs)
+            wants_stream = bool(kwargs.get("stream"))
             if replayer is not None:
                 replayed = replayer.replay_step("llm_turn", actor, input_payload)
+                if wants_stream:
+                    return _async_replay_stream_chunks(replayed)
                 return _reconstruct_replay_object(replayed)
 
             t0 = time.perf_counter()
-            with guard.reserve_budget(estimated_cost_usd) as reservation:
-                try:
-                    response = await orig_create(*args, **kwargs)
-                    out_dict = _to_plain_dict(response)
-                    pt, ct, ec = _extract_usage_tokens(out_dict)
-                    actual_cost = ec if ec is not None else _estimate_cost_usd(model, pt, ct, model_pricing=model_pricing)
-                    reservation.commit(actual_cost)
-                except Exception as exc:
-                    _record_error(actor, input_payload, exc, (time.perf_counter() - t0) * 1000.0)
-                    raise
+            reservation = guard.reserve_budget(estimated_cost_usd)
+            try:
+                response = await orig_create(*args, **kwargs)
+            except Exception as exc:
+                reservation.release()
+                _record_error(actor, input_payload, exc, (time.perf_counter() - t0) * 1000.0)
+                raise
+
+            if wants_stream or hasattr(response, "__aiter__"):
+                acc = _StreamAccumulator(
+                    actor=actor,
+                    model=model,
+                    input_payload=input_payload,
+                    recorder=recorder,
+                    guard=guard,
+                    reservation=reservation,
+                    model_pricing=model_pricing,
+                    t0=t0,
+                )
+                return _AsyncStreamWrapper(response, acc)
+
+            out_dict = _to_plain_dict(response)
+            pt, ct, ec = _extract_usage_tokens(out_dict)
+            actual_cost = ec if ec is not None else _estimate_cost_usd(model, pt, ct, model_pricing=model_pricing)
+            reservation.commit(actual_cost)
             return _finalize(actor, model, input_payload, response, (time.perf_counter() - t0) * 1000.0)
 
         return _async_create
@@ -362,21 +654,39 @@ def _wrap_llm_create(
     @functools.wraps(orig_create)
     def _sync_create(*args: Any, **kwargs: Any) -> Any:
         actor, model, input_payload = _prepare(args, kwargs)
+        wants_stream = bool(kwargs.get("stream"))
         if replayer is not None:
             replayed = replayer.replay_step("llm_turn", actor, input_payload)
+            if wants_stream:
+                return _replay_stream_chunks(replayed)
             return _reconstruct_replay_object(replayed)
 
         t0 = time.perf_counter()
-        with guard.reserve_budget(estimated_cost_usd) as reservation:
-            try:
-                response = orig_create(*args, **kwargs)
-                out_dict = _to_plain_dict(response)
-                pt, ct, ec = _extract_usage_tokens(out_dict)
-                actual_cost = ec if ec is not None else _estimate_cost_usd(model, pt, ct, model_pricing=model_pricing)
-                reservation.commit(actual_cost)
-            except Exception as exc:
-                _record_error(actor, input_payload, exc, (time.perf_counter() - t0) * 1000.0)
-                raise
+        reservation = guard.reserve_budget(estimated_cost_usd)
+        try:
+            response = orig_create(*args, **kwargs)
+        except Exception as exc:
+            reservation.release()
+            _record_error(actor, input_payload, exc, (time.perf_counter() - t0) * 1000.0)
+            raise
+
+        if wants_stream and hasattr(response, "__iter__") and not isinstance(response, (dict, bytes, str)):
+            acc = _StreamAccumulator(
+                actor=actor,
+                model=model,
+                input_payload=input_payload,
+                recorder=recorder,
+                guard=guard,
+                reservation=reservation,
+                model_pricing=model_pricing,
+                t0=t0,
+            )
+            return _SyncStreamWrapper(response, acc)
+
+        out_dict = _to_plain_dict(response)
+        pt, ct, ec = _extract_usage_tokens(out_dict)
+        actual_cost = ec if ec is not None else _estimate_cost_usd(model, pt, ct, model_pricing=model_pricing)
+        reservation.commit(actual_cost)
         return _finalize(actor, model, input_payload, response, (time.perf_counter() - t0) * 1000.0)
 
     return _sync_create
@@ -488,6 +798,7 @@ class FlightCallbackHandler:
     ) -> None:
         self.recorder = recorder or FlightRecorder(agent_id=agent_id)
         self.guard = guard or TrajectoryCircuitBreaker()
+        self._lock = threading.Lock()
         self._inflight: Dict[str, Tuple[str, str, Dict[str, Any], float]] = {}
 
     def on_llm_start(
@@ -499,18 +810,20 @@ class FlightCallbackHandler:
         **kwargs: Any,
     ) -> None:
         actor = str(serialized.get("name") or serialized.get("id") or "llm")
-        self._inflight[str(run_id)] = (
-            "llm_turn",
-            actor,
-            {"prompts": _to_plain_value(prompts), "kwargs": _to_plain_value(kwargs)},
-            time.perf_counter(),
-        )
+        with self._lock:
+            self._inflight[str(run_id)] = (
+                "llm_turn",
+                actor,
+                {"prompts": _to_plain_value(prompts), "kwargs": _to_plain_value(kwargs)},
+                time.perf_counter(),
+            )
 
     def on_llm_end(self, response: Any, *, run_id: str = "default", **kwargs: Any) -> None:
-        kind, actor, input_payload, t0 = self._inflight.pop(
-            str(run_id),
-            ("llm_turn", "llm", {}, time.perf_counter()),
-        )
+        with self._lock:
+            kind, actor, input_payload, t0 = self._inflight.pop(
+                str(run_id),
+                ("llm_turn", "llm", {}, time.perf_counter()),
+            )
         out_dict = _to_plain_dict(response)
         pt, ct, ec = _extract_usage_tokens(out_dict)
         cost = ec if ec is not None else 0.0
@@ -528,10 +841,11 @@ class FlightCallbackHandler:
         self.guard.observe_span(span)
 
     def on_llm_error(self, error: BaseException, *, run_id: str = "default", **kwargs: Any) -> None:
-        kind, actor, input_payload, t0 = self._inflight.pop(
-            str(run_id),
-            ("llm_turn", "llm", {}, time.perf_counter()),
-        )
+        with self._lock:
+            kind, actor, input_payload, t0 = self._inflight.pop(
+                str(run_id),
+                ("llm_turn", "llm", {}, time.perf_counter()),
+            )
         span = self.recorder.record(
             kind=kind,  # type: ignore[arg-type]
             actor=actor,
@@ -551,18 +865,20 @@ class FlightCallbackHandler:
         **kwargs: Any,
     ) -> None:
         actor = str(serialized.get("name") or "tool")
-        self._inflight[str(run_id)] = (
-            "tool_call",
-            actor,
-            {"input": _to_plain_value(input_str), "kwargs": _to_plain_value(kwargs)},
-            time.perf_counter(),
-        )
+        with self._lock:
+            self._inflight[str(run_id)] = (
+                "tool_call",
+                actor,
+                {"input": _to_plain_value(input_str), "kwargs": _to_plain_value(kwargs)},
+                time.perf_counter(),
+            )
 
     def on_tool_end(self, output: Any, *, run_id: str = "default", **kwargs: Any) -> None:
-        kind, actor, input_payload, t0 = self._inflight.pop(
-            str(run_id),
-            ("tool_call", "tool", {}, time.perf_counter()),
-        )
+        with self._lock:
+            kind, actor, input_payload, t0 = self._inflight.pop(
+                str(run_id),
+                ("tool_call", "tool", {}, time.perf_counter()),
+            )
         span = self.recorder.record(
             kind=kind,  # type: ignore[arg-type]
             actor=actor,
@@ -574,10 +890,11 @@ class FlightCallbackHandler:
         self.guard.observe_span(span)
 
     def on_tool_error(self, error: BaseException, *, run_id: str = "default", **kwargs: Any) -> None:
-        kind, actor, input_payload, t0 = self._inflight.pop(
-            str(run_id),
-            ("tool_call", "tool", {}, time.perf_counter()),
-        )
+        with self._lock:
+            kind, actor, input_payload, t0 = self._inflight.pop(
+                str(run_id),
+                ("tool_call", "tool", {}, time.perf_counter()),
+            )
         span = self.recorder.record(
             kind=kind,  # type: ignore[arg-type]
             actor=actor,

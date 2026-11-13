@@ -2,6 +2,21 @@
 
 All notable changes to `agentflight` are documented in this file.
 
+## [1.3.1] - 2026-11-13
+
+### Production Hardening
+- **Thread-Safe Recording & Atomic Cassette Saves (`src/agentflight/recorder.py`)**:
+  - Protected `FlightRecorder` (`RLock`) and `CassetteReplayer` (`Lock`) mutations and cursor state for concurrent multi-threaded execution.
+  - Added atomic `FlightRecorder.save()` via temporary file + `fsync` + `os.replace()` preventing partial/corrupted cassettes on crash, and translated corrupt cassette parsing into `CassetteTamperError`.
+- **Sync & Async Streaming SDK Wrappers (`src/agentflight/wrappers.py`)**:
+  - Added full `stream=True` iterator/context-manager proxies (`_SyncStreamWrapper`, `_AsyncStreamWrapper`, `_StreamAccumulator`) capturing streamed text deltas, tool-call chunks, token usage, partial error recovery, and offline stream replay across OpenAI Chat, OpenAI Responses, and Anthropic Messages.
+  - Added thread lock synchronization inside `FlightCallbackHandler`.
+- **Single-Source Versioning & Server Security Hardening (`src/agentflight/_version.py`, `src/agentflight/http_server.py`, `src/agentflight/mcp_server.py`, `api/index.py`)**:
+  - Unified `SERVER_VERSION` across `__init__.py`, `mcp_server.py`, `http_server.py`, and `api/index.py`.
+  - Enforced `Content-Length` validation and configurable `AGENTFLIGHT_MAX_BODY_BYTES` (`413` on oversized requests), JSON-RPC `params` dict validation (`-32602`), security response headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`), configurable `MCP_ALLOWED_ORIGINS`, and broken-pipe resilience in `http_server.py`.
+- **Zero-Overhead Lazy `pytest11` Shimming & 83% Coverage Gate (`src/_agentflight_pytest.py`, `.github/workflows/ci.yml`)**:
+  - Added lazy `_agentflight_pytest` entry point shim eliminating eager startup imports and early-coverage warnings (`--cov-fail-under=80` + `mypy src/agentflight api` enforced in CI; 157 passing tests).
+
 ## [1.3.0] - 2026-11-13
 
 ### Added

@@ -13,6 +13,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import tempfile
+import threading
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -192,48 +195,55 @@ class FlightRecorder:
     ) -> None:
         self.agent_id = agent_id
         self.metadata: Dict[str, Any] = dict(metadata or {})
+        self._lock = threading.RLock()
         self._spans: List[TrajectorySpan] = []
         if spans:
             for sp in spans:
                 self._append_verified(sp)
 
     def _append_verified(self, span: TrajectorySpan) -> TrajectorySpan:
-        prev = self._spans[-1].step_hash if self._spans else GENESIS_HASH
-        idx = len(self._spans)
-        reindexed = TrajectorySpan(
-            step_index=idx,
-            kind=span.kind,
-            actor=span.actor,
-            input_payload=span.input_payload,
-            output_payload=span.output_payload,
-            latency_ms=span.latency_ms,
-            prompt_tokens=span.prompt_tokens,
-            completion_tokens=span.completion_tokens,
-            cost_usd=span.cost_usd,
-            status=span.status,
-        ).with_computed_hashes(prev)
-        self._spans.append(reindexed)
-        return reindexed
+        with self._lock:
+            prev = self._spans[-1].step_hash if self._spans else GENESIS_HASH
+            idx = len(self._spans)
+            reindexed = TrajectorySpan(
+                step_index=idx,
+                kind=span.kind,
+                actor=span.actor,
+                input_payload=span.input_payload,
+                output_payload=span.output_payload,
+                latency_ms=span.latency_ms,
+                prompt_tokens=span.prompt_tokens,
+                completion_tokens=span.completion_tokens,
+                cost_usd=span.cost_usd,
+                status=span.status,
+            ).with_computed_hashes(prev)
+            self._spans.append(reindexed)
+            return reindexed
 
     @property
     def spans(self) -> List[TrajectorySpan]:
-        return list(self._spans)
+        with self._lock:
+            return list(self._spans)
 
     @property
     def head_hash(self) -> str:
-        return self._spans[-1].step_hash if self._spans else GENESIS_HASH
+        with self._lock:
+            return self._spans[-1].step_hash if self._spans else GENESIS_HASH
 
     @property
     def total_tokens(self) -> int:
-        return sum(s.prompt_tokens + s.completion_tokens for s in self._spans)
+        with self._lock:
+            return sum(s.prompt_tokens + s.completion_tokens for s in self._spans)
 
     @property
     def total_cost_usd(self) -> float:
-        return round(sum(s.cost_usd for s in self._spans), 8)
+        with self._lock:
+            return round(sum(s.cost_usd for s in self._spans), 8)
 
     @property
     def total_latency_ms(self) -> float:
-        return round(sum(s.latency_ms for s in self._spans), 4)
+        with self._lock:
+            return round(sum(s.latency_ms for s in self._spans), 4)
 
     def record(
         self,
@@ -248,20 +258,21 @@ class FlightRecorder:
         cost_usd: float = 0.0,
         status: SpanStatus = "ok",
     ) -> TrajectorySpan:
-        """Record a single trajectory span and chain its SHA-256 digest."""
-        raw_span = TrajectorySpan(
-            step_index=len(self._spans),
-            kind=kind,
-            actor=actor,
-            input_payload=dict(input_payload),
-            output_payload=dict(output_payload),
-            latency_ms=float(latency_ms),
-            prompt_tokens=int(prompt_tokens),
-            completion_tokens=int(completion_tokens),
-            cost_usd=float(cost_usd),
-            status=status,
-        )
-        return self._append_verified(raw_span)
+        """Record a single trajectory span and chain its SHA-256 digest thread-safely."""
+        with self._lock:
+            raw_span = TrajectorySpan(
+                step_index=len(self._spans),
+                kind=kind,
+                actor=actor,
+                input_payload=dict(input_payload),
+                output_payload=dict(output_payload),
+                latency_ms=float(latency_ms),
+                prompt_tokens=int(prompt_tokens),
+                completion_tokens=int(completion_tokens),
+                cost_usd=float(cost_usd),
+                status=status,
+            )
+            return self._append_verified(raw_span)
 
     def wrap_tool(
         self,
@@ -302,71 +313,88 @@ class FlightRecorder:
 
     def to_cassette_dict(self) -> Dict[str, Any]:
         """Serialize the full cassette into a dictionary with summary telemetry."""
-        return {
-            "version": "1.0.0",
-            "agent_id": self.agent_id,
-            "metadata": self.metadata,
-            "head_hash": self.head_hash,
-            "step_count": len(self._spans),
-            "total_tokens": self.total_tokens,
-            "total_cost_usd": self.total_cost_usd,
-            "total_latency_ms": self.total_latency_ms,
-            "spans": [s.to_dict() for s in self._spans],
-        }
-
-    def save(self, path: Union[str, Path]) -> Path:
-        """
-        Save cassette to disk as `.flight.json` or `.flight.jsonl`.
-        Automatically selects JSON Lines if the path ends with `.jsonl`.
-        """
-        target = Path(path)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        if target.name.endswith(".jsonl"):
-            lines: List[str] = []
-            header = {
-                "type": "cassette_header",
+        with self._lock:
+            return {
                 "version": "1.0.0",
                 "agent_id": self.agent_id,
                 "metadata": self.metadata,
                 "head_hash": self.head_hash,
                 "step_count": len(self._spans),
+                "total_tokens": self.total_tokens,
+                "total_cost_usd": self.total_cost_usd,
+                "total_latency_ms": self.total_latency_ms,
+                "spans": [s.to_dict() for s in self._spans],
             }
-            lines.append(json.dumps(header, sort_keys=True))
-            for sp in self._spans:
-                row = {"type": "span", **sp.to_dict()}
-                lines.append(json.dumps(row, sort_keys=True))
-            target.write_text("\n".join(lines) + "\n", encoding="utf-8")
-        else:
-            target.write_text(
-                json.dumps(self.to_cassette_dict(), indent=2, sort_keys=True) + "\n",
-                encoding="utf-8",
-            )
+
+    def save(self, path: Union[str, Path]) -> Path:
+        """
+        Atomically save cassette to disk as `.flight.json` or `.flight.jsonl`.
+        Automatically selects JSON Lines if the path ends with `.jsonl`.
+        """
+        target = Path(path)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with self._lock:
+            if target.name.endswith(".jsonl"):
+                lines: List[str] = []
+                header = {
+                    "type": "cassette_header",
+                    "version": "1.0.0",
+                    "agent_id": self.agent_id,
+                    "metadata": self.metadata,
+                    "head_hash": self.head_hash,
+                    "step_count": len(self._spans),
+                }
+                lines.append(json.dumps(header, sort_keys=True))
+                for sp in self._spans:
+                    row = {"type": "span", **sp.to_dict()}
+                    lines.append(json.dumps(row, sort_keys=True))
+                payload_text = "\n".join(lines) + "\n"
+            else:
+                payload_text = json.dumps(self.to_cassette_dict(), indent=2, sort_keys=True) + "\n"
+
+        tmp_fd, tmp_path = tempfile.mkstemp(dir=str(target.parent), prefix=f".{target.name}.", suffix=".tmp")
+        try:
+            with os.fdopen(tmp_fd, "w", encoding="utf-8") as handle:
+                handle.write(payload_text)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(tmp_path, target)
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
         return target
 
     @classmethod
     def load(cls, path: Union[str, Path], *, verify: bool = True) -> "FlightRecorder":
         """Load a `.flight.json` or `.flight.jsonl` cassette and optionally verify its hash chain."""
         target = Path(path)
-        raw_text = target.read_text(encoding="utf-8").strip()
-        if target.name.endswith(".jsonl"):
-            lines = [ln for ln in raw_text.splitlines() if ln.strip()]
-            if not lines:
-                raise CassetteTamperError("Empty .flight.jsonl cassette file.")
-            header = json.loads(lines[0])
-            if header.get("type") != "cassette_header":
-                raise CassetteTamperError("Missing cassette_header in .flight.jsonl file.")
-            spans = [TrajectorySpan.from_dict(json.loads(ln)) for ln in lines[1:]]
-            cassette_dict = {
-                "version": header.get("version", "1.0.0"),
-                "agent_id": header.get("agent_id", "default-agent"),
-                "metadata": header.get("metadata", {}),
-                "head_hash": header.get("head_hash", GENESIS_HASH),
-                "step_count": header.get("step_count", len(spans)),
-                "spans": [s.to_dict() for s in spans],
-            }
-        else:
-            cassette_dict = json.loads(raw_text)
-            spans = [TrajectorySpan.from_dict(s) for s in cassette_dict.get("spans", [])]
+        try:
+            raw_text = target.read_text(encoding="utf-8").strip()
+            if target.name.endswith(".jsonl"):
+                lines = [ln for ln in raw_text.splitlines() if ln.strip()]
+                if not lines:
+                    raise CassetteTamperError("Empty .flight.jsonl cassette file.")
+                header = json.loads(lines[0])
+                if not isinstance(header, dict) or header.get("type") != "cassette_header":
+                    raise CassetteTamperError("Missing cassette_header in .flight.jsonl file.")
+                spans = [TrajectorySpan.from_dict(json.loads(ln)) for ln in lines[1:]]
+                cassette_dict = {
+                    "version": header.get("version", "1.0.0"),
+                    "agent_id": header.get("agent_id", "default-agent"),
+                    "metadata": header.get("metadata", {}),
+                    "head_hash": header.get("head_hash", GENESIS_HASH),
+                    "step_count": header.get("step_count", len(spans)),
+                    "spans": [s.to_dict() for s in spans],
+                }
+            else:
+                cassette_dict = json.loads(raw_text)
+                if not isinstance(cassette_dict, dict):
+                    raise CassetteTamperError("Invalid cassette JSON: top-level value must be an object.")
+                spans = [TrajectorySpan.from_dict(s) for s in cassette_dict.get("spans", [])]
+        except CassetteTamperError:
+            raise
+        except (ValueError, KeyError, TypeError) as exc:
+            raise CassetteTamperError(f"Malformed cassette file '{target}': {exc}") from exc
 
         if verify:
             verify_cassette(cassette_dict)
@@ -470,6 +498,7 @@ class CassetteReplayer:
             self._agent_id = "replayed-agent"
 
         self.strict_order = strict_order
+        self._lock = threading.Lock()
         self._cursor: int = 0
         self._lookup: Dict[Tuple[str, str, str], List[TrajectorySpan]] = {}
         self._lookup_cursors: Dict[Tuple[str, str, str], int] = {}
@@ -480,7 +509,8 @@ class CassetteReplayer:
 
     @property
     def cursor(self) -> int:
-        return self._cursor
+        with self._lock:
+            return self._cursor
 
     @property
     def spans(self) -> List[TrajectorySpan]:
@@ -495,33 +525,39 @@ class CassetteReplayer:
     @property
     def is_exhausted(self) -> bool:
         """True if the replay cursor has advanced through all spans in the cassette."""
-        return self._cursor >= len(self._spans)
+        with self._lock:
+            return self._cursor >= len(self._spans)
 
     def advance(self) -> TrajectorySpan:
         """Advance the replay cursor by one step and return that TrajectorySpan."""
-        if self.is_exhausted:
-            raise StopIteration("CassetteReplayer cursor is exhausted.")
-        span = self._spans[self._cursor]
-        self._cursor += 1
-        return span
+        with self._lock:
+            if self._cursor >= len(self._spans):
+                raise StopIteration("CassetteReplayer cursor is exhausted.")
+            span = self._spans[self._cursor]
+            self._cursor += 1
+            return span
 
     @property
     def remaining_steps(self) -> int:
-        return max(0, len(self._spans) - self._cursor)
+        with self._lock:
+            return max(0, len(self._spans) - self._cursor)
 
     @property
     def tokens_saved(self) -> int:
-        return sum(s.prompt_tokens + s.completion_tokens for s in self._spans[: self._cursor])
+        with self._lock:
+            return sum(s.prompt_tokens + s.completion_tokens for s in self._spans[: self._cursor])
 
     @property
     def cost_saved_usd(self) -> float:
-        return round(sum(s.cost_usd for s in self._spans[: self._cursor]), 8)
+        with self._lock:
+            return round(sum(s.cost_usd for s in self._spans[: self._cursor]), 8)
 
     def reset(self) -> None:
         """Reset replay cursor back to step 0."""
-        self._cursor = 0
-        for k in self._lookup_cursors:
-            self._lookup_cursors[k] = 0
+        with self._lock:
+            self._cursor = 0
+            for k in self._lookup_cursors:
+                self._lookup_cursors[k] = 0
 
     def replay_step(
         self,
@@ -539,64 +575,65 @@ class CassetteReplayer:
             {"kind": kind, "actor": actor, "input_payload": input_payload}
         )
 
-        if self.strict_order:
-            if self._cursor >= len(self._spans):
-                raise TrajectoryDivergenceError(
-                    f"Trajectory exceeded recorded cassette length ({len(self._spans)} steps) "
-                    f"with unexpected call {kind}:{actor}.",
-                    step_index=self._cursor,
-                    actual_kind=kind,
-                    actual_actor=actor,
-                    actual_input=input_payload,
+        with self._lock:
+            if self.strict_order:
+                if self._cursor >= len(self._spans):
+                    raise TrajectoryDivergenceError(
+                        f"Trajectory exceeded recorded cassette length ({len(self._spans)} steps) "
+                        f"with unexpected call {kind}:{actor}.",
+                        step_index=self._cursor,
+                        actual_kind=kind,
+                        actual_actor=actor,
+                        actual_input=input_payload,
+                    )
+                expected = self._spans[self._cursor]
+                if (
+                    expected.kind != kind
+                    or expected.actor != actor
+                    or expected.compute_input_hash() != actual_in_hash
+                ):
+                    diff = _compute_payload_diff(expected.input_payload, input_payload)
+                    raise TrajectoryDivergenceError(
+                        f"Trajectory divergence at step {self._cursor}: "
+                        f"expected ({expected.kind}, '{expected.actor}') "
+                        f"but got ({kind}, '{actor}'). Diff: {diff}",
+                        step_index=self._cursor,
+                        expected_span=expected,
+                        actual_kind=kind,
+                        actual_actor=actor,
+                        actual_input=input_payload,
+                        diff=diff,
+                    )
+                self._cursor += 1
+                return dict(expected.output_payload)
+
+            # Unordered lookup mode by (kind, actor, canonical_input_hash)
+            key = (kind, actor, actual_in_hash)
+            candidates = self._lookup.get(key)
+            if not candidates:
+                # Find closest actor match to produce an informative structural diff
+                same_actor = [s for s in self._spans if s.kind == kind and s.actor == actor]
+                expected_span = same_actor[0] if same_actor else None
+                diff = (
+                    _compute_payload_diff(expected_span.input_payload, input_payload)
+                    if expected_span
+                    else {}
                 )
-            expected = self._spans[self._cursor]
-            if (
-                expected.kind != kind
-                or expected.actor != actor
-                or expected.compute_input_hash() != actual_in_hash
-            ):
-                diff = _compute_payload_diff(expected.input_payload, input_payload)
                 raise TrajectoryDivergenceError(
-                    f"Trajectory divergence at step {self._cursor}: "
-                    f"expected ({expected.kind}, '{expected.actor}') "
-                    f"but got ({kind}, '{actor}'). Diff: {diff}",
+                    f"No recorded cassette span matches ({kind}, '{actor}') with input {input_payload}.",
                     step_index=self._cursor,
-                    expected_span=expected,
+                    expected_span=expected_span,
                     actual_kind=kind,
                     actual_actor=actor,
                     actual_input=input_payload,
                     diff=diff,
                 )
+
+            idx = self._lookup_cursors[key]
+            chosen = candidates[min(idx, len(candidates) - 1)]
+            self._lookup_cursors[key] = idx + 1
             self._cursor += 1
-            return dict(expected.output_payload)
-
-        # Unordered lookup mode by (kind, actor, canonical_input_hash)
-        key = (kind, actor, actual_in_hash)
-        candidates = self._lookup.get(key)
-        if not candidates:
-            # Find closest actor match to produce an informative structural diff
-            same_actor = [s for s in self._spans if s.kind == kind and s.actor == actor]
-            expected_span = same_actor[0] if same_actor else None
-            diff = (
-                _compute_payload_diff(expected_span.input_payload, input_payload)
-                if expected_span
-                else {}
-            )
-            raise TrajectoryDivergenceError(
-                f"No recorded cassette span matches ({kind}, '{actor}') with input {input_payload}.",
-                step_index=self._cursor,
-                expected_span=expected_span,
-                actual_kind=kind,
-                actual_actor=actor,
-                actual_input=input_payload,
-                diff=diff,
-            )
-
-        idx = self._lookup_cursors[key]
-        chosen = candidates[min(idx, len(candidates) - 1)]
-        self._lookup_cursors[key] = idx + 1
-        self._cursor += 1
-        return dict(chosen.output_payload)
+            return dict(chosen.output_payload)
 
     def stub_tool(self, actor: str, *, kind: SpanKind = "tool_call") -> Callable[..., Dict[str, Any]]:
         """Return a deterministic stub callable for `actor` backed by this cassette."""

@@ -19,7 +19,7 @@ import time
 import uuid
 from collections import defaultdict, deque
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT_DIR / "src"
@@ -31,6 +31,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
+from agentflight._version import __version__
 from agentflight.mcp_server import AgentFlightMCPServer
 
 try:
@@ -39,8 +40,13 @@ except ImportError:
     from api.portal import render_developer_portal
 
 SERVER_NAME = "agentflight"
-SERVER_VERSION = "1.3.0"
-MAX_BODY_BYTES = 1_000_000
+SERVER_VERSION = __version__
+MAX_BODY_BYTES = max(1, int(os.environ.get("MCP_MAX_BODY_BYTES", "1000000")))
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("MCP_ALLOWED_ORIGINS", "*").split(",")
+    if origin.strip()
+] or ["*"]
 
 # Best-effort per-IP sliding-window rate limit. State is per serverless instance, so it
 # bounds abuse of a warm instance but is not a global quota (use Vercel Firewall for that).
@@ -98,12 +104,21 @@ app = FastAPI(
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["Mcp-Session-Id"],
 )
+
+
+@app.middleware("http")
+async def _security_headers_middleware(request: Request, call_next: Any) -> Response:
+    response: Response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    return response
 
 
 def _error(code: int, message: str, req_id: Any = None, status: int = 200) -> JSONResponse:
@@ -121,10 +136,11 @@ def _sanitize_tools(tools: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             continue
         tool = copy.deepcopy(tool)
         schema = tool.get("inputSchema") or {}
-        for arg in HOSTED_FORBIDDEN_ARGS.get(name, []):
-            schema.get("properties", {}).pop(arg, None)
-            if arg in schema.get("required", []):
-                schema["required"].remove(arg)
+        if isinstance(name, str):
+            for arg in HOSTED_FORBIDDEN_ARGS.get(name, []):
+                schema.get("properties", {}).pop(arg, None)
+                if arg in schema.get("required", []):
+                    schema["required"].remove(arg)
         visible.append(tool)
     return visible
 
@@ -146,13 +162,14 @@ def _dispatch(message: Any) -> Optional[Dict[str, Any]]:
         return None if is_notification else {"jsonrpc": "2.0", "id": req_id, "result": {}}
 
     if method == "tools/call":
-        params = message.get("params") or {}
+        raw_params = message.get("params")
+        params = raw_params if isinstance(raw_params, dict) else {}
         name = params.get("name")
         args = params.get("arguments") or {}
         refused = None
-        if name in HOSTED_BLOCKED_TOOLS:
+        if isinstance(name, str) and name in HOSTED_BLOCKED_TOOLS:
             refused = f"Tool '{name}' is disabled on the hosted deployment (filesystem/process access). Install locally via stdio to use it."
-        else:
+        elif isinstance(name, str):
             for arg in HOSTED_FORBIDDEN_ARGS.get(name, []):
                 if isinstance(args, dict) and arg in args:
                     refused = f"Argument '{arg}' is disabled on the hosted deployment. Pass the content inline instead."
@@ -178,7 +195,7 @@ def _dispatch(message: Any) -> Optional[Dict[str, Any]]:
 
     if method == "tools/list" and isinstance(response.get("result"), dict):
         response["result"]["tools"] = _sanitize_tools(response["result"].get("tools", []))
-    return response
+    return cast(Optional[Dict[str, Any]], response)
 
 
 @app.get("/")

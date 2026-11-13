@@ -6,14 +6,14 @@
 
 [![CI & Reliability Gate](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/agentflight-mcp.svg?color=blue)](https://pypi.org/project/agentflight-mcp/)
-[![Release v1.3.0](https://img.shields.io/badge/release-v1.3.0-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.3.0)
+[![Release v1.3.1](https://img.shields.io/badge/release-v1.3.1-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.3.1)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Operational-10b981?logo=vercel&logoColor=white)](https://agentflight-tau.vercel.app/mcp)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-✔%20Connected-10b981?logo=anthropic&logoColor=white)](#hosted-endpoint-vercel)
 [![Glama Score](https://glama.ai/mcp/servers/codesphere-u/agentflight/badges/score.svg)](https://glama.ai/mcp/servers/codesphere-u/agentflight)
 [![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
-[![Tests Passed](https://img.shields.io/badge/tests-149%20passed-brightgreen.svg)](tests/)
+[![Tests Passed](https://img.shields.io/badge/tests-157%20passed-brightgreen.svg)](tests/)
 [![Core SDK Stdlib](https://img.shields.io/badge/core%20SDK-100%25%20Python%20stdlib-brightgreen.svg)](src/agentflight/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
@@ -84,8 +84,8 @@ Production AI agent engineering in 2026 faces two compounding bottlenecks:
 # Install from PyPI (module import & CLI command remain `agentflight`):
 pip install agentflight-mcp
 
-# Or install v1.3.0 directly from GitHub:
-pip install "git+https://github.com/codesphere-u/agentflight.git@v1.3.0"
+# Or install v1.3.1 directly from GitHub:
+pip install "git+https://github.com/codesphere-u/agentflight.git@v1.3.1"
 
 # Contributors:
 pip install -e ".[dev]"

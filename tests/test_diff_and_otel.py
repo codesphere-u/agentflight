@@ -57,7 +57,16 @@ def _build_baseline_cassette() -> FlightRecorder:
 
 
 def test_version_is_current() -> None:
-    assert __version__ == "1.3.0"
+    import re
+    from pathlib import Path
+
+    from agentflight.mcp_server import SERVER_VERSION
+
+    pyproject_text = (Path(__file__).resolve().parent.parent / "pyproject.toml").read_text(encoding="utf-8")
+    match = re.search(r'^version\s*=\s*"([^"]+)"', pyproject_text, flags=re.MULTILINE)
+    assert match is not None
+    assert __version__ == match.group(1)
+    assert SERVER_VERSION == __version__
 
 
 def test_levenshtein_and_lcs_primitives() -> None:
@@ -316,10 +325,12 @@ def test_cli_export_otel_subcommand(tmp_path: Path, capsys: pytest.CaptureFixtur
 
 
 def test_mcp_server_initialize_and_tools_list() -> None:
+    from agentflight import __version__
+
     server = AgentFlightMCPServer()
     init_resp = server.handle_request({"jsonrpc": "2.0", "id": 1, "method": "initialize"})
     assert init_resp is not None
-    assert init_resp["result"]["serverInfo"]["version"] == "1.1.0"
+    assert init_resp["result"]["serverInfo"]["version"] == __version__
 
     list_resp = server.handle_request({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
     assert list_resp is not None

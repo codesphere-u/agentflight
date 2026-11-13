@@ -5,6 +5,7 @@ AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay,
 Loop/Cost Circuit Breaker & MCP Tool-Smell Linter.
 """
 
+from ._version import __version__
 from .diff import (
     TrajectoryDifferentialAnalyzer,
     TrajectoryDiffReport,
@@ -50,8 +51,6 @@ from .recorder import (
 from .schema_optimizer import SchemaOptimizationResult, ToolSchemaOptimizer
 from .testing import FlightSession, flight_test
 from .wrappers import FlightCallbackHandler, wrap_anthropic, wrap_callable, wrap_openai
-
-__version__ = "1.3.0"
 
 __all__ = [
     "__version__",
