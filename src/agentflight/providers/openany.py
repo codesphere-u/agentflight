@@ -23,15 +23,14 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass
 from pathlib import Path
-from dataclasses import asdict, dataclass, field
-from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Sequence, Union
+from typing import Any, Callable, Dict, Iterator, List, Literal, Optional, Sequence, Tuple, cast
 
 from ..guard import CircuitBreakerTripped, TrajectoryCircuitBreaker
 from ..linter import ToolLintReport, ToolSmellLinter
-from ..recorder import FlightRecorder, TrajectorySpan
+from ..recorder import FlightRecorder
 from . import register_provider
-
 
 # ---------------------------------------------------------------------------
 # Exceptions
@@ -560,7 +559,6 @@ class OpenAnyProvider:
             payload.update(extra_body)
 
         start_time = time.perf_counter()
-        status_flag = "ok"
         error_info: Optional[Dict[str, Any]] = None
         resp_data: Dict[str, Any] = {}
 
@@ -569,7 +567,6 @@ class OpenAnyProvider:
         except Exception as e:
             if reservation is not None:
                 reservation.release()
-            status_flag = "error"
             error_info = {"error": str(e), "type": type(e).__name__}
             latency_ms = (time.perf_counter() - start_time) * 1000.0
             # Record failed turn in flight recorder if provided
@@ -600,7 +597,6 @@ class OpenAnyProvider:
         usage = resp_data.get("usage", {})
         actual_prompt_tokens = usage.get("prompt_tokens", est_prompt_tokens)
         actual_comp_tokens = usage.get("completion_tokens", 0)
-        actual_total_tokens = usage.get("total_tokens", actual_prompt_tokens + actual_comp_tokens)
 
         actual_cost_usd = self.estimate_cost(target_model, actual_prompt_tokens, actual_comp_tokens)
 
@@ -845,7 +841,7 @@ class OpenAnyProvider:
 
         resp = self._send_request(self.config.mcp_url, method="POST", payload=req_payload)
         result = resp.get("result", {})
-        return result.get("tools", [])
+        return cast(List[Dict[str, Any]], result.get("tools", []))
 
     def call_mcp_tool(
         self,
@@ -906,7 +902,7 @@ class OpenAnyProvider:
             latency_ms = (time.perf_counter() - start_time) * 1000.0
             result = resp.get("result", resp)
             is_error = resp.get("error") is not None or result.get("isError", False)
-            status_flag = "error" if is_error else "ok"
+            status_flag: Literal["ok", "error"] = "error" if is_error else "ok"
 
             if recorder is not None:
                 recorder.record(
@@ -926,7 +922,7 @@ class OpenAnyProvider:
                     kind="tool_call",
                 )
 
-            return result
+            return cast(Dict[str, Any], result)
         except Exception as e:
             latency_ms = (time.perf_counter() - start_time) * 1000.0
             if recorder is not None:

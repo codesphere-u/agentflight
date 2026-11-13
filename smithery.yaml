@@ -6,5 +6,5 @@ startCommand:
   commandFunction: |-
     (config) => ({
       command: 'uvx',
-      args: ['--from', 'git+https://github.com/codesphere-u/agentflight.git', 'agentflight', 'serve-mcp']
+      args: ['--from', 'agentflight-mcp', 'agentflight', 'serve-mcp']
     })

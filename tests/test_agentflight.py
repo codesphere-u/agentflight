@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import pytest
 
@@ -18,16 +18,12 @@ from agentflight import (
     ToolSmellLinter,
     TrajectoryCircuitBreaker,
     TrajectoryDivergenceError,
-    TrajectoryEvaluator,
-    TrajectorySpan,
     canonical_hash,
     canonical_json,
     diff_trajectories,
-    estimate_schema_tokens,
     verify_cassette,
 )
-from agentflight.cli import main as cli_main, run_benchmarks
-
+from agentflight.cli import main as cli_main
 
 # ============================================================================
 # 1. Recorder & SHA-256 Cassette Integrity Tests

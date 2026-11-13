@@ -8,10 +8,10 @@ on platforms such as Glama.ai, Fly.io, Cloudflare, and Docker containers.
 from __future__ import annotations
 
 import json
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import logging
-from typing import Optional, TYPE_CHECKING
 import uuid
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from agentflight.mcp_server import AgentFlightMCPServer

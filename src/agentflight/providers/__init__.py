@@ -10,7 +10,7 @@ budget enforcement, and zero runtime vendor lock-in.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
+from typing import Any, Dict, List, Protocol, runtime_checkable
 
 
 @runtime_checkable

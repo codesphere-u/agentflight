@@ -11,9 +11,8 @@ safe defaults, and zero ambiguity.
 from __future__ import annotations
 
 import copy
-import re
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from dataclasses import dataclass
+from typing import Any, Dict, List, Sequence
 
 from .linter import ToolSmellLinter, estimate_schema_tokens
 

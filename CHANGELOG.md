@@ -2,6 +2,26 @@
 
 All notable changes to `agentflight` are documented in this file.
 
+## [1.3.0] - 2026-11-13
+
+### Added
+- **1-Line Drop-In SDK Wrappers (`src/agentflight/wrappers.py`)**:
+  - `wrap_openai(client, ...)` (supports `OpenAI`, `AsyncOpenAI`, OpenRouter, vLLM, and OpenAny clients via both `.chat.completions.create` and `.responses.create`).
+  - `wrap_anthropic(client, ...)` (supports `Anthropic` and `AsyncAnthropic` `.messages.create`).
+  - `wrap_callable(fn, ...)` and `FlightCallbackHandler` (sync/async decorators and duck-typed LangChain / LangGraph / OpenAny lifecycle callbacks).
+- **Auto-Registered Pytest Plugin (`src/agentflight/pytest_plugin.py`)**:
+  - Registered via `pytest11` entry point (`agentflight-mcp` install automatically activates it in pytest).
+  - Provides built-in fixtures (`flight_recorder`, `flight_guard`, `flight_session`), `@pytest.mark.flight_cassette(path, mode="auto")`, `@pytest.mark.flight_guard(...)`, and `--flight-mode` / `--flight-dir` CLI flags.
+- **Visual `.flight.json` Timeline Replay Viewer (`api/portal.py`)**:
+  - Added interactive cassette timeline & chain-linkage inspector to the hosted web portal with file upload, paste support, sample incident presets, latency bars, USD spend, and SHA-256 chain continuity verification.
+- **Fast PyPI `uvx` Startup (`smithery.yaml`, `README.md`)**:
+  - Switched `uvx` and Smithery commands from git-cloning the repository to pulling the prebuilt PyPI distribution (`uvx --from agentflight-mcp agentflight serve-mcp`).
+- **Static Quality & CI Gates (`.github/workflows/ci.yml`, `pyproject.toml`)**:
+  - Added `ruff` (`E`, `F`, `I`) and `mypy` type-checking gates to CI alongside the full pytest suite (149 passing tests).
+
+### Fixed
+- Fixed `@property` access (`total_cost_usd`, `total_tokens`) and `compare_cassettes` drift reporting in `FlightSession(mode="diff")` (`src/agentflight/testing.py`).
+
 ## [1.2.0] - 2026-11-11
 
 ### Added

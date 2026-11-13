@@ -11,14 +11,14 @@ from __future__ import annotations
 import io
 import json
 from pathlib import Path
+
 import pytest
 
 from agentflight import (
     AgentFlightMCPServer,
     FlightRecorder,
-    TrajectoryDifferentialAnalyzer,
     TrajectoryDiffReport,
-     __version__,
+    __version__,
     compare_cassettes,
     compute_lcs_length,
     compute_levenshtein_distance,
@@ -57,7 +57,7 @@ def _build_baseline_cassette() -> FlightRecorder:
 
 
 def test_version_is_current() -> None:
-    assert __version__ == "1.2.0"
+    assert __version__ == "1.3.0"
 
 
 def test_levenshtein_and_lcs_primitives() -> None:

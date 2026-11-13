@@ -10,12 +10,11 @@ timeline cascades, cost runaway, loop oscillations, and blast radius.
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Sequence, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
-from .guard import TrajectoryCircuitBreaker
-from .recorder import GENESIS_HASH, verify_cassette
+from .recorder import verify_cassette
 
 IncidentSeverity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW", "CLEAN"]
 RootCauseCategory = Literal[
@@ -84,10 +83,10 @@ class IncidentReport:
 
         md = [
             f"# ✈️ Black-Box Incident Investigation Report: {self.flight_id}",
-            f"> Official Agent Flight Data Recorder (FDR) Analysis",
+            "> Official Agent Flight Data Recorder (FDR) Analysis",
             "",
-            f"| Metric | Assessment |",
-            f"| :--- | :--- |",
+            "| Metric | Assessment |",
+            "| :--- | :--- |",
             f"| **Incident Status** | {sev_badge} |",
             f"| **Root Cause** | `{self.root_cause}` |",
             f"| **Agent Identifier** | `{self.agent_id}` |",
@@ -98,14 +97,14 @@ class IncidentReport:
             f"| **Airspeed Latency** | `{self.total_latency_ms:.1f} ms` |",
             f"| **Cassette Integrity** | {integrity_str} |",
             "",
-            f"## 📋 Executive Summary",
+            "## 📋 Executive Summary",
             f"{self.summary}",
             "",
         ]
 
         if self.blast_radius_mutations:
             md.extend([
-                f"## ⚠️ Blast Radius Assessment (Destructive Operations)",
+                "## ⚠️ Blast Radius Assessment (Destructive Operations)",
                 f"The agent executed **{len(self.blast_radius_mutations)}** potentially state-mutating operations prior to termination:",
                 "",
                 "| Step | Action | Status | Parameters |",
@@ -119,14 +118,14 @@ class IncidentReport:
             md.append("")
 
         md.extend([
-            f"## 🛠️ Corrective Safety Recommendations",
+            "## 🛠️ Corrective Safety Recommendations",
         ])
         for r in self.recommendations:
             md.append(f"- {r}")
         md.append("")
 
         md.extend([
-            f"## ⏱️ Flight Telemetry Timeline",
+            "## ⏱️ Flight Telemetry Timeline",
             "",
             "| Step | Actor | Kind | Latency | Cost | Status | Notes |",
             "| :---: | :--- | :---: | :---: | :---: | :---: | :--- |",
@@ -194,8 +193,7 @@ class FlightPostMortemAnalyzer:
             "Record golden baseline cassettes for continuous CI regression testing.",
         ]
 
-        # 2. Sequential analysis with CircuitBreaker loop tracker
-        breaker = TrajectoryCircuitBreaker(max_ping_pong_cycles=2)
+        # 2. Sequential analysis across recorded spans
         recent_actors: List[str] = []
 
         for i, span in enumerate(spans_raw):

@@ -14,16 +14,15 @@ import functools
 import inspect
 import json
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional, Sequence, Union
+from typing import Any, Callable, Dict, Literal, Optional, Sequence, Union
 
-from .diff import TrajectoryDifferentialAnalyzer, compare_cassettes
+from .diff import compare_cassettes
 from .recorder import (
     CassetteReplayer,
     FlightRecorder,
     SpanKind,
     TrajectoryDivergenceError,
     TrajectorySpan,
-    verify_cassette,
 )
 
 RecordMode = Literal["auto", "record", "replay", "diff"]
@@ -101,12 +100,12 @@ class FlightSession:
     @property
     def total_cost_usd(self) -> float:
         """Total financial cost in USD across all recorded spans."""
-        return self.recorder.total_cost_usd()
+        return self.recorder.total_cost_usd
 
     @property
     def total_tokens(self) -> int:
         """Total token count across all recorded spans."""
-        return self.recorder.total_tokens()
+        return self.recorder.total_tokens
 
     def record_step(
         self,
@@ -222,12 +221,17 @@ class FlightSession:
             self.recorder.save(self.cassette_path)
 
         elif self.mode == "diff" and self._initial_cassette_dict is not None:
-            candidate_dict = self.recorder.to_cassette_dict()
-            report = compare_cassettes(self._initial_cassette_dict, candidate_dict)
-            if self.fail_on_drift and not report.is_identical:
-                diff_summary = "\n".join(report.summary_lines)
+            from .recorder import TrajectorySpan
+
+            baseline_spans = [
+                TrajectorySpan.from_dict(s)
+                for s in self._initial_cassette_dict.get("spans", [])
+            ]
+            report = compare_cassettes(baseline_spans, self.recorder)
+            if self.fail_on_drift and report.regression_detected:
                 raise TrajectoryDivergenceError(
-                    f"Trajectory drifted from baseline cassette {self.cassette_path}:\n{diff_summary}"
+                    f"Trajectory drifted from baseline cassette {self.cassette_path}:\n{report.summary_markdown}",
+                    step_index=0,
                 )
 
 

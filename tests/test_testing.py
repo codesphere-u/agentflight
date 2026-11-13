@@ -6,11 +6,8 @@ Unit tests for `agentflight.testing` (@flight_test and FlightSession).
 
 from __future__ import annotations
 
-import tempfile
 from pathlib import Path
 
-import pytest
-from agentflight.recorder import TrajectoryDivergenceError
 from agentflight.testing import FlightSession, flight_test
 
 

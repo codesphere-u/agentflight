@@ -14,12 +14,12 @@ from __future__ import annotations
 import copy
 import json
 import os
+import sys
 import time
+import uuid
 from collections import defaultdict, deque
 from pathlib import Path
-import sys
 from typing import Any, Dict, List, Optional
-import uuid
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT_DIR / "src"
@@ -32,13 +32,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from agentflight.mcp_server import AgentFlightMCPServer
+
 try:
     from portal import render_developer_portal
 except ImportError:
     from api.portal import render_developer_portal
 
 SERVER_NAME = "agentflight"
-SERVER_VERSION = "1.2.0"
+SERVER_VERSION = "1.3.0"
 MAX_BODY_BYTES = 1_000_000
 
 # Best-effort per-IP sliding-window rate limit. State is per serverless instance, so it

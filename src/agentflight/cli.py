@@ -25,7 +25,6 @@ from .diff import compare_cassettes
 from .eval import TrajectoryEvaluator
 from .guard import CircuitBreakerTripped, TrajectoryCircuitBreaker
 from .linter import (
-    RULE_CATALOG,
     SHOWCASE_FLAWED_MCP_TOOLS,
     SHOWCASE_HARDENED_MCP_TOOLS,
     ToolSmellLinter,
@@ -725,7 +724,7 @@ def _run_post_mortem_command(args: argparse.Namespace) -> int:
 
 
 def _run_ci_command(args: argparse.Namespace) -> int:
-    from .linter import ToolSmellLinter, SHOWCASE_HARDENED_MCP_TOOLS
+    from .linter import SHOWCASE_HARDENED_MCP_TOOLS, ToolSmellLinter
     from .post_mortem import FlightPostMortemAnalyzer
 
     lines = [
@@ -757,7 +756,7 @@ def _run_ci_command(args: argparse.Namespace) -> int:
     if args.cassette:
         pm = FlightPostMortemAnalyzer(max_cost_ceiling_usd=args.max_cost).analyze(args.cassette)
         if not pm.is_hash_chain_valid:
-            lines.append(f"| **Cassette Cryptographic Chain** | ❌ FAIL | SHA-256 chain verification failed |")
+            lines.append("| **Cassette Cryptographic Chain** | ❌ FAIL | SHA-256 chain verification failed |")
             exit_code = 1
         else:
             lines.append(f"| **Cassette Cryptographic Chain** | ✅ PASS | SHA-256 chain valid ({pm.total_steps} steps) |")
@@ -792,7 +791,7 @@ def _run_fix_command(args: argparse.Namespace) -> int:
     results = optimizer.optimize_tools(tools)
     hardened_tools = [r.hardened_tool for r in results]
 
-    output_data = copy.deepcopy(data) if is_dict else hardened_tools
+    output_data: Any = copy.deepcopy(data) if is_dict else hardened_tools
     if is_dict:
         output_data["tools"] = hardened_tools
 

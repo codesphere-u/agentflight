@@ -7,6 +7,7 @@ Unit tests for `agentflight.post_mortem` (FlightPostMortemAnalyzer).
 from __future__ import annotations
 
 from pathlib import Path
+
 from agentflight.post_mortem import FlightPostMortemAnalyzer
 from agentflight.recorder import FlightRecorder
 

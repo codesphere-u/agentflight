@@ -1356,6 +1356,55 @@ def render_developer_portal(
     </section>
 
     <!-- ========================================================
+         VISUAL .FLIGHT.JSON TIMELINE REPLAY & CHAIN INSPECTOR
+         ======================================================== -->
+    <section class="card" id="cassette-timeline">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <h2 style="font-size: 18px; color: #fff; display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--amber);">&#9201;</span> Visual <code>.flight.json</code> Timeline Replay Viewer
+          </h2>
+          <p class="text-xs text-dim">Paste or upload any <code>.flight.json</code> / <code>.flight.jsonl</code> cassette to inspect SHA-256 chain links, per-step latency, USD spend, and circuit-breaker trips.</p>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-sm" onclick="loadTimelinePreset('incident')">Load Incident Cassette</button>
+          <button class="btn btn-sm btn-blue" onclick="loadTimelinePreset('openany')">Load Verified OpenAny Run</button>
+          <label class="btn btn-sm" style="cursor: pointer; margin: 0;">
+            Upload .flight.json
+            <input type="file" accept=".json,.jsonl,.flight.json,.flight.jsonl" style="display: none;" onchange="uploadTimelineFile(this)">
+          </label>
+          <button class="btn btn-sm btn-amber" onclick="renderCassetteTimeline()">Render Timeline &rarr;</button>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: minmax(260px, 1fr) minmax(320px, 1.45fr); gap: 16px; align-items: start;">
+        <div class="pane">
+          <div class="pane-head">
+            <span class="pane-title">Cassette JSON / JSONL Input</span>
+            <span id="tl-agent-badge" class="badge" style="background: rgba(56, 189, 248, 0.16); color: #38bdf8;">Ready</span>
+          </div>
+          <textarea id="timeline-input" class="code-editor" style="height: 310px;" placeholder="Paste .flight.json or .flight.jsonl contents here..."></textarea>
+        </div>
+
+        <div class="pane">
+          <div class="pane-head">
+            <span class="pane-title">Cryptographic Trajectory Timeline</span>
+            <span id="tl-chain-badge" class="badge" style="background: rgba(16, 185, 129, 0.2); color: #4ade80;">Waiting for cassette</span>
+          </div>
+          <div id="tl-summary-bar" class="mono text-xs" style="display: flex; gap: 14px; flex-wrap: wrap; padding: 10px 12px; background: rgba(0,0,0,0.35); border: 1px solid var(--card-border); border-radius: 8px; margin-bottom: 10px;">
+            <span>SPANS: <strong id="tl-stat-spans" style="color: #fff;">0</strong></span>
+            <span>TOKENS: <strong id="tl-stat-tokens" style="color: #38bdf8;">0</strong></span>
+            <span>COST: <strong id="tl-stat-cost" style="color: #4ade80;">$0.0000</strong></span>
+            <span>LATENCY: <strong id="tl-stat-latency" style="color: var(--amber);">0.0 ms</strong></span>
+          </div>
+          <div id="timeline-steps" style="display: flex; flex-direction: column; gap: 8px; max-height: 252px; overflow-y: auto; padding-right: 4px;">
+            <div class="text-xs text-muted">Click "Load Incident Cassette" or paste your own `.flight.json` to inspect every span.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
          1-CLICK CLIENT CONFIGURATION
          ======================================================== -->
     <section class="card" id="client-config">
@@ -2231,15 +2280,279 @@ MERKLE CASSETTE SEAL: ${{r.merkle_hash}}
       }}
     }}
 
-    // Initialize telemetry flight player, receipt, and sample doctor on load
+    // Initialize telemetry flight player, receipt, sample doctor, and cassette timeline on load
+    const SAMPLE_TIMELINE_CASSETTES = {{
+      incident: {{
+        version: "1.0.0",
+        agent_id: "checkout-supervisor-v3",
+        head_hash: "8c21e0a49f3b7d1a4b5f6c7d8e9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f70",
+        step_count: 4,
+        spans: [
+          {{
+            step_index: 0,
+            kind: "llm_turn",
+            actor: "openai.gpt-4o",
+            status: "ok",
+            latency_ms: 412.5,
+            prompt_tokens: 340,
+            completion_tokens: 68,
+            cost_usd: 0.00153,
+            prev_hash: "0000000000000000000000000000000000000000000000000000000000000000",
+            step_hash: "1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f809",
+            input_payload: {{ model: "gpt-4o", message: "Verify order #89412 inventory" }},
+            output_payload: {{ tool_call: "check_inventory", order_id: "89412" }}
+          }},
+          {{
+            step_index: 1,
+            kind: "tool_call",
+            actor: "check_inventory",
+            status: "ok",
+            latency_ms: 42.1,
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            cost_usd: 0.0,
+            prev_hash: "1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f809",
+            step_hash: "2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a",
+            input_payload: {{ order_id: "89412" }},
+            output_payload: {{ retry: true, status: "pending_sync" }}
+          }},
+          {{
+            step_index: 2,
+            kind: "tool_call",
+            actor: "check_inventory",
+            status: "ok",
+            latency_ms: 39.8,
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            cost_usd: 0.0,
+            prev_hash: "2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a",
+            step_hash: "3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+            input_payload: {{ order_id: "89412" }},
+            output_payload: {{ retry: true, status: "pending_sync" }}
+          }},
+          {{
+            step_index: 3,
+            kind: "tool_call",
+            actor: "check_inventory",
+            status: "error",
+            latency_ms: 1.1,
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            cost_usd: 0.0,
+            prev_hash: "3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+            step_hash: "8c21e0a49f3b7d1a4b5f6c7d8e9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f70",
+            input_payload: {{ order_id: "89412" }},
+            output_payload: {{ circuit_breaker: "TRIPPED", reason: "exact_call_loop", saved_usd: 14.80 }}
+          }}
+        ]
+      }},
+      openany: {{
+        version: "1.0.0",
+        agent_id: "openany-research-router",
+        head_hash: "7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e",
+        step_count: 3,
+        spans: [
+          {{
+            step_index: 0,
+            kind: "llm_turn",
+            actor: "openany.deepseek/deepseek-v3",
+            status: "ok",
+            latency_ms: 284.0,
+            prompt_tokens: 512,
+            completion_tokens: 144,
+            cost_usd: 0.000297,
+            prev_hash: "0000000000000000000000000000000000000000000000000000000000000000",
+            step_hash: "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e",
+            input_payload: {{ model: "deepseek/deepseek-v3", task: "Extract CVE affected packages" }},
+            output_payload: {{ packages: ["fastapi", "uvicorn"] }}
+          }},
+          {{
+            step_index: 1,
+            kind: "mcp_rpc",
+            actor: "agentflight_lint_tools",
+            status: "ok",
+            latency_ms: 2.4,
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            cost_usd: 0.0,
+            prev_hash: "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e",
+            step_hash: "4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b",
+            input_payload: {{ target: "checkout-mcp" }},
+            output_payload: {{ score: 98, grade: "A+" }}
+          }},
+          {{
+            step_index: 2,
+            kind: "state_checkpoint",
+            actor: "publish_gate",
+            status: "ok",
+            latency_ms: 5.2,
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            cost_usd: 0.0,
+            prev_hash: "4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b",
+            step_hash: "7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e",
+            input_payload: {{ gate: "pytest+ruff+hash_verify" }},
+            output_payload: {{ approved: true }}
+          }}
+        ]
+      }}
+    }};
+
+    function escHtml(str) {{
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }}
+
+    function parseTimelineInput(raw) {{
+      const trimmed = raw.trim();
+      if (!trimmed) throw new Error('Empty cassette input');
+      if (trimmed.startsWith('{{')) {{
+        try {{
+          return JSON.parse(trimmed);
+        }} catch (e) {{
+          // Fall through to JSONL parsing
+        }}
+      }}
+      const lines = trimmed.split(new RegExp('\\r?\\n')).map(l => l.trim()).filter(Boolean);
+      const parsedLines = lines.map(l => JSON.parse(l));
+      const header = parsedLines[0] || {{}};
+      const spans = parsedLines.slice(header.type === 'cassette_header' ? 1 : 0);
+      return {{
+        version: header.version || '1.0.0',
+        agent_id: header.agent_id || 'jsonl-agent',
+        head_hash: header.head_hash,
+        spans
+      }};
+    }}
+
+    function loadTimelinePreset(name) {{
+      const sample = SAMPLE_TIMELINE_CASSETTES[name] || SAMPLE_TIMELINE_CASSETTES.incident;
+      document.getElementById('timeline-input').value = JSON.stringify(sample, null, 2);
+      renderCassetteTimeline();
+    }}
+
+    function uploadTimelineFile(inputEl) {{
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {{
+        document.getElementById('timeline-input').value = String(ev.target.result || '');
+        renderCassetteTimeline();
+      }};
+      reader.readAsText(file);
+    }}
+
+    function renderCassetteTimeline() {{
+      const raw = document.getElementById('timeline-input').value;
+      const container = document.getElementById('timeline-steps');
+      const agentBadge = document.getElementById('tl-agent-badge');
+      const chainBadge = document.getElementById('tl-chain-badge');
+
+      let cassette;
+      try {{
+        cassette = parseTimelineInput(raw);
+      }} catch (err) {{
+        agentBadge.innerText = 'Parse Error';
+        chainBadge.innerText = 'Invalid JSON / JSONL';
+        chainBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+        chainBadge.style.color = '#f87171';
+        container.innerHTML = `<div class="text-xs" style="color: #f87171;">${{escHtml(err.message)}}</div>`;
+        return;
+      }}
+
+      const spans = Array.isArray(cassette.spans) ? cassette.spans : [];
+      agentBadge.innerText = cassette.agent_id || 'unknown-agent';
+
+      let totalTokens = 0;
+      let totalCost = 0;
+      let totalLatency = 0;
+      let maxLatency = 1;
+      let expectedPrev = '0'.repeat(64);
+      let chainIntact = spans.length > 0;
+
+      for (const s of spans) {{
+        totalTokens += Number(s.prompt_tokens || 0) + Number(s.completion_tokens || 0);
+        totalCost += Number(s.cost_usd || 0);
+        const lat = Number(s.latency_ms || 0);
+        totalLatency += lat;
+        if (lat > maxLatency) maxLatency = lat;
+        if (s.prev_hash && s.prev_hash !== expectedPrev) chainIntact = false;
+        if (s.step_hash) expectedPrev = s.step_hash;
+      }}
+      if (cassette.head_hash && spans.length && spans[spans.length - 1].step_hash && cassette.head_hash !== expectedPrev) {{
+        chainIntact = false;
+      }}
+
+      document.getElementById('tl-stat-spans').innerText = String(spans.length);
+      document.getElementById('tl-stat-tokens').innerText = totalTokens.toLocaleString();
+      document.getElementById('tl-stat-cost').innerText = `$${{totalCost.toFixed(6)}}`;
+      document.getElementById('tl-stat-latency').innerText = `${{totalLatency.toFixed(1)}} ms`;
+
+      if (chainIntact) {{
+        chainBadge.innerText = '✔ SHA-256 Chain Linked';
+        chainBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+        chainBadge.style.color = '#4ade80';
+      }} else {{
+        chainBadge.innerText = '⚠ Chain Linkage Mismatch';
+        chainBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+        chainBadge.style.color = '#f87171';
+      }}
+
+      if (!spans.length) {{
+        container.innerHTML = '<div class="text-xs text-muted">No spans found in cassette.</div>';
+        return;
+      }}
+
+      container.innerHTML = spans.map((sp, idx) => {{
+        const status = sp.status || 'ok';
+        const isErr = status === 'error';
+        const tokens = Number(sp.prompt_tokens || 0) + Number(sp.completion_tokens || 0);
+        const lat = Number(sp.latency_ms || 0);
+        const barPct = Math.max(4, Math.min(100, Math.round((lat / maxLatency) * 100)));
+        const stepHashShort = sp.step_hash ? String(sp.step_hash).slice(0, 12) + '...' : 'unsealed';
+        const borderCol = isErr ? 'rgba(239, 68, 68, 0.5)' : 'rgba(56, 189, 248, 0.22)';
+        const statusBg = isErr ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.18)';
+        const statusFg = isErr ? '#f87171' : '#4ade80';
+        const outPreview = escHtml(JSON.stringify(sp.output_payload || {{}})).slice(0, 140);
+        return `
+          <div style="background: rgba(0,0,0,0.42); border: 1px solid ${{borderCol}}; border-radius: 8px; padding: 10px 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="mono text-xs" style="color: var(--amber);">#${{String(sp.step_index ?? idx).padStart(2, '0')}}</span>
+                <span class="badge" style="background: rgba(56, 189, 248, 0.16); color: #38bdf8;">${{escHtml(sp.kind || 'span')}}</span>
+                <span class="mono text-xs" style="color: #fff; font-weight: 600;">${{escHtml(sp.actor || 'unknown')}}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="mono text-xs text-dim">${{lat.toFixed(1)}}ms &bull; ${{tokens}} tok &bull; $${{Number(sp.cost_usd || 0).toFixed(5)}}</span>
+                <span class="badge" style="background: ${{statusBg}}; color: ${{statusFg}};">${{escHtml(status.toUpperCase())}}</span>
+              </div>
+            </div>
+            <div style="height: 4px; background: rgba(255,255,255,0.06); border-radius: 99px; margin: 7px 0; overflow: hidden;">
+              <div style="height: 100%; width: ${{barPct}}%; background: ${{isErr ? '#ef4444' : 'linear-gradient(90deg, #38bdf8, #f59e0b)'}};"></div>
+            </div>
+            <div class="mono" style="font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+              <span>OUT: ${{outPreview}}</span>
+              <span style="color: var(--amber);">SHA: ${{escHtml(stepHashShort)}}</span>
+            </div>
+          </div>
+        `;
+      }}).join('');
+    }}
+
     document.addEventListener('DOMContentLoaded', () => {{
       renderFlightStep('flight_golden', 0);
       updateReceiptFromFlight('flight_golden');
       loadDoctorSample('flawed');
+      loadTimelinePreset('incident');
     }});
     renderFlightStep('flight_golden', 0);
     updateReceiptFromFlight('flight_golden');
     loadDoctorSample('flawed');
+    loadTimelinePreset('incident');
   </script>
 </body>
 </html>

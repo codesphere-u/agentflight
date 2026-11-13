@@ -22,6 +22,7 @@ import os
 import tempfile
 import urllib.request
 from typing import Any, Dict, List, Optional, Tuple
+
 import pytest
 
 from agentflight import (
@@ -31,7 +32,6 @@ from agentflight import (
     OpenAnyAuthError,
     OpenAnyBudgetExceededError,
     OpenAnyConfig,
-    OpenAnyError,
     OpenAnyInsufficientBalanceError,
     OpenAnyProvider,
     OpenAnyRateLimitError,
@@ -40,7 +40,6 @@ from agentflight import (
     list_providers,
 )
 from agentflight.providers.openany import redact_sensitive
-
 
 # ---------------------------------------------------------------------------
 # Mock HTTP Client Fixture
@@ -571,7 +570,6 @@ def test_concurrent_budget_reservation_circuit_breaker() -> None:
     Verify that thread-safe budget reservations prevent parallel requests
     from independently exceeding the same remaining budget.
     """
-    import threading
 
     # Budget cap: $0.0020
     guard = TrajectoryCircuitBreaker(max_cost_usd=0.0020)

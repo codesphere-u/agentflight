@@ -14,8 +14,8 @@ exception on:
 from __future__ import annotations
 
 import threading
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple
+from dataclasses import dataclass
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 from .recorder import SpanKind, SpanStatus, TrajectorySpan, canonical_hash
 

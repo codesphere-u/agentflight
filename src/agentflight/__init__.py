@@ -23,7 +23,7 @@ from .linter import (
     ToolSmellLinter,
     estimate_schema_tokens,
 )
-from .mcp_server import AgentFlightMCPServer, MCP_TOOLS
+from .mcp_server import MCP_TOOLS, AgentFlightMCPServer
 from .otel_export import OTelSpanPayload, export_cassette_to_otel
 from .post_mortem import FlightPostMortemAnalyzer, IncidentReport
 from .providers import get_provider, list_providers, register_provider
@@ -49,8 +49,9 @@ from .recorder import (
 )
 from .schema_optimizer import SchemaOptimizationResult, ToolSchemaOptimizer
 from .testing import FlightSession, flight_test
+from .wrappers import FlightCallbackHandler, wrap_anthropic, wrap_callable, wrap_openai
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 __all__ = [
     "__version__",
@@ -101,4 +102,8 @@ __all__ = [
     "IncidentReport",
     "ToolSchemaOptimizer",
     "SchemaOptimizationResult",
+    "FlightCallbackHandler",
+    "wrap_openai",
+    "wrap_anthropic",
+    "wrap_callable",
 ]

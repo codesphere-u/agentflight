@@ -14,9 +14,9 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Literal, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 SpanKind = Literal["llm_turn", "tool_call", "mcp_rpc", "state_checkpoint"]
 SpanStatus = Literal["ok", "error", "skipped"]

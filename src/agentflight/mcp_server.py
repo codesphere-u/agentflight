@@ -13,9 +13,8 @@ Exposes AgentFlight capabilities over stdio or in-memory JSON-RPC 2.0:
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import sys
-from typing import Any, Dict, IO, List, Optional
+from typing import IO, Any, Dict, List, Optional
 
 from .diff import compare_cassettes
 from .linter import RULE_CATALOG, SHOWCASE_HARDENED_MCP_TOOLS, ToolSmellLinter
@@ -515,8 +514,8 @@ class AgentFlightMCPServer:
             tools = arguments.get("tools")
             if not isinstance(tools, list):
                 tools = SHOWCASE_HARDENED_MCP_TOOLS
-            report = self.linter.lint(tools)
-            return self._tool_response(report.to_dict())
+            lint_report = self.linter.lint(tools)
+            return self._tool_response(lint_report.to_dict())
 
         if name == "agentflight_verify_cassette":
             cassette_path = arguments.get("cassette_path")

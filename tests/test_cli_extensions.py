@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+
 from agentflight.cli import main
 from agentflight.recorder import FlightRecorder
 

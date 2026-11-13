@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-import pytest
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 API_DIR = ROOT_DIR / "api"
@@ -47,4 +46,8 @@ def test_portal_html_render():
     assert "alvin.codesphereug.com/work/agentflight.html" in html
     assert "Akandwanaho Ivan (Alvin)" in html
     assert "Codesphere AI Suite" in html
+    # Visual .flight.json timeline replay viewer
+    assert "cassette-timeline" in html
+    assert "renderCassetteTimeline" in html
+    assert "SAMPLE_TIMELINE_CASSETTES" in html
 

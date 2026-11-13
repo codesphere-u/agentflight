@@ -6,14 +6,14 @@
 
 [![CI & Reliability Gate](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/agentflight-mcp.svg?color=blue)](https://pypi.org/project/agentflight-mcp/)
-[![Release v1.2.0](https://img.shields.io/badge/release-v1.2.0-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.2.0)
+[![Release v1.3.0](https://img.shields.io/badge/release-v1.3.0-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.3.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Operational-10b981?logo=vercel&logoColor=white)](https://agentflight-tau.vercel.app/mcp)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-✔%20Connected-10b981?logo=anthropic&logoColor=white)](#hosted-endpoint-vercel)
 [![Glama Score](https://glama.ai/mcp/servers/codesphere-u/agentflight/badges/score.svg)](https://glama.ai/mcp/servers/codesphere-u/agentflight)
 [![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
-[![Tests Passed](https://img.shields.io/badge/tests-142%20passed-brightgreen.svg)](tests/)
+[![Tests Passed](https://img.shields.io/badge/tests-149%20passed-brightgreen.svg)](tests/)
 [![Core SDK Stdlib](https://img.shields.io/badge/core%20SDK-100%25%20Python%20stdlib-brightgreen.svg)](src/agentflight/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
@@ -84,8 +84,8 @@ Production AI agent engineering in 2026 faces two compounding bottlenecks:
 # Install from PyPI (module import & CLI command remain `agentflight`):
 pip install agentflight-mcp
 
-# Or install v1.2.0 directly from GitHub:
-pip install "git+https://github.com/codesphere-u/agentflight.git@v1.2.0"
+# Or install v1.3.0 directly from GitHub:
+pip install "git+https://github.com/codesphere-u/agentflight.git@v1.3.0"
 
 # Contributors:
 pip install -e ".[dev]"
@@ -94,6 +94,30 @@ pip install -e ".[dev]"
 ---
 
 ## Quickstart
+
+### 0. 1-Line Drop-In SDK & Pytest Integration (`v1.3.0`)
+
+Wrap `OpenAI`, `AsyncOpenAI`, OpenRouter, vLLM, OpenAny, or `Anthropic` clients with zero boilerplate:
+
+```python
+from openai import OpenAI
+from agentflight import wrap_openai, wrap_anthropic, TrajectoryCircuitBreaker
+
+client = wrap_openai(OpenAI(), guard=TrajectoryCircuitBreaker(max_cost_usd=0.25))
+resp = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": "Health?"}])
+client.agentflight_recorder.save("tests/cassettes/health.flight.json")
+```
+
+Pytest fixtures (`flight_recorder`, `flight_guard`, `flight_session`) and `@pytest.mark.flight_cassette` register automatically on `pip install agentflight-mcp`:
+
+```python
+import pytest
+
+@pytest.mark.flight_cassette("tests/cassettes/checkout.flight.json")
+def test_checkout_deterministic(flight_session, flight_guard):
+    search = flight_session.stub("search_catalog", fallback_fn=lambda q: {"hits": [q]})
+    assert search(q="router")["hits"] == ["router"]
+```
 
 ### 1. Record & Cryptographically Verify an Agent Trajectory (`FlightRecorder`)
 
@@ -435,7 +459,7 @@ npx -y @smithery/cli install @codesphere-u/agentflight --client claude
       "command": "uvx",
       "args": [
         "--from",
-        "git+https://github.com/codesphere-u/agentflight.git",
+        "agentflight-mcp",
         "agentflight",
         "serve-mcp"
       ]
