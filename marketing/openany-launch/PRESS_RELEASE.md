@@ -26,7 +26,7 @@ AgentFlight v1.2.0 delivers the critical control plane required for enterprise s
 
 ### Availability & Getting Started
 
-AgentFlight is available immediately as an open-source Python package on PyPI (`pip install agentflight`). The interactive Mission Control portal can be previewed at [https://agentflight-tau.vercel.app](https://agentflight-tau.vercel.app).
+AgentFlight is available immediately as an open-source Python package on PyPI (`pip install agentflight-mcp`). The interactive Mission Control portal can be previewed at [https://agentflight-tau.vercel.app](https://agentflight-tau.vercel.app).
 
 For technical documentation, visit [https://github.com/codesphere-u/agentflight](https://github.com/codesphere-u/agentflight).  
 To explore OpenAny's model catalog, visit [https://openany.si](https://openany.si).

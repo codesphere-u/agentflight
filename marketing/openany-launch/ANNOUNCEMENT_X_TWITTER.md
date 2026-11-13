@@ -58,7 +58,7 @@ Every request sent via AgentFlight includes verified partner attribution (`X-Ope
 
 Get started in 30 seconds:
 ```bash
-pip install agentflight
+pip install agentflight-mcp
 agentflight openany models
 ```
 

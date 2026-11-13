@@ -5,6 +5,7 @@
 </p>
 
 [![CI & Reliability Gate](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/agentflight-mcp.svg?color=blue)](https://pypi.org/project/agentflight-mcp/)
 [![Release v1.2.0](https://img.shields.io/badge/release-v1.2.0-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.2.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
@@ -80,11 +81,11 @@ Production AI agent engineering in 2026 faces two compounding bottlenecks:
 ## Installation
 
 ```bash
-# Install v1.2.0 directly from GitHub:
-pip install "git+https://github.com/codesphere-u/agentflight.git@v1.2.0"
+# Install from PyPI (module import & CLI command remain `agentflight`):
+pip install agentflight-mcp
 
-# Or via PyPI (triggered by the v1.2.0 release workflow):
-pip install agentflight
+# Or install v1.2.0 directly from GitHub:
+pip install "git+https://github.com/codesphere-u/agentflight.git@v1.2.0"
 
 # Contributors:
 pip install -e ".[dev]"

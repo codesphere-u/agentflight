@@ -51,7 +51,7 @@ With AgentFlight:
 ```text
 Through our official partnership with @OpenAny_SI, you can now route across 128+ models (MiniMax, Claude 3.5/Sonnet 4.6, DeepSeek-R1, Qwen-Coder) with a single unified SDK:
 
-$ pip install agentflight
+$ pip install agentflight-mcp
 $ agentflight openany models
 ```
 
@@ -99,7 +99,7 @@ Static audit for 50 remote MCP tools against 10 schema rules (TS001–TS010), pr
 
 AgentFlight is 100% open-source under the MIT License.
 
-📦 PyPI: pip install agentflight
+📦 PyPI: pip install agentflight-mcp
 💻 GitHub: https://github.com/codesphere-u/agentflight
 🌐 Live Portal: https://agentflight-tau.vercel.app
 🤝 Partner Gateway: https://openany.si
@@ -138,7 +138,7 @@ Every trajectory is written to a .flight.json cassette where every span is crypt
 We also implemented static ergonomics analysis for remote MCP endpoints (TS001-TS010). It detects untyped schemas, missing descriptions, and excessive name lengths, compiling schemas down by up to 78% context token savings.
 
 ### Quickstart:
-$ pip install agentflight
+$ pip install agentflight-mcp
 $ agentflight openany models
 
 GitHub repo (MIT): https://github.com/codesphere-u/agentflight
@@ -167,7 +167,7 @@ AgentFlight halts unaffordable requests BEFORE they leave your machine.
 Spend on blocked calls: $0.00.
 
 Full 110s live demo on our channel!
-📦 pip install agentflight
+📦 pip install agentflight-mcp
 ⭐️ Link in bio / GitHub: codesphere-u/agentflight
 
 #ai #developer #programming #coding #tech #python #opensource
@@ -182,7 +182,7 @@ Full 110s live demo on our channel!
 - **Headline:** **"Your AI agent shouldn't have an unlimited company credit card."**
 - **Subheadline:** Calculate costs before network dispatch. Halt runaway retry loops before they spend a single cent.
 - **Metric Box:** `Network Egress: 0 Bytes | Spend: $0.00`
-- **CTA Button:** `pip install agentflight`
+- **CTA Button:** `pip install agentflight-mcp`
 
 ### Angle B: The "0.08 μs Replay" (Speed & CI/CD Focus)
 - **Top Badge:** `DETERMINISTIC FLIGHT RECORDER`

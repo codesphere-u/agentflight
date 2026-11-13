@@ -42,7 +42,7 @@ AgentFlight v1.2.0 introduces the official commercial integration with **OpenAny
 
 ### 📦 Installation
 ```bash
-pip install --upgrade agentflight
+pip install --upgrade agentflight-mcp
 ```
 
 ### 🧪 Full Test Suite Status

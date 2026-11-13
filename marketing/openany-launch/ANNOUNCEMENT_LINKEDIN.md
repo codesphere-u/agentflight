@@ -44,7 +44,7 @@ AgentFlight remains 100% provider-agnostic, open-source, and MIT-licensed.
 
 Install via PyPI:
 ```bash
-pip install agentflight
+pip install agentflight-mcp
 ```
 
 - Explore the OpenAny Model Fleet: `agentflight openany models`

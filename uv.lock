@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "agentflight"
+name = "agentflight-mcp"
 version = "1.2.0"
 source = { editable = "." }
 dependencies = [
