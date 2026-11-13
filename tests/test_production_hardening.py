@@ -280,6 +280,8 @@ def test_mcp_server_protocol_edge_cases_and_hosted_security_headers() -> None:
     from api.index import app
 
     client = TestClient(app)
+    assert client.head("/health").status_code == 200
+    assert client.head("/").status_code == 200
     res = client.post("/mcp", json={"jsonrpc": "2.0", "id": 9, "method": "tools/call", "params": "invalid"})
     assert res.headers.get("x-content-type-options") == "nosniff"
     assert res.headers.get("x-frame-options") == "SAMEORIGIN"

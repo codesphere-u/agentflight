@@ -233,6 +233,14 @@ async def health_check(request: Request):
     }
 
 
+@app.head("/")
+@app.head("/health")
+@app.head("/healthz")
+@app.head("/api/health")
+async def health_head() -> Response:
+    return Response(status_code=200, media_type="application/json")
+
+
 @app.get("/mcp")
 async def mcp_get(request: Request):
     accept = request.headers.get("accept", "")
