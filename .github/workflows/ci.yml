@@ -35,7 +35,7 @@ jobs:
 
       - name: Run Ruff lint & Mypy static type-check gates
         run: |
-          ruff check src tests api
+          ruff check .
           mypy src/agentflight api
 
       - name: Run pytest suite with coverage

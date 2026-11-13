@@ -67,6 +67,9 @@ py-modules = ["_agentflight_pytest"]
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+agentflight = ["py.typed"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
@@ -90,6 +93,7 @@ ignore = ["E501"]
 
 [tool.mypy]
 python_version = "3.10"
+mypy_path = "src"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true

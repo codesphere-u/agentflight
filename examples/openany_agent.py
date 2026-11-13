@@ -122,7 +122,7 @@ def run_openany_agent_demo() -> None:
 
     print(f"   Replayed Step {span.step_index}: [{span.kind}] {span.actor}")
     print(f"   Replay Latency: {elapsed_us:.2f} us (<0.02ms)")
-    print(f"   API Cost Incurred: $0.000000 (Pure in-memory execution)")
+    print("   API Cost Incurred: $0.000000 (Pure in-memory execution)")
     print(f"   Tamper Verification: PASS (SHA-256 digest: {span.step_hash[:16]}...)")
 
     # Clean up demo cassette

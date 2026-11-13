@@ -33,6 +33,7 @@ import sys
 import tempfile
 import time
 import wave
+
 import imageio_ffmpeg
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -701,7 +702,7 @@ def main() -> int:
         audio_master_wav = build_master_audio(tmp_audio_dir, ffmpeg_bin)
 
         # 2. Render Video Frames
-        print(f"\n[Step 2/3] Rendering video frames with Ken Burns zooms and animated HUDs...")
+        print("\n[Step 2/3] Rendering video frames with Ken Burns zooms and animated HUDs...")
         total_frames = sum(int(dur * FPS) for _, _, dur in SCENE_SCRIPTS)
         writer = imageio_ffmpeg.write_frames(
             raw_video,
@@ -733,7 +734,7 @@ def main() -> int:
         print(f"  ✓ Video stream rendered in {render_time:.2f}s")
 
         # 3. Multiplex Video + Audio Master
-        print(f"\n[Step 3/3] Multiplexing H.264 video + AAC stereo audio into final MP4...")
+        print("\n[Step 3/3] Multiplexing H.264 video + AAC stereo audio into final MP4...")
         subprocess.run([
             ffmpeg_bin, "-y",
             "-i", raw_video,

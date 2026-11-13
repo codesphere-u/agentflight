@@ -47,7 +47,7 @@ def run_benchmark(iterations: int = 500, spans_per_cassette: int = 50) -> None:
             replayer = CassetteReplayer(cassette_path)
             while not replayer.is_exhausted:
                 t0 = time.perf_counter_ns()
-                span = replayer.advance()
+                replayer.advance()
                 t1 = time.perf_counter_ns()
                 span_durations_ns.append(t1 - t0)
     finally:
@@ -71,7 +71,7 @@ def run_benchmark(iterations: int = 500, spans_per_cassette: int = 50) -> None:
     print(f"  P99 Latency : {p99:.3f} μs / span")
     print(f"  Mean Latency: {mean:.3f} μs / span")
     print(f"  Throughput  : {throughput:,.0f} spans / second")
-    print(f"  Network Cost: $0.00 (Zero external network requests)")
+    print("  Network Cost: $0.00 (Zero external network requests)")
     print("=====================================================================")
 
 

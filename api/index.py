@@ -274,9 +274,12 @@ def _dispatch(message: Any) -> Optional[Dict[str, Any]]:
 async def health_check(request: Request):
     accept = request.headers.get("accept", "")
     if "text/html" in accept:
-        tools = _sanitize_tools(mcp_engine.handle_request({"jsonrpc": "2.0", "id": 1, "method": "tools/list"}).get("result", {}).get("tools", []))
-        resources = mcp_engine.handle_request({"jsonrpc": "2.0", "id": 2, "method": "resources/list"}).get("result", {}).get("resources", [])
-        prompts = mcp_engine.handle_request({"jsonrpc": "2.0", "id": 3, "method": "prompts/list"}).get("result", {}).get("prompts", [])
+        tools_resp = mcp_engine.handle_request({"jsonrpc": "2.0", "id": 1, "method": "tools/list"}) or {}
+        resources_resp = mcp_engine.handle_request({"jsonrpc": "2.0", "id": 2, "method": "resources/list"}) or {}
+        prompts_resp = mcp_engine.handle_request({"jsonrpc": "2.0", "id": 3, "method": "prompts/list"}) or {}
+        tools = _sanitize_tools(tools_resp.get("result", {}).get("tools", []))
+        resources = resources_resp.get("result", {}).get("resources", [])
+        prompts = prompts_resp.get("result", {}).get("prompts", [])
         html_content = render_developer_portal(
             server_name=SERVER_NAME,
             server_version=SERVER_VERSION,

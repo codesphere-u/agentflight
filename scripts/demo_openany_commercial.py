@@ -19,7 +19,6 @@ from __future__ import annotations
 import os
 import sys
 import time
-from typing import Dict, Any
 
 from agentflight import (
     CassetteReplayer,
@@ -73,7 +72,7 @@ def main() -> int:
     try:
         models = provider.get_models()
         print(f"• Successfully queried OpenAny gateway: {len(models)} models available.")
-        print(f"• Sample Catalog Models:")
+        print("• Sample Catalog Models:")
         for m in models[:4]:
             p = m.get("pricing", {})
             if isinstance(p, list) and p:
@@ -94,8 +93,8 @@ def main() -> int:
 
     prompt = "In 10 words or less, describe the mission of an AI flight recorder."
     print(f"• Prompt       : \"{prompt}\"")
-    print(f"• Model        : MiniMax-M2.5")
-    print(f"• Spending Cap : $0.0500 USD")
+    print("• Model        : MiniMax-M2.5")
+    print("• Spending Cap : $0.0500 USD")
 
     t0 = time.perf_counter()
     try:
@@ -109,11 +108,10 @@ def main() -> int:
         latency = (time.perf_counter() - t0) * 1000.0
         content = resp.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
         usage = resp.get("usage", {})
-        meta = resp.get("_agentflight", {})
 
-        print(f"\n--- OpenAny Gateway Response ---")
+        print("\n--- OpenAny Gateway Response ---")
         print(f"\"{content}\"")
-        print(f"--------------------------------")
+        print("--------------------------------")
         print(f"• Request ID   : {resp.get('id')}")
         print(f"• Tokens       : {usage.get('total_tokens', 0)} total ({usage.get('prompt_tokens', 0)} prompt + {usage.get('completion_tokens', 0)} completion)")
         print(f"• Billed Cost  : ${guard.stats.total_cost_usd:.6f} USD")
@@ -140,7 +138,7 @@ def main() -> int:
         )
         print("[!] UNEXPECTED: Request was not blocked!")
     except OpenAnyBudgetExceededError as e:
-        print(f"\n🛡️  [CIRCUIT BREAKER TRIPPED BEFORE EXECUTION!]")
+        print("\n🛡️  [CIRCUIT BREAKER TRIPPED BEFORE EXECUTION!]")
         print(f"   Reason         : {e.reason}")
         print(f"   Estimated Cost : ${e.estimated_cost_usd:.6f} USD")
         print(f"   Budget Cap     : ${e.budget_limit_usd:.6f} USD")
