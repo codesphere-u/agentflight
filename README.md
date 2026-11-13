@@ -80,11 +80,11 @@ Production AI agent engineering in 2026 faces two compounding bottlenecks:
 ## Installation
 
 ```bash
-# Zero-dependency core SDK & CLI (FlightRecorder, Replayer, CircuitBreaker, MCP Linter):
-pip install agentflight
-
-# Or install directly from GitHub v1.2.0:
+# Install v1.2.0 directly from GitHub (works immediately, zero runtime dependencies):
 pip install "git+https://github.com/codesphere-u/agentflight.git@v1.2.0"
+
+# Or via PyPI (triggered by the v1.2.0 release workflow):
+pip install agentflight
 
 # Optional ASGI / Vercel web portal extras (FastAPI, Pydantic, Uvicorn):
 pip install "agentflight[server]"
@@ -456,8 +456,8 @@ The hosted gateway is [`api/index.py`](api/index.py); it enforces a 1 MB body li
 
 AgentFlight features an official commercial provider integration for [OpenAny](https://openany.si), giving developers access to 128+ AI models and 3,200+ external APIs with pre-execution cost circuit breaking, black-box flight recording, and sub-microsecond deterministic replay.
 
-> 🤝 **Commercial Revenue Sharing & Transparent Disclosure:**  
-> AgentFlight has partnered with OpenAny under a confirmed 30% permanent revenue sharing agreement. Outbound requests to OpenAny automatically carry the verified attribution header `X-OpenAny-Partner-Id: agentflight`.  
+> 🤝 **Partner Attribution & Transparent Disclosure:**  
+> AgentFlight integrates natively with OpenAny. Outbound requests to OpenAny carry the verified partner header `X-OpenAny-Partner-Id: agentflight`.  
 > *Disclosure: AgentFlight may earn a commission from OpenAny usage through our partnership, at no additional cost to you where confirmed by OpenAny.*  
 > AgentFlight remains 100% provider-agnostic, open-source, and free to use with any model provider.
 
