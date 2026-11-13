@@ -222,7 +222,7 @@ async def mcp_get(request: Request):
         return await sse_legacy(request)
     if "text/html" in accept:
         return await health_check(request)
-    return await health_check(request)
+    return Response(status_code=405, headers={"Allow": "POST, OPTIONS"})
 
 
 @app.get("/sse")
