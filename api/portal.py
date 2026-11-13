@@ -887,7 +887,7 @@ def render_developer_portal(
             <span class="badge badge-ver">v{safe_version}</span>
             <span class="badge badge-live">Operational</span>
             <span class="badge badge-proto">MCP 2024-11-05</span>
-            <span class="badge badge-partner">OpenAny Partner &bull; 30% Rev Share</span>
+            <span class="badge badge-partner">OpenAny Partner</span>
             <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35);">Independently Owned</span>
             <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.35);">Codesphere AI Suite</span>
           </div>

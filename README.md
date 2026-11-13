@@ -13,7 +13,7 @@
 [![Glama Score](https://glama.ai/mcp/servers/codesphere-u/agentflight/badges/score.svg)](https://glama.ai/mcp/servers/codesphere-u/agentflight)
 [![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
 [![Tests Passed](https://img.shields.io/badge/tests-142%20passed-brightgreen.svg)](tests/)
-[![Zero External API Keys](https://img.shields.io/badge/dependencies-zero%20runtime%20deps-brightgreen.svg)](pyproject.toml)
+[![Core SDK Stdlib](https://img.shields.io/badge/core%20SDK-100%25%20Python%20stdlib-brightgreen.svg)](src/agentflight/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
 **AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay (`<0.02 ms`, `$0.00` CI Spend), Differential Regression Detector, OpenTelemetry / W3C TraceContext Exporter (for `stackpulse`), Real-Time Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter.**
@@ -41,7 +41,7 @@ Production AI agent engineering in 2026 faces two compounding bottlenecks:
 1. **Non-Deterministic, Expensive Multi-Step Agent Debugging & CI Testing**: When a 15-step tool-calling or MCP agent fails on step 12, re-running live LLM turns and external API calls in CI is slow (`10–45s`), flaky, and expensive. Engineers need a **"VCR / Black-Box Flight Recorder for AI Agents"** that captures every LLM turn, MCP RPC, and tool invocation into a tamper-evident SHA-256 hash chain cassette and replays the entire trajectory deterministically in **`<0.02 ms` with `$0.00` token spend**—raising a structural diff (`TrajectoryDivergenceError`) the instant an agent's behavior drifts from the golden baseline.
 2. **"MCP Tool Smell" (Schema Ergonomics Bugs)**: Empirical evaluations across Model Context Protocol (MCP) servers and function-calling suites show that most tool-selection failures are caused not by model reasoning limits, but by poorly authored tool schemas: missing parameter descriptions, ambiguous boolean flags (`flag`, `mode`), deeply nested input objects (`depth > 3`), unconstrained finite-set strings (`status`, `format` without `enum`), overlapping tool names (`search_records` vs. `find_records`), and destructive tools (`delete_*`, `drop_*`) without confirmation guards.
 
-**`agentflight`** solves both problems in a single, zero-dependency, pure-Python 3.10+ toolkit.
+**`agentflight`** solves both problems with a pure-Python 3.10+ stdlib core engine (`src/agentflight/` uses zero third-party runtime dependencies), paired with a FastAPI/ASGI portal gateway.
 
 ---
 
@@ -80,14 +80,11 @@ Production AI agent engineering in 2026 faces two compounding bottlenecks:
 ## Installation
 
 ```bash
-# Install v1.2.0 directly from GitHub (works immediately, zero runtime dependencies):
+# Install v1.2.0 directly from GitHub:
 pip install "git+https://github.com/codesphere-u/agentflight.git@v1.2.0"
 
 # Or via PyPI (triggered by the v1.2.0 release workflow):
 pip install agentflight
-
-# Optional ASGI / Vercel web portal extras (FastAPI, Pydantic, Uvicorn):
-pip install "agentflight[server]"
 
 # Contributors:
 pip install -e ".[dev]"
