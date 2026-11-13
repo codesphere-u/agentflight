@@ -13,6 +13,7 @@ exception on:
 
 from __future__ import annotations
 
+import threading
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple
 
@@ -52,9 +53,48 @@ class CircuitBreakerStats:
     consecutive_errors: int = 0
     total_tokens: int = 0
     total_cost_usd: float = 0.0
+    reserved_cost_usd: float = 0.0
     tripped: bool = False
     trip_reason: Optional[TripReason] = None
     trip_message: Optional[str] = None
+
+
+class BudgetReservation:
+    """
+    Active budget reservation holding funds during in-flight LLM/tool execution.
+    Prevents race conditions where parallel requests bypass spending caps.
+    """
+
+    def __init__(self, breaker: "TrajectoryCircuitBreaker", amount_usd: float) -> None:
+        self.breaker = breaker
+        self.amount_usd = amount_usd
+        self._committed = False
+        self._released = False
+
+    def commit(self, actual_cost_usd: float) -> None:
+        """Commit the reservation upon execution completion."""
+        with self.breaker._lock:
+            if not self._released and not self._committed:
+                self.breaker.stats.reserved_cost_usd = max(
+                    0.0, round(self.breaker.stats.reserved_cost_usd - self.amount_usd, 8)
+                )
+                self._committed = True
+
+    def release(self) -> None:
+        """Release reserved funds if execution was canceled, blocked, or failed before billing."""
+        with self.breaker._lock:
+            if not self._released and not self._committed:
+                self.breaker.stats.reserved_cost_usd = max(
+                    0.0, round(self.breaker.stats.reserved_cost_usd - self.amount_usd, 8)
+                )
+                self._released = True
+
+    def __enter__(self) -> "BudgetReservation":
+        return self
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        if exc_type is not None and not self._committed:
+            self.release()
 
 
 class TrajectoryCircuitBreaker:
@@ -89,11 +129,42 @@ class TrajectoryCircuitBreaker:
 
         self._history: List[Tuple[str, str]] = []  # (actor, input_hash)
         self.stats = CircuitBreakerStats()
+        self._lock = threading.Lock()
 
     def reset(self) -> None:
         """Reset all circuit breaker counters and call history."""
-        self._history.clear()
-        self.stats = CircuitBreakerStats()
+        with self._lock:
+            self._history.clear()
+            self.stats = CircuitBreakerStats()
+
+    def reserve_budget(self, estimated_cost_usd: float) -> BudgetReservation:
+        """
+        Thread-safe budget reservation for concurrent agent execution.
+        Prevents race conditions where parallel requests bypass budget limits.
+        """
+        with self._lock:
+            effective_total = self.stats.total_cost_usd + self.stats.reserved_cost_usd
+            projected = effective_total + estimated_cost_usd
+            if self.max_cost_usd is not None and projected > self.max_cost_usd:
+                step_idx = self.stats.steps_observed
+                self._trip(
+                    reason="cost_budget_exceeded",
+                    step_index=step_idx,
+                    message=(
+                        f"Budget reservation rejected at step {step_idx}: estimated ${estimated_cost_usd:.6f} "
+                        f"with current spend ${self.stats.total_cost_usd:.6f} and active reservations ${self.stats.reserved_cost_usd:.6f} "
+                        f"would total ${projected:.6f}, exceeding cap ${self.max_cost_usd:.4f}."
+                    ),
+                    evidence={
+                        "estimated_cost_usd": estimated_cost_usd,
+                        "current_spent_usd": self.stats.total_cost_usd,
+                        "reserved_cost_usd": self.stats.reserved_cost_usd,
+                        "projected_total_usd": projected,
+                        "budget_limit_usd": self.max_cost_usd,
+                    },
+                )
+            self.stats.reserved_cost_usd = round(self.stats.reserved_cost_usd + estimated_cost_usd, 8)
+            return BudgetReservation(self, estimated_cost_usd)
 
     def observe_span(self, span: TrajectorySpan) -> CircuitBreakerStats:
         """Inspect a recorded `TrajectorySpan` and trip if any guard invariant is violated."""
@@ -121,10 +192,11 @@ class TrajectoryCircuitBreaker:
         """
         Inspect a live agent step and raise `CircuitBreakerTripped` if any threshold is breached.
         """
-        step_idx = self.stats.steps_observed
-        self.stats.steps_observed += 1
-        self.stats.total_tokens += int(prompt_tokens) + int(completion_tokens)
-        self.stats.total_cost_usd = round(self.stats.total_cost_usd + float(cost_usd), 8)
+        with self._lock:
+            step_idx = self.stats.steps_observed
+            self.stats.steps_observed += 1
+            self.stats.total_tokens += int(prompt_tokens) + int(completion_tokens)
+            self.stats.total_cost_usd = round(self.stats.total_cost_usd + float(cost_usd), 8)
 
         if status == "error":
             self.stats.consecutive_errors += 1

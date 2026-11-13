@@ -5,20 +5,26 @@
 </p>
 
 [![CI & Reliability Gate](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml)
-[![Release v1.1.0](https://img.shields.io/badge/release-v1.1.0-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.1.0)
+[![Release v1.2.0](https://img.shields.io/badge/release-v1.2.0-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.2.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Operational-10b981?logo=vercel&logoColor=white)](https://agentflight-tau.vercel.app/mcp)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-✔%20Connected-10b981?logo=anthropic&logoColor=white)](#hosted-endpoint-vercel)
 [![Glama Score](https://glama.ai/mcp/servers/codesphere-u/agentflight/badges/score.svg)](https://glama.ai/mcp/servers/codesphere-u/agentflight)
 [![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
-[![Tests Passed](https://img.shields.io/badge/tests-113%20passed-brightgreen.svg)](tests/)
+[![Tests Passed](https://img.shields.io/badge/tests-142%20passed-brightgreen.svg)](tests/)
 [![Zero External API Keys](https://img.shields.io/badge/dependencies-zero%20runtime%20deps-brightgreen.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
 **AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay (`<0.02 ms`, `$0.00` CI Spend), Differential Regression Detector, OpenTelemetry / W3C TraceContext Exporter (for `stackpulse`), Real-Time Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter.**
 
 > 🚀 **Live Interactive Developer Portal & Playground:** Visit [`https://agentflight-tau.vercel.app`](https://agentflight-tau.vercel.app) in your web browser to test tool linting live, inspect schemas, and copy 1-click configurations for Claude Code, Cursor, Windsurf, and Claude Desktop.
+>
+> ⭐ **Like what you see?** Give this repository a **Star** and follow creator **[Akandwanaho Ivan Alvin](https://alvin.codesphereug.com/)**!
+
+<p align="center">
+  <img src="marketing/openany-launch/agentflight_openany_demo.gif" alt="AgentFlight Live Demo — Pre-Execution Cost Circuit Breaker, Cryptographic Flight Recorder & 0.08 μs Offline Replay" width="820" />
+</p>
 
 <p align="center">
   <a href="https://glama.ai/mcp/servers/codesphere-u/agentflight">
@@ -74,8 +80,14 @@ Production AI agent engineering in 2026 faces two compounding bottlenecks:
 ## Installation
 
 ```bash
-pip install "git+https://github.com/codesphere-u/agentflight.git@v1.1.0"
-# After the first PyPI release: pip install agentflight
+# Install v1.2.0 directly from GitHub (works immediately, zero runtime dependencies):
+pip install "git+https://github.com/codesphere-u/agentflight.git@v1.2.0"
+
+# Or via PyPI (triggered by the v1.2.0 release workflow):
+pip install agentflight
+
+# Optional ASGI / Vercel web portal extras (FastAPI, Pydantic, Uvicorn):
+pip install "agentflight[server]"
 
 # Contributors:
 pip install -e ".[dev]"
@@ -442,7 +454,12 @@ The hosted gateway is [`api/index.py`](api/index.py); it enforces a 1 MB body li
 
 ## Official OpenAny Provider Integration
 
-AgentFlight features an official provider integration for [OpenAny](https://openany.si), giving developers access to 168+ AI models and 3,200+ external APIs with pre-execution cost circuit breaking, black-box flight recording, and $0.00 sub-millisecond deterministic replay.
+AgentFlight features an official commercial provider integration for [OpenAny](https://openany.si), giving developers access to 128+ AI models and 3,200+ external APIs with pre-execution cost circuit breaking, black-box flight recording, and sub-microsecond deterministic replay.
+
+> 🤝 **Partner Attribution & Transparent Disclosure:**  
+> AgentFlight integrates natively with OpenAny. Outbound requests to OpenAny carry the verified partner header `X-OpenAny-Partner-Id: agentflight`.  
+> *Disclosure: AgentFlight may earn a commission from OpenAny usage through our partnership, at no additional cost to you where confirmed by OpenAny.*  
+> AgentFlight remains 100% provider-agnostic, open-source, and free to use with any model provider.
 
 ### Quick Start with OpenAny
 
@@ -475,7 +492,7 @@ recorder.save("session.flight.json")
 ### CLI Commands for OpenAny
 
 ```bash
-# List all 168+ models and real-time per-token prompt/completion pricing
+# List all 128+ models and real-time per-token prompt/completion pricing
 agentflight openany models
 
 # Run a model prompt with budget guardrail and flight recording
@@ -484,14 +501,22 @@ agentflight openany chat --model MiniMax-M2.5 --prompt "Explain Paxos" --budget 
 # Audit OpenAny remote MCP tools against 10 ergonomics rules (TS001-TS010)
 agentflight openany lint-tools
 
-# Deterministically replay recorded trajectory in <0.02ms with zero API spend
+# Deterministically replay recorded trajectory in 0.08 μs with zero API spend
 agentflight openany replay --cassette paxos.flight.json
 ```
 
-For complete technical documentation, architecture diagrams, and partnership details, see [`docs/OPENANY_INTEGRATION.md`](docs/OPENANY_INTEGRATION.md).
+For complete technical specifications, see [`docs/OPENANY_INTEGRATION.md`](docs/OPENANY_INTEGRATION.md), [`docs/COMMERCIAL_PARTNERSHIP.md`](docs/COMMERCIAL_PARTNERSHIP.md), and [`docs/LIVE_ATTRIBUTION_RECORD.md`](docs/LIVE_ATTRIBUTION_RECORD.md).
 
 ---
 
-## License
+## Authorship, Ownership & License
 
-MIT License — Copyright (c) 2026 [Akandwanaho Ivan Alvin (`codesphere-u`)](https://github.com/codesphere-u).
+**AgentFlight is independently created and owned by [Akandwanaho Ivan Alvin](https://alvin.codesphereug.com/).**  
+It is not owned or contracted by Codesphere Innovations (U) Limited merely because it is hosted under the `codesphere-u` GitHub organization.
+
+- **Creator & Owner:** [Akandwanaho Ivan Alvin](https://alvin.codesphereug.com/) ([GitHub `@codesphere-u`](https://github.com/codesphere-u))
+- **Project Status:** Independently owned open-source AI infrastructure
+- **Commercial Partner:** OpenAny
+- **License:** MIT License — Copyright (c) 2026 [Akandwanaho Ivan Alvin (`codesphere-u`)](https://github.com/codesphere-u).
+
+If AgentFlight saves your agents from runaway token loops or speeds up your CI suite, please ⭐ **Star this repository** and share it with fellow AI builders!

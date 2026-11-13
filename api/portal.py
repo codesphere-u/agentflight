@@ -887,7 +887,8 @@ def render_developer_portal(
             <span class="badge badge-ver">v{safe_version}</span>
             <span class="badge badge-live">Operational</span>
             <span class="badge badge-proto">MCP 2024-11-05</span>
-            <span class="badge badge-partner">OpenAny Partner</span>
+            <span class="badge badge-partner">OpenAny Partner &bull; 30% Rev Share</span>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35);">Independently Owned</span>
             <span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.35);">Codesphere AI Suite</span>
           </div>
           <p class="text-sm text-dim" style="margin-top: 8px; max-width: 720px;">{safe_tagline}</p>
@@ -1489,8 +1490,9 @@ def render_developer_portal(
 
     <!-- Footer -->
     <footer class="footer">
-      <div>&copy; 2026 CodeSphere Innovations &bull; Architect: <a href="https://alvin.codesphereug.com" target="_blank" rel="noopener" style="color: var(--openany-blue-bright); font-weight: 600; text-decoration: none;">Akandwanaho Ivan (Alvin)</a> &bull; <a href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener" style="color: var(--amber); text-decoration: none;">System Case Study</a> &bull; OpenAny Strategic Partner &bull; MIT License</div>
-      <div class="mono">Transport: Streamable HTTP (<code>POST /mcp</code>) + SSE (<code>GET /mcp</code>)</div>
+      <div>&copy; 2026 Akandwanaho Ivan Alvin &bull; Independently Owned Open-Source AI Infrastructure &bull; Creator & Owner: <a href="https://alvin.codesphereug.com" target="_blank" rel="noopener" style="color: var(--openany-blue-bright); font-weight: 600; text-decoration: none;">Akandwanaho Ivan (Alvin)</a> &bull; <a href="https://alvin.codesphereug.com/work/agentflight.html" target="_blank" rel="noopener" style="color: var(--amber); text-decoration: none;">System Case Study</a> &bull; Commercial Partner: OpenAny &bull; MIT License</div>
+      <div style="margin-top: 6px; font-size: 11px; color: #64748b;">Transparent Partnership Disclosure: AgentFlight may earn a commission from OpenAny usage through our partnership, at no additional cost to you where confirmed by OpenAny.</div>
+      <div class="mono" style="margin-top: 6px;">Transport: Streamable HTTP (<code>POST /mcp</code>) + SSE (<code>GET /mcp</code>) &bull; Attribution Header: <code>X-OpenAny-Partner-Id: agentflight</code></div>
     </footer>
   </div>
 

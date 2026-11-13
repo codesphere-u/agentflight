@@ -119,6 +119,7 @@ class OpenAnyConfig:
     default_model: str = "MiniMax-M2.5"
     max_budget_usd: float = 0.50
     partner_id: str = "agentflight"
+    referral_url: Optional[str] = None
     timeout_seconds: float = 30.0
     max_retries: int = 2
     retry_backoff_factor: float = 0.5
@@ -151,9 +152,29 @@ class OpenAnyConfig:
             default_model=os.environ.get("OPENANY_DEFAULT_MODEL", "MiniMax-M2.5"),
             max_budget_usd=float(os.environ.get("OPENANY_MAX_BUDGET_USD", "0.50")),
             partner_id=os.environ.get("OPENANY_PARTNER_ID", "agentflight"),
+            referral_url=os.environ.get("OPENANY_REFERRAL_URL"),
             timeout_seconds=float(os.environ.get("OPENANY_TIMEOUT_SECONDS", "30.0")),
             max_retries=int(os.environ.get("OPENANY_MAX_RETRIES", "2")),
         )
+
+
+def is_openany_domain(url: str, base_url: str = "https://api.openany.si/v1", mcp_url: str = "https://mcp.openany.si/mcp") -> bool:
+    """
+    Verify whether target URL is an authorized OpenAny domain.
+    Prevents partner attribution headers and API keys from leaking to third-party domains.
+    """
+    try:
+        parsed = urllib.parse.urlparse(url)
+        host = (parsed.hostname or "").lower()
+        if host == "openany.si" or host.endswith(".openany.si"):
+            return True
+        for target in (base_url, mcp_url):
+            target_host = (urllib.parse.urlparse(target).hostname or "").lower()
+            if host and host == target_host:
+                return True
+        return False
+    except Exception:
+        return False
 
 
 def redact_sensitive(data: Any, secrets: Optional[Sequence[str]] = None) -> Any:
@@ -167,7 +188,12 @@ def redact_sensitive(data: Any, secrets: Optional[Sequence[str]] = None) -> Any:
         redacted: Dict[str, Any] = {}
         for k, v in data.items():
             k_lower = str(k).lower()
-            if any(term in k_lower for term in ("key", "secret", "token", "auth", "credential", "password")):
+            is_sensitive_key = (
+                any(term in k_lower for term in ("api_key", "secret", "auth", "credential", "password", "bearer"))
+                or ("key" in k_lower and not k_lower.endswith("_key_id"))
+                or ("token" in k_lower and not any(metric in k_lower for metric in ("prompt_tokens", "completion_tokens", "total_tokens", "max_tokens", "reasoning_tokens", "cached_tokens")))
+            )
+            if is_sensitive_key:
                 redacted[k] = "[REDACTED]"
             else:
                 redacted[k] = redact_sensitive(v, secrets)
@@ -213,9 +239,11 @@ class OpenAnyProvider:
         config: Optional[OpenAnyConfig] = None,
         *,
         http_client: Optional[Callable[[urllib.request.Request, float], Any]] = None,
+        stream_client: Optional[Callable[[str, Dict[str, Any], Optional[Dict[str, str]]], Iterator[str]]] = None,
     ) -> None:
         self.config = config or OpenAnyConfig.from_env()
         self._http_client = http_client or self._default_http_execute
+        self._stream_client = stream_client
         self._model_cache: Dict[str, Dict[str, Any]] = {}
         self._model_cache_timestamp: float = 0.0
 
@@ -242,20 +270,70 @@ class OpenAnyProvider:
         except urllib.error.URLError as e:
             raise OpenAnyError(f"Network error connecting to OpenAny: {e.reason}") from e
 
-    def _build_headers(self, custom_headers: Optional[Dict[str, str]] = None) -> Dict[str, str]:
-        """Build request headers including authentication, streamable accept, and partnership attribution."""
+    def _build_headers(
+        self,
+        target_url: Optional[str] = None,
+        custom_headers: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, str]:
+        """
+        Build request headers including authentication, streamable accept, and partnership attribution.
+
+        Commercial Attribution Header:
+        - X-OpenAny-Partner-Id: Set to 'agentflight' for confirmed permanent 30% revenue share tracking.
+        - Security Boundary: X-OpenAny-Partner-Id and Authorization are ONLY attached when
+          target_url matches an authorized OpenAny host (*.openany.si or configured base_url/mcp_url).
+        """
         headers = {
             "Content-Type": "application/json",
             "Accept": "application/json, text/event-stream",
-            "User-Agent": "agentflight/1.1.0 (partner=openany; https://github.com/codesphere-u/agentflight)",
+            "User-Agent": "agentflight/1.2.0 (partner=openany; https://github.com/codesphere-u/agentflight)",
         }
-        if self.config.api_key:
-            headers["Authorization"] = f"Bearer {self.config.api_key.strip()}"
-        if self.config.partner_id:
-            headers["X-Partner-Id"] = self.config.partner_id
+        is_target_openany = True
+        if target_url:
+            is_target_openany = is_openany_domain(target_url, self.config.base_url, self.config.mcp_url)
+
+        if is_target_openany:
+            if self.config.api_key:
+                headers["Authorization"] = f"Bearer {self.config.api_key.strip()}"
+            if self.config.partner_id:
+                headers["X-OpenAny-Partner-Id"] = self.config.partner_id
+
         if custom_headers:
             headers.update(custom_headers)
         return headers
+
+    def _stream_request(
+        self,
+        url: str,
+        payload: Dict[str, Any],
+        headers: Optional[Dict[str, str]] = None,
+    ) -> Iterator[str]:
+        """Send streaming request and yield Server-Sent Events (SSE) lines."""
+        if self._stream_client is not None:
+            yield from self._stream_client(url, payload, headers)
+            return
+
+        req_headers = self._build_headers(target_url=url, custom_headers=headers)
+        data = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(url, data=data, headers=req_headers, method="POST")
+
+        try:
+            with urllib.request.urlopen(req, timeout=self.config.timeout_seconds) as resp:
+                for line in resp:
+                    decoded = line.decode("utf-8").strip()
+                    if decoded:
+                        yield decoded
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", errors="replace") if hasattr(e, "read") else ""
+            if e.code in (401, 403):
+                raise OpenAnyAuthError(f"OpenAny streaming authentication failed ({e.code}): {body}", status_code=e.code) from e
+            if e.code == 402:
+                raise OpenAnyInsufficientBalanceError(f"OpenAny streaming balance insufficient ({e.code}): {body}", status_code=e.code) from e
+            if e.code == 429:
+                raise OpenAnyRateLimitError(f"OpenAny streaming rate limit exceeded ({e.code}): {body}") from e
+            raise OpenAnyError(f"OpenAny streaming failed ({e.code}): {body}", status_code=e.code) from e
+        except Exception as e:
+            raise OpenAnyError(f"OpenAny streaming network error: {e}") from e
 
     def _send_request(
         self,
@@ -265,7 +343,7 @@ class OpenAnyProvider:
         headers: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
         """Send JSON HTTP request with retries and structured error translation."""
-        req_headers = self._build_headers(headers)
+        req_headers = self._build_headers(target_url=url, custom_headers=headers)
         data = json.dumps(payload).encode("utf-8") if payload is not None else None
 
         last_error: Optional[Exception] = None
@@ -419,18 +497,22 @@ class OpenAnyProvider:
         est_max_comp_tokens = max_tokens if max_tokens is not None else 512
         est_cost_usd = self.estimate_cost(target_model, est_prompt_tokens, est_max_comp_tokens)
 
-        # 2. Check Budget Circuit Breaker BEFORE dispatching paid call
+        # 2. Check Budget Circuit Breaker BEFORE dispatching paid call (Thread-Safe Reservation)
+        reservation = None
         if guard is not None and guard.max_cost_usd is not None:
-            projected_total = guard.stats.total_cost_usd + est_cost_usd
-            if projected_total > guard.max_cost_usd:
-                raise OpenAnyBudgetExceededError(
-                    f"OpenAny pre-execution budget guard tripped: estimated call cost ${est_cost_usd:.6f} "
-                    f"would push total spend to ${projected_total:.6f}, exceeding max limit ${guard.max_cost_usd:.2f}.",
-                    step_index=guard.stats.steps_observed,
-                    estimated_cost_usd=est_cost_usd,
-                    current_spent_usd=guard.stats.total_cost_usd,
-                    budget_limit_usd=guard.max_cost_usd,
-                )
+            try:
+                reservation = guard.reserve_budget(est_cost_usd)
+            except CircuitBreakerTripped as e:
+                if e.reason == "cost_budget_exceeded":
+                    raise OpenAnyBudgetExceededError(
+                        f"OpenAny pre-execution budget guard tripped: estimated call cost ${est_cost_usd:.6f} "
+                        f"would push total spend to ${guard.stats.total_cost_usd + guard.stats.reserved_cost_usd:.6f}, exceeding max limit ${guard.max_cost_usd:.2f}.",
+                        step_index=guard.stats.steps_observed,
+                        estimated_cost_usd=est_cost_usd,
+                        current_spent_usd=guard.stats.total_cost_usd,
+                        budget_limit_usd=guard.max_cost_usd,
+                    ) from e
+                raise
 
         # 3. Check Pre-Execution Loop Detection
         actor_name = f"openany:{target_model}"
@@ -448,6 +530,8 @@ class OpenAnyProvider:
             if len(guard._history) >= (n_rep - 1):
                 tail = guard._history[-(n_rep - 1):]
                 if all(item == sig for item in tail):
+                    if reservation is not None:
+                        reservation.release()
                     guard._trip(
                         reason="exact_call_loop",
                         step_index=guard.stats.steps_observed,
@@ -483,6 +567,8 @@ class OpenAnyProvider:
         try:
             resp_data = self._send_request(url, method="POST", payload=payload)
         except Exception as e:
+            if reservation is not None:
+                reservation.release()
             status_flag = "error"
             error_info = {"error": str(e), "type": type(e).__name__}
             latency_ms = (time.perf_counter() - start_time) * 1000.0
@@ -517,6 +603,10 @@ class OpenAnyProvider:
         actual_total_tokens = usage.get("total_tokens", actual_prompt_tokens + actual_comp_tokens)
 
         actual_cost_usd = self.estimate_cost(target_model, actual_prompt_tokens, actual_comp_tokens)
+
+        # Commit budget reservation
+        if reservation is not None:
+            reservation.commit(actual_cost_usd)
 
         # 6. Reconcile with circuit breaker
         if guard is not None:
@@ -553,6 +643,187 @@ class OpenAnyProvider:
             )
 
         return resp_data
+
+    def stream_chat(
+        self,
+        messages: List[Dict[str, Any]],
+        *,
+        model: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+        guard: Optional[TrajectoryCircuitBreaker] = None,
+        recorder: Optional[FlightRecorder] = None,
+        extra_body: Optional[Dict[str, Any]] = None,
+    ) -> Iterator[Dict[str, Any]]:
+        """
+        Stream an AI chat completion from OpenAny with real-time SSE chunk delivery,
+        pre-execution budget reservation, circuit-breaker observation, and black-box recording.
+        """
+        target_model = model or self.config.default_model
+
+        # 1. Pre-execution token & cost estimation
+        total_chars = sum(len(str(m.get("content", ""))) for m in messages)
+        est_prompt_tokens = max(1, total_chars // 4)
+        est_max_comp_tokens = max_tokens if max_tokens is not None else 512
+        est_cost_usd = self.estimate_cost(target_model, est_prompt_tokens, est_max_comp_tokens)
+
+        # 2. Pre-execution budget reservation
+        reservation = None
+        if guard is not None and guard.max_cost_usd is not None:
+            try:
+                reservation = guard.reserve_budget(est_cost_usd)
+            except CircuitBreakerTripped as e:
+                if e.reason == "cost_budget_exceeded":
+                    raise OpenAnyBudgetExceededError(
+                        f"OpenAny pre-execution budget guard tripped: estimated call cost ${est_cost_usd:.6f} "
+                        f"would push spend to ${guard.stats.total_cost_usd + guard.stats.reserved_cost_usd:.6f}, exceeding limit ${guard.max_cost_usd:.2f}.",
+                        step_index=guard.stats.steps_observed,
+                        estimated_cost_usd=est_cost_usd,
+                        current_spent_usd=guard.stats.total_cost_usd,
+                        budget_limit_usd=guard.max_cost_usd,
+                    ) from e
+                raise
+
+        # 3. Pre-execution loop check
+        actor_name = f"openany:{target_model}"
+        request_input = {
+            "model": target_model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "estimated_cost_usd": est_cost_usd,
+            "stream": True,
+        }
+        if guard is not None:
+            from ..recorder import canonical_hash
+            sig = (actor_name, canonical_hash(request_input))
+            n_rep = guard.max_identical_repeats
+            if len(guard._history) >= (n_rep - 1):
+                tail = guard._history[-(n_rep - 1):]
+                if all(item == sig for item in tail):
+                    if reservation is not None:
+                        reservation.release()
+                    guard._trip(
+                        reason="exact_call_loop",
+                        step_index=guard.stats.steps_observed,
+                        message=(
+                            f"Exact call loop detected at step {guard.stats.steps_observed}: model '{actor_name}' invoked "
+                            f"{n_rep} times consecutively with identical arguments."
+                        ),
+                        evidence={
+                            "actor": actor_name,
+                            "repeats": n_rep,
+                            "input_payload": request_input,
+                        },
+                    )
+
+        # 4. Dispatch streaming request
+        url = f"{self.config.base_url}/chat/completions"
+        payload = {
+            "model": target_model,
+            "messages": messages,
+            "temperature": temperature,
+            "stream": True,
+        }
+        if max_tokens is not None:
+            payload["max_tokens"] = max_tokens
+        if extra_body:
+            payload.update(extra_body)
+
+        start_time = time.perf_counter()
+        accumulated_text: List[str] = []
+        chunks_received = 0
+        final_usage = None
+
+        try:
+            for sse_line in self._stream_request(url, payload=payload):
+                if not sse_line or sse_line.startswith(":"):
+                    continue
+                if sse_line.startswith("data: "):
+                    raw_data = sse_line[6:].strip()
+                    if raw_data == "[DONE]":
+                        break
+                    try:
+                        chunk = json.loads(raw_data)
+                    except Exception:
+                        continue
+                    chunks_received += 1
+                    delta = chunk.get("choices", [{}])[0].get("delta", {})
+                    content = delta.get("content")
+                    if content:
+                        accumulated_text.append(content)
+                    if "usage" in chunk:
+                        final_usage = chunk["usage"]
+                    yield chunk
+
+            latency_ms = (time.perf_counter() - start_time) * 1000.0
+            full_text = "".join(accumulated_text)
+            actual_comp_tokens = max(1, len(full_text) // 4) if not final_usage else final_usage.get("completion_tokens", max(1, len(full_text) // 4))
+            actual_prompt_tokens = est_prompt_tokens if not final_usage else final_usage.get("prompt_tokens", est_prompt_tokens)
+            actual_cost_usd = self.estimate_cost(target_model, actual_prompt_tokens, actual_comp_tokens)
+
+            if reservation is not None:
+                reservation.commit(actual_cost_usd)
+
+            if guard is not None:
+                guard.observe(
+                    actor=actor_name,
+                    input_payload=request_input,
+                    status="ok",
+                    prompt_tokens=actual_prompt_tokens,
+                    completion_tokens=actual_comp_tokens,
+                    cost_usd=actual_cost_usd,
+                    kind="llm_turn",
+                )
+
+            if recorder is not None:
+                recorder.record(
+                    kind="llm_turn",
+                    actor=actor_name,
+                    input_payload=redact_sensitive(request_input, [self.config.api_key or ""]),
+                    output_payload={
+                        "model": target_model,
+                        "content": full_text,
+                        "chunks_received": chunks_received,
+                        "_agentflight": {
+                            "estimated_cost_usd": est_cost_usd,
+                            "actual_cost_usd": actual_cost_usd,
+                            "latency_ms": round(latency_ms, 2),
+                            "partner_id": self.config.partner_id,
+                            "streaming": True,
+                        },
+                    },
+                    latency_ms=latency_ms,
+                    prompt_tokens=actual_prompt_tokens,
+                    completion_tokens=actual_comp_tokens,
+                    cost_usd=actual_cost_usd,
+                    status="ok",
+                )
+
+        except Exception as e:
+            if reservation is not None:
+                reservation.release()
+            latency_ms = (time.perf_counter() - start_time) * 1000.0
+            if recorder is not None:
+                recorder.record(
+                    kind="llm_turn",
+                    actor=actor_name,
+                    input_payload=redact_sensitive(request_input, [self.config.api_key or ""]),
+                    output_payload={"error": str(e), "type": type(e).__name__},
+                    latency_ms=latency_ms,
+                    status="error",
+                )
+            if guard is not None:
+                guard.observe(
+                    actor=actor_name,
+                    input_payload=request_input,
+                    status="error",
+                    prompt_tokens=0,
+                    completion_tokens=0,
+                    cost_usd=0.0,
+                    kind="llm_turn",
+                )
+            raise
 
     # -----------------------------------------------------------------------
     # Remote MCP Integration (Tools & Data APIs)

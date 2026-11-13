@@ -2,13 +2,13 @@ cff-version: 1.2.0
 message: "If you cite or use this software in research, systems, or publications, please cite it as below."
 authors:
   - family-names: "Akandwanaho"
-    given-names: "Ivan"
+    given-names: "Ivan Alvin"
     email: "codesphereinnovationz@gmail.com"
-    affiliation: "Codesphere Innovations (U) Limited"
+    affiliation: "Independent Researcher & Engineer"
 title: "AgentFlight"
-abstract: "Static Tool-Smell Linter and Token-Budget Compiler for Model Context Protocol Toolsets"
-version: "1.0.0"
-date-released: 2026-11-10
+abstract: "AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay, Loop/Cost Circuit Breaker & MCP Tool-Smell Linter"
+version: "1.2.0"
+date-released: 2026-11-11
 url: "https://github.com/codesphere-u/agentflight"
 repository-code: "https://github.com/codesphere-u/agentflight"
 license: "MIT"

@@ -38,7 +38,7 @@ except ImportError:
     from api.portal import render_developer_portal
 
 SERVER_NAME = "agentflight"
-SERVER_VERSION = "1.1.0"
+SERVER_VERSION = "1.2.0"
 MAX_BODY_BYTES = 1_000_000
 
 # Best-effort per-IP sliding-window rate limit. State is per serverless instance, so it
@@ -79,14 +79,14 @@ mcp_engine = AgentFlightMCPServer()
 app = FastAPI(
     title=f"AgentFlight MCP Server ({SERVER_VERSION})",
     description="High-performance Agent Tool Ergonomics & Flight Recorder Model Context Protocol (MCP) server running on Vercel Serverless. "
-                "Supports static tool-smell linting, token-budget compiling, and trajectory telemetry. "
-                "Built by CodeSphere Innovations.",
+                "Supports static tool-smell linting, token-budget compiling, trajectory telemetry, and official OpenAny integration. "
+                "Created and owned by Akandwanaho Ivan Alvin. Independently owned open-source AI infrastructure.",
     version=SERVER_VERSION,
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
     contact={
-        "name": "Codesphere Innovations",
+        "name": "Akandwanaho Ivan Alvin (Creator & Owner)",
         "url": "https://github.com/codesphere-u/agentflight",
         "email": "codesphereinnovationz@gmail.com",
     },
@@ -222,7 +222,7 @@ async def mcp_get(request: Request):
         return await sse_legacy(request)
     if "text/html" in accept:
         return await health_check(request)
-    return await health_check(request)
+    return Response(status_code=405, headers={"Allow": "POST, OPTIONS"})
 
 
 @app.get("/sse")

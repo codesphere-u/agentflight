@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050811"/>
+      <stop offset="100%" stop-color="#020306"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <rect width="1100" height="520" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <text x="50" y="55" font-family="-apple-system, sans-serif" font-weight="800" font-size="24" fill="#ffffff">
+    AgentFlight × OpenAny — Permanent Revenue Attribution Flow
+  </text>
+  <text x="50" y="80" font-family="monospace" font-size="12" fill="#64748b">
+    END-TO-END COMMERCIAL REVENUE RECOGNITION SPECIFICATION (HEADER: X-OpenAny-Partner-Id: agentflight)
+  </text>
+
+  <!-- Step Cards -->
+  <!-- Step 1: Developer Action -->
+  <g transform="translate(50, 120)" filter="url(#shadow)">
+    <rect width="210" height="310" rx="12" fill="#0d1527" stroke="rgba(59,130,246,0.4)" stroke-width="1.5"/>
+    <circle cx="36" cy="36" r="16" fill="rgba(59,130,246,0.15)"/>
+    <text x="36" y="42" font-family="monospace" font-size="14" font-weight="bold" fill="#60a5fa" text-anchor="middle">1</text>
+    <text x="64" y="42" font-family="-apple-system, sans-serif" font-weight="700" font-size="14" fill="#f8fafc">Developer Onboarding</text>
+    
+    <g transform="translate(16, 75)" font-family="monospace" font-size="11" fill="#94a3b8">
+      <text x="0" y="0">• Developer installs</text>
+      <text x="0" y="16">  `pip install agentflight`</text>
+      <text x="0" y="40">• Discovers OpenAny via</text>
+      <text x="0" y="56">  partner link or docs</text>
+      <text x="0" y="80">• Creates OpenAny key</text>
+      <text x="0" y="96">  `ale-your-key...`</text>
+      <text x="0" y="120">• Configures local env</text>
+      <text x="0" y="136">  `OPENANY_API_KEY`</text>
+      <text x="0" y="165" fill="#f59e0b" font-weight="bold">Zero lock-in</text>
+      <text x="0" y="180" fill="#64748b">(OpenAny is optional)</text>
+    </g>
+  </g>
+
+  <!-- Flow Arrow 1 -> 2 -->
+  <line x1="265" y1="275" x2="315" y2="275" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,4"/>
+  <polygon points="315,275 307,270 307,280" fill="#3b82f6"/>
+
+  <!-- Step 2: AgentFlight Pre-Flight Shield -->
+  <g transform="translate(320, 120)" filter="url(#shadow)">
+    <rect width="210" height="310" rx="12" fill="#0d1527" stroke="rgba(245,158,11,0.4)" stroke-width="1.5"/>
+    <circle cx="36" cy="36" r="16" fill="rgba(245,158,11,0.15)"/>
+    <text x="36" y="42" font-family="monospace" font-size="14" font-weight="bold" fill="#fbbf24" text-anchor="middle">2</text>
+    <text x="64" y="42" font-family="-apple-system, sans-serif" font-weight="700" font-size="14" fill="#f8fafc">Pre-Flight Guard</text>
+
+    <g transform="translate(16, 75)" font-family="monospace" font-size="11" fill="#94a3b8">
+      <text x="0" y="0">• Evaluates prompt token</text>
+      <text x="0" y="16">  count before dispatch</text>
+      <text x="0" y="40">• Queries real pricing</text>
+      <text x="0" y="56">  for target OpenAny model</text>
+      <text x="0" y="80">• Thread-safe budget</text>
+      <text x="0" y="96">  reservation checked</text>
+      <text x="0" y="120">• Attaches confirmed</text>
+      <text x="0" y="136">  attribution header</text>
+      <rect x="0" y="150" width="178" height="42" rx="4" fill="#1e1305" stroke="#f59e0b" stroke-width="1"/>
+      <text x="8" y="166" fill="#fbbf24" font-size="9" font-weight="bold">X-OpenAny-Partner-Id:</text>
+      <text x="8" y="180" fill="#38bdf8" font-size="9">agentflight</text>
+    </g>
+  </g>
+
+  <!-- Flow Arrow 2 -> 3 -->
+  <line x1="535" y1="275" x2="585" y2="275" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,4"/>
+  <polygon points="585,275 577,270 577,280" fill="#f59e0b"/>
+
+  <!-- Step 3: OpenAny Gateway Routing -->
+  <g transform="translate(590, 120)" filter="url(#shadow)">
+    <rect width="210" height="310" rx="12" fill="#0d1527" stroke="rgba(99,102,241,0.4)" stroke-width="1.5"/>
+    <circle cx="36" cy="36" r="16" fill="rgba(99,102,241,0.15)"/>
+    <text x="36" y="42" font-family="monospace" font-size="14" font-weight="bold" fill="#818cf8" text-anchor="middle">3</text>
+    <text x="64" y="42" font-family="-apple-system, sans-serif" font-weight="700" font-size="14" fill="#f8fafc">Gateway Attribution</text>
+
+    <g transform="translate(16, 75)" font-family="monospace" font-size="11" fill="#94a3b8">
+      <text x="0" y="0">• Gateway inspects</text>
+      <text x="0" y="16">  incoming headers</text>
+      <text x="0" y="40">• Tags execution turn</text>
+      <text x="0" y="56">  with partner='agentflight'</text>
+      <text x="0" y="80">• Routes prompt to 128+</text>
+      <text x="0" y="96">  models or 3,200 APIs</text>
+      <text x="0" y="120">• Deducts developer</text>
+      <text x="0" y="136">  prepaid usage</text>
+      <rect x="0" y="152" width="178" height="36" rx="4" fill="#13112c" stroke="#6366f1" stroke-width="1"/>
+      <text x="8" y="168" fill="#a5b4fc" font-size="9" font-weight="bold">Backend Gateway ID:</text>
+      <text x="8" y="180" fill="#cbd5e1" font-size="9">AIephant AI Gateway</text>
+    </g>
+  </g>
+
+  <!-- Flow Arrow 3 -> 4 -->
+  <line x1="805" y1="275" x2="855" y2="275" stroke="#10b981" stroke-width="2" stroke-dasharray="4,4"/>
+  <polygon points="855,275 847,270 847,280" fill="#10b981"/>
+
+  <!-- Step 4: Revenue Share Settlement -->
+  <g transform="translate(860, 120)" filter="url(#shadow)">
+    <rect width="210" height="310" rx="12" fill="#0d1527" stroke="rgba(16,185,129,0.4)" stroke-width="1.5"/>
+    <circle cx="36" cy="36" r="16" fill="rgba(16,185,129,0.15)"/>
+    <text x="36" y="42" font-family="monospace" font-size="14" font-weight="bold" fill="#34d399" text-anchor="middle">4</text>
+    <text x="64" y="42" font-family="-apple-system, sans-serif" font-weight="700" font-size="14" fill="#f8fafc">30% Revenue Share</text>
+
+    <g transform="translate(16, 75)" font-family="monospace" font-size="11" fill="#94a3b8">
+      <text x="0" y="0">• Permanent 30% revenue</text>
+      <text x="0" y="16">  share credited to</text>
+      <text x="0" y="32">  AgentFlight</text>
+      <text x="0" y="56">• Beneficiary &amp; Owner:</text>
+      <text x="0" y="72" fill="#f8fafc" font-weight="bold">  Akandwanaho Ivan</text>
+      <text x="0" y="88" fill="#f8fafc" font-weight="bold">  Alvin</text>
+      <text x="0" y="112">• Aggregated in</text>
+      <text x="0" y="128">  Partner Dashboard</text>
+      <rect x="0" y="146" width="178" height="46" rx="4" fill="#042017" stroke="#10b981" stroke-width="1"/>
+      <text x="8" y="164" fill="#34d399" font-size="10" font-weight="bold">30% Permanent Share</text>
+      <text x="8" y="180" fill="#a7f3d0" font-size="9">Commercial Growth</text>
+    </g>
+  </g>
+
+  <!-- Bottom Disclaimer -->
+  <text x="50" y="480" font-family="monospace" font-size="11" fill="#64748b">
+    Transparent Disclosure: AgentFlight may earn a commission from OpenAny usage through our partnership, at no additional cost to you where confirmed by OpenAny.
+  </text>
+</svg>
