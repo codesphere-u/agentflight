@@ -12,12 +12,11 @@ AgentFlight v1.2.0 introduces the official commercial integration with **OpenAny
 
 ### 🌟 Key Highlights
 
-1. **Commercial Attribution Infrastructure:**
-   - Outbound requests to OpenAny now transmit the confirmed attribution header:
+1. **Verified Partner Attribution Infrastructure:**
+   - Outbound requests to OpenAny now transmit the verified partner header:
      ```http
      X-OpenAny-Partner-Id: agentflight
      ```
-   - Powers a permanent 30% revenue sharing partnership with OpenAny.
    - Domain boundary isolation strictly prevents header and credential leakage to third-party domains.
 
 2. **Thread-Safe Budget Reservations (`TrajectoryCircuitBreaker`):**
@@ -46,5 +45,6 @@ pip install --upgrade agentflight-mcp
 ```
 
 ### 🧪 Full Test Suite Status
-- **132 passed**, 1 skipped in 3.88s (100% passing across mock and live test fixtures).
+- **142 passed** (0 failed, 0 skipped) across mock, gateway, and live test fixtures.
 - 20 dedicated provider and attribution tests.
+- Built distribution: `agentflight-mcp` (`1.2.0`) on PyPI.
