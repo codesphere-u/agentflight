@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentFlight — AI Agent Flight Recorder, Replay &amp; MCP Linter</title>
+    <meta
+      name="description"
+      content="Record tamper-evident SHA-256 agent cassettes, replay multi-step runs in 0.08 microseconds at $0 spend, trip runaway loops, and lint 10 MCP tool smells."
+    />
+    <meta
+      name="keywords"
+      content="AgentFlight, AI agent flight recorder, deterministic trajectory replay, MCP tool-smell linter, loop circuit breaker, SHA-256 cassette, pytest AI testing"
+    />
+    <meta name="author" content="Akandwanaho Ivan Alvin" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#fffdf2" />
+    <link rel="canonical" href="https://codesphere-u.github.io/agentflight/" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.5.0" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://codesphere-u.github.io/agentflight/" />
+    <meta property="og:site_name" content="AgentFlight" />
+    <meta property="og:title" content="AgentFlight — AI Agent Flight Recorder, Replay &amp; MCP Linter" />
+    <meta
+      property="og:description"
+      content="0.08 us deterministic replay, automatic secret redaction, runaway loop circuit breaking, and 10 MCP ergonomics rules in pure Python stdlib."
+    />
+    <meta property="og:image" content="https://codesphere-u.github.io/agentflight/og-image.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="AgentFlight sky-blue and black-box amber social card showing 100 Grade A+ score" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AgentFlight — AI Agent Flight Recorder, Replay &amp; MCP Linter" />
+    <meta
+      name="twitter:description"
+      content="VCR flight recorder for AI agents: SHA-256 cassettes, $0.00 CI replay, loop circuit breaker &amp; 10-rule MCP tool linter."
+    />
+    <meta name="twitter:image" content="https://codesphere-u.github.io/agentflight/og-image.svg" />
+
+    <style>
+      [hidden] { display: none !important; }
+      .brand-wordmark-svg { height: 36px; width: 196px; display: block; }
+    </style>
+    <link rel="stylesheet" href="./styles.css?v=1.5.0" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://codesphere-u.github.io/agentflight/#org",
+            "name": "AgentFlight",
+            "url": "https://codesphere-u.github.io/agentflight/",
+            "founder": {
+              "@type": "Person",
+              "name": "Akandwanaho Ivan Alvin",
+              "url": "https://alvin.codesphereug.com/"
+            },
+            "sameAs": [
+              "https://github.com/codesphere-u/agentflight",
+              "https://pypi.org/project/agentflight-mcp/"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://codesphere-u.github.io/agentflight/#website",
+            "url": "https://codesphere-u.github.io/agentflight/",
+            "name": "AgentFlight",
+            "publisher": {
+              "@id": "https://codesphere-u.github.io/agentflight/#org"
+            }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://codesphere-u.github.io/agentflight/#software",
+            "name": "AgentFlight",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "macOS, Linux, Windows",
+            "softwareVersion": "1.5.0",
+            "license": "https://opensource.org/licenses/MIT",
+            "url": "https://codesphere-u.github.io/agentflight/",
+            "downloadUrl": "https://pypi.org/project/agentflight-mcp/",
+            "description": "AI Agent Black-Box Flight Recorder, 0.08 us Deterministic Trajectory Replay, Differential Regression Detector, Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter.",
+            "publisher": {
+              "@id": "https://codesphere-u.github.io/agentflight/#org"
+            },
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How does AgentFlight replay multi-step AI agents in CI with $0 token spend?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "FlightRecorder captures every LLM turn, streaming delta, and MCP tool call into a canonical-JSON SHA-256 hash chain (.flight.json or .flight.jsonl) with secrets automatically scrubbed. CassetteReplayer and the built-in pytest plugin stub matching tool calls locally in 0.08 to 2.8 microseconds and raise TrajectoryDivergenceError when arguments drift."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What does the core Python SDK require at runtime?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The core AgentFlight recording, replay, circuit-breaker, diffing, OpenTelemetry export, redaction, and MCP linter engine under src/agentflight runs on pure Python 3.10+ standard library with zero external runtime dependencies."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I connect AgentFlight to Claude Code, Cursor, or CI pipelines?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Run agentflight serve-mcp locally via uvx, connect directly to the public Streamable HTTP endpoint at https://agentflight-tau.vercel.app/mcp, or gate pull requests using agentflight ci and pytest --flight-mode=replay."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body data-analytics="plausible">
+    <div class="page-col">
+      <header class="site-header">
+        <a class="brand-link" href="./" aria-label="AgentFlight home">
+          <svg class="brand-wordmark-svg" width="196" height="36" viewBox="0 0 218 40" fill="none" role="img" aria-label="agentflight">
+            <rect x="2" y="5" width="28" height="28" rx="8" fill="#7cc6fe" stroke="#14213d" stroke-width="2.6" />
+            <rect x="7" y="10" width="18" height="18" rx="4" fill="#fffdf2" stroke="#14213d" stroke-width="1.8" />
+            <circle cx="12.5" cy="15.5" r="2.1" fill="#ffd166" stroke="#14213d" stroke-width="1.4" />
+            <circle cx="19.5" cy="15.5" r="2.1" fill="#ffd166" stroke="#14213d" stroke-width="1.4" />
+            <path d="M9.5 22.5H13L15 20.5L17 24L19 22.5H22.5" stroke="#026aa7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <text x="38" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22.5" font-weight="800" letter-spacing="-0.6" fill="none" stroke="#14213d" stroke-width="4" stroke-linejoin="round">agentflight</text>
+            <text x="38" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22.5" font-weight="800" letter-spacing="-0.6" fill="#7cc6fe">agentflight</text>
+          </svg>
+        </a>
+
+        <nav class="header-nav" aria-label="Primary navigation">
+          <a href="./studio.html">studio</a>
+          <a href="./proof.html">proof</a>
+          <a href="./docs.html">docs</a>
+          <a href="./rules.html">rules</a>
+          <a
+            class="icon-link"
+            href="https://github.com/codesphere-u/agentflight"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="AgentFlight on GitHub"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+              />
+            </svg>
+          </a>
+          <a
+            class="nav-pill"
+            href="https://github.com/codesphere-u/agentflight/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            v1.5.0
+          </a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero-duo" aria-labelledby="hero-title">
+          <div class="mascot-wrap">
+            <!-- Original AgentFlight Black-Box Flight Recorder & Radar Mascot in Sky Blue & Amber -->
+            <svg
+              width="136"
+              height="136"
+              viewBox="0 0 180 180"
+              fill="none"
+              role="img"
+              aria-label="AgentFlight black-box flight recorder mascot with amber cassette reels and avionics telemetry oscilloscope"
+            >
+              <ellipse cx="90" cy="158" rx="48" ry="8" fill="#14213d" fill-opacity="0.1" />
+              <path d="M70 130L64 147" stroke="#14213d" stroke-width="4" stroke-linecap="round" />
+              <ellipse cx="58" cy="149" rx="12" ry="7" fill="#0a2e52" stroke="#14213d" stroke-width="3.5" />
+              <path d="M110 130L116 147" stroke="#14213d" stroke-width="4" stroke-linecap="round" />
+              <ellipse cx="122" cy="149" rx="12" ry="7" fill="#0a2e52" stroke="#14213d" stroke-width="3.5" />
+
+              <!-- Radar beacon antenna -->
+              <path d="M90 36V20" stroke="#14213d" stroke-width="3.5" stroke-linecap="round" />
+              <circle cx="90" cy="16" r="6.5" fill="#ffd166" stroke="#14213d" stroke-width="3.2" />
+              <path d="M72 19L65 13M108 19L115 13" stroke="#026aa7" stroke-width="2.5" stroke-linecap="round" />
+
+              <!-- Left & Right aero wings -->
+              <path d="M36 86L18 76L24 98L36 96Z" fill="#ffd166" stroke="#14213d" stroke-width="3.2" stroke-linejoin="round" />
+              <path d="M144 86L162 76L156 98L144 96Z" fill="#ffd166" stroke="#14213d" stroke-width="3.2" stroke-linejoin="round" />
+
+              <!-- Black-box recorder chassis -->
+              <rect x="38" y="38" width="104" height="94" rx="24" fill="#7cc6fe" stroke="#14213d" stroke-width="4" />
+              <rect x="50" y="50" width="80" height="70" rx="14" fill="#fffdf2" stroke="#14213d" stroke-width="3" />
+
+              <!-- Cassette spools / friendly eyes -->
+              <circle cx="72" cy="76" r="9.5" fill="#ffd166" stroke="#14213d" stroke-width="2.8" />
+              <circle cx="72" cy="76" r="3.4" fill="#14213d" />
+              <circle cx="108" cy="76" r="9.5" fill="#ffd166" stroke="#14213d" stroke-width="2.8" />
+              <circle cx="108" cy="76" r="3.4" fill="#14213d" />
+
+              <!-- Tape bridge + flight waveform smile -->
+              <line x1="81.5" y1="76" x2="98.5" y2="76" stroke="#14213d" stroke-width="2" stroke-dasharray="3 2" />
+              <path d="M62 100H78L84 92L91 107L98 97L103 100H118" stroke="#026aa7" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+
+          <div class="hero-copy">
+            <h1 id="hero-title">record, replay &amp; guard every agent turn</h1>
+            <p class="hero-sub">
+              the open-source black-box flight recorder, loop breaker &amp; MCP linter
+            </p>
+          </div>
+        </section>
+
+        <section class="cta-area" aria-label="Install AgentFlight">
+          <div class="split-btn-group">
+            <button type="button" class="split-main" id="cta-main-btn">
+              <strong>install agentflight</strong>
+              <span id="hero-cmd-sub">pypi · uvx · claude mcp · pytest · v1.5.0</span>
+            </button>
+            <button
+              type="button"
+              class="split-caret"
+              id="cta-caret-btn"
+              aria-expanded="false"
+              aria-controls="cta-popover"
+              aria-label="Choose runtime target"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M4 6L8 10L12 6"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <code class="cmd-caption" id="hero-cmd">pip install agentflight-mcp</code>
+
+          <div class="cta-popover" id="cta-popover" role="region" aria-label="Installation options" hidden>
+            <div class="pop-tabs" role="tablist" aria-label="Runtime mode">
+              <button type="button" class="pop-tab active" role="tab" aria-selected="true" data-persona="pypi">
+                PyPI (pip)
+              </button>
+              <button type="button" class="pop-tab" role="tab" aria-selected="false" data-persona="uvx">
+                uvx Stdio
+              </button>
+              <button type="button" class="pop-tab" role="tab" aria-selected="false" data-persona="mcp">
+                Claude MCP
+              </button>
+              <button type="button" class="pop-tab" role="tab" aria-selected="false" data-persona="pytest">
+                Pytest CI
+              </button>
+            </div>
+
+            <div class="pop-cmd">
+              <code id="pop-cmd-code">pip install agentflight-mcp &amp;&amp; agentflight doctor</code>
+              <button type="button" class="action-mini" id="pop-copy-btn">Copy</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="preview-frame" aria-label="AgentFlight preview">
+          <div class="frame-bar">
+            <div class="dots" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="frame-tabs" role="tablist" aria-label="Preview view">
+              <button type="button" class="frame-tab active" role="tab" aria-selected="true" data-homeview="term">
+                Doctor &amp; Replay
+              </button>
+              <button type="button" class="frame-tab" role="tab" aria-selected="false" data-homeview="cassette">
+                .flight.json
+              </button>
+              <button type="button" class="frame-tab" role="tab" aria-selected="false" data-homeview="linter">
+                MCP Lint (TS001)
+              </button>
+            </div>
+            <a class="frame-open-link" href="./studio.html">open studio →</a>
+          </div>
+
+          <div class="preview-body">
+            <pre class="code-block" id="home-preview-code">$ agentflight demo
+
+FlightRecorder: 4 spans chained (SHA-256 verified, API keys scrubbed)
+CassetteReplayer: replayed 4/4 spans in 0.011 ms  [$0.0000 CI spend]
+TrajectoryCircuitBreaker: tripped ping_pong_oscillation (A -&gt; B -&gt; A -&gt; B)
+ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)</pre>
+          </div>
+
+          <div class="preview-foot">
+            <span>0.08 us/span replay · 10 MCP rules · pure Python 3.10+ stdlib core</span>
+            <div class="preview-foot-links">
+              <a href="./studio.html">Try MCP &amp; Breaker Studio</a>
+              <a href="./docs.html">Read docs</a>
+            </div>
+          </div>
+        </section>
+
+        <hr class="hairline" />
+
+        <section class="editorial-grid" aria-label="Core principles">
+          <div>
+            <h2>Tamper-Evident</h2>
+            <p>
+              Every LLM turn and MCP call is hashed into a canonical-JSON SHA-256 chain with API keys scrubbed automatically.
+            </p>
+          </div>
+
+          <div>
+            <h2>$0.00 CI Replay</h2>
+            <p>
+              Replace flaky 30-second live API CI runs with deterministic cassette replay executing in microseconds offline.
+            </p>
+          </div>
+
+          <div>
+            <h2>Loop &amp; Cost Shield</h2>
+            <p>
+              Stop infinite repeat calls, A↔B ping-pong cycles, error storms, and dollar budget spikes before spending another token.
+            </p>
+          </div>
+
+          <div>
+            <h2>10 MCP Rules</h2>
+            <p>
+              Lint schemas statically across TS001–TS010 to catch missing descriptions, deep nesting, overlap collisions, and unguarded deletes.
+            </p>
+          </div>
+        </section>
+
+        <hr class="hairline" />
+
+        <section class="ecosystem-section" aria-labelledby="eco-title">
+          <h2 id="eco-title">Works Everywhere</h2>
+          <p class="ecosystem-sub">
+            Drop into OpenAI, Anthropic, Pytest, Claude Code, Cursor, or OpenTelemetry pipelines — pairs cleanly with Prometheus, StackPulse, Plausible, and Vercel.
+          </p>
+
+          <div class="eco-badges" aria-label="Supported integrations">
+            <a class="eco-item" href="./docs.html#wrappers">
+              <span class="eco-circle" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              </span>
+              <span>SDK Wrappers</span>
+            </a>
+
+            <a class="eco-item" href="./docs.html#pytest-ci">
+              <span class="eco-circle" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+              </span>
+              <span>Pytest CI</span>
+            </a>
+
+            <a class="eco-item" href="./docs.html#mcp-server">
+              <span class="eco-circle" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 10h8M8 14h5"/></svg>
+              </span>
+              <span>MCP Server</span>
+            </a>
+
+            <a class="eco-item" href="./docs.html#post-mortem">
+              <span class="eco-circle" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </span>
+              <span>OTel Traces</span>
+            </a>
+          </div>
+
+          <p class="inline-cta-links">
+            Inspect <a href="./proof.html">verified Python 3.12 benchmarks</a>, test schemas in the <a href="./studio.html">interactive studio</a>, or read all <a href="./rules.html">10 TS &amp; 5 breaker rules</a>.
+          </p>
+        </section>
+
+        <hr class="hairline" />
+
+        <section id="faq" aria-labelledby="faq-title">
+          <h2 id="faq-title" class="sec-title">questions</h2>
+          <div class="faq-stack">
+            <details class="faq-item">
+              <summary>How does AgentFlight replay multi-step AI agents in CI with $0 token spend?</summary>
+              <p>
+                <code>FlightRecorder</code> captures every LLM turn, streaming delta, and MCP tool call into a canonical-JSON SHA-256 hash chain (<code>.flight.json</code> or <code>.flight.jsonl</code>) with secrets scrubbed. <code>CassetteReplayer</code> and the built-in pytest plugin stub matching tool calls locally in microseconds and raise <code>TrajectoryDivergenceError</code> when arguments drift.
+              </p>
+            </details>
+
+            <details class="faq-item">
+              <summary>What does the core Python SDK require at runtime?</summary>
+              <p>
+                Everything inside <code>src/agentflight</code> (recording, replay, loop circuit breaker, trajectory diffing, OpenTelemetry export, PII redaction, and the stdio MCP server) uses pure Python 3.10+ standard library only.
+              </p>
+            </details>
+
+            <details class="faq-item">
+              <summary>Can I connect AgentFlight to Claude Code, Cursor, or CI pipelines?</summary>
+              <p>
+                Yes. Run <code>agentflight serve-mcp</code> via <code>uvx</code> for local stdio workflows, connect to the hosted Streamable HTTP endpoint at <code>https://agentflight-tau.vercel.app/mcp</code>, or gate pull requests using <code>agentflight ci</code>.
+              </p>
+            </details>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-links">
+          <a href="./studio.html">studio</a>
+          <span>·</span>
+          <a href="./proof.html">proof</a>
+          <span>·</span>
+          <a href="./docs.html">docs</a>
+          <span>·</span>
+          <a href="./rules.html">rules</a>
+          <span>·</span>
+          <a href="https://github.com/codesphere-u/agentflight" target="_blank" rel="noopener noreferrer">github</a>
+          <span>·</span>
+          <a href="./llms.txt">llms.txt</a>
+          <span>·</span>
+          <a href="./sitemap.xml">sitemap.xml</a>
+        </div>
+        <div>MIT Licensed · Created by Akandwanaho Ivan Alvin · Works cleanly with Plausible &amp; OTel</div>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js?v=1.5.0" defer></script>
+  </body>
+</html>

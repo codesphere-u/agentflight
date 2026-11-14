@@ -6,7 +6,8 @@
 
 [![CI & Reliability Gate](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/agentflight-mcp.svg?color=blue)](https://pypi.org/project/agentflight-mcp/)
-[![Release v1.4.0](https://img.shields.io/badge/release-v1.4.0-blue.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.4.0)
+[![Release v1.5.0](https://img.shields.io/badge/release-v1.5.0-7cc6fe.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.5.0)
+[![Docs & Website](https://img.shields.io/badge/website-codesphere--u.github.io%2Fagentflight-ffd166.svg)](https://codesphere-u.github.io/agentflight/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Operational-10b981?logo=vercel&logoColor=white)](https://agentflight-tau.vercel.app/mcp)
@@ -19,7 +20,11 @@
 
 **AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay (`<0.02 ms`, `$0.00` CI Spend), Differential Regression Detector, OpenTelemetry / W3C TraceContext Exporter (for `stackpulse`), Real-Time Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter.**
 
-> 🚀 **Live Interactive Developer Portal & Playground:** Visit [`https://agentflight-tau.vercel.app`](https://agentflight-tau.vercel.app) in your web browser to test tool linting live, inspect schemas, and copy 1-click configurations for Claude Code, Cursor, Windsurf, and Claude Desktop.
+> 🌐 **Editorial Website, Interactive MCP Studio & Full Docs:** Explore [`https://codesphere-u.github.io/agentflight/`](https://codesphere-u.github.io/agentflight/) — featuring the browser-side [Interactive Studio](https://codesphere-u.github.io/agentflight/studio.html), [Verified Proof](https://codesphere-u.github.io/agentflight/proof.html), [Chaptered Documentation](https://codesphere-u.github.io/agentflight/docs.html), and [15 Rules Rubric](https://codesphere-u.github.io/agentflight/rules.html).
+>
+> 🚀 **Live Hosted MCP Endpoint:** Connect Claude Code, Cursor, or Windsurf directly via Streamable HTTP at [`https://agentflight-tau.vercel.app/mcp`](https://agentflight-tau.vercel.app).
+>
+> 📖 **Repo Guides:** [Getting Started Guide](docs/GETTING_STARTED.md) · [MCP & AI Agents Setup](docs/MCP_AND_AGENTS.md) · [Architecture](docs/architecture.md) · [`llms.txt`](llms.txt) · [`llms-full.txt`](llms-full.txt)
 >
 > ⭐ **Like what you see?** Give this repository a **Star** and follow creator **[Akandwanaho Ivan Alvin](https://alvin.codesphereug.com/)**!
 
@@ -84,8 +89,8 @@ Production AI agent engineering in 2026 faces two compounding bottlenecks:
 # Install from PyPI (module import & CLI command remain `agentflight`):
 pip install agentflight-mcp
 
-# Or install v1.4.0 directly from GitHub:
-pip install "git+https://github.com/codesphere-u/agentflight.git@v1.4.0"
+# Or install v1.5.0 directly from GitHub:
+pip install "git+https://github.com/codesphere-u/agentflight.git@v1.5.0"
 
 # Contributors:
 pip install -e ".[dev]"

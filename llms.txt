@@ -1,0 +1,20 @@
+# AgentFlight (`v1.5.0`)
+
+> AI Agent Black-Box Flight Recorder, 0.08 us Deterministic Trajectory Replay ($0.00 CI spend), Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter (`TS001`–`TS010`).
+
+## Website & Documentation
+
+- [Project Website](https://codesphere-u.github.io/agentflight/): Overview, installer & live demo preview.
+- [Interactive Studio](https://codesphere-u.github.io/agentflight/studio.html): Live MCP Tool-Smell Linter, Circuit Breaker simulator & artifact viewer.
+- [Documentation (`website/docs.html`)](https://codesphere-u.github.io/agentflight/docs.html): Guided SDK, CLI, Pytest, MCP & OTel manual.
+- [Getting Started Guide](docs/GETTING_STARTED.md): Role-based CLI & Python SDK onboarding.
+- [MCP & Agents Setup](docs/MCP_AND_AGENTS.md): Claude Code, Cursor, Windsurf, Smithery, Glama & GitHub Actions setup.
+- [Architecture Specification](docs/architecture.md): Core SHA-256 chain & determinism internals.
+- [15 Rules Rubric](https://codesphere-u.github.io/agentflight/rules.html): Complete `TS001`–`TS010` & `CB001`–`CB005` reference.
+
+## Quick Commands
+
+- `pip install agentflight-mcp && agentflight doctor --json`
+- `uvx --from agentflight-mcp agentflight serve-mcp`
+- `agentflight lint` / `agentflight fix tools.json` / `agentflight ci --fail-on-smell`
+- `claude mcp add --transport http agentflight https://agentflight-tau.vercel.app/mcp`

@@ -1,0 +1,16 @@
+{
+  "name": "AgentFlight — AI Agent Flight Recorder, Replay & MCP Linter",
+  "short_name": "AgentFlight",
+  "description": "Black-box SHA-256 flight recorder, 0.08 us deterministic trajectory replay, loop/cost circuit breaker & 10-rule MCP tool-smell linter.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fffdf2",
+  "theme_color": "#7cc6fe",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

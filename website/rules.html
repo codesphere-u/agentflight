@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentFlight — 10 MCP Tool-Smell &amp; 5 Circuit Breaker Rules</title>
+    <meta
+      name="description"
+      content="Complete rubric for AgentFlight rules TS001–TS010 (MCP Tool-Smell Linter) and CB001–CB005 (Trajectory Circuit Breaker) with weights, triggers, and auto-fixes."
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#fffdf2" />
+    <link rel="canonical" href="https://codesphere-u.github.io/agentflight/rules.html" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.5.0" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://codesphere-u.github.io/agentflight/rules.html" />
+    <meta property="og:title" content="AgentFlight — 10 MCP Tool-Smell &amp; 5 Circuit Breaker Rules" />
+    <meta
+      property="og:description"
+      content="Filter and search every static MCP schema ergonomics rule (TS001–TS010) and runtime loop/budget guard rule (CB001–CB005)."
+    />
+    <meta property="og:image" content="https://codesphere-u.github.io/agentflight/og-image.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AgentFlight — 10 MCP Tool-Smell &amp; 5 Circuit Breaker Rules" />
+    <meta
+      name="twitter:description"
+      content="Transparent MCP ergonomics rubric (TS001–TS010) plus runtime circuit-breaker trip conditions."
+    />
+    <meta name="twitter:image" content="https://codesphere-u.github.io/agentflight/og-image.svg" />
+
+    <style>
+      [hidden] { display: none !important; }
+      .page-col-docs { width: min(940px, 100% - 2rem); margin-inline: auto; }
+      .brand-wordmark-svg { height: 36px; width: 196px; display: block; }
+      .docs-layout { display: flex; align-items: flex-start; gap: 2.75rem; width: 100%; min-width: 0; }
+      .docs-sidebar { flex: 0 0 196px; width: 196px; position: sticky; top: 2rem; }
+      .docs-mobile-nav { display: none; }
+    </style>
+    <link rel="stylesheet" href="./styles.css?v=1.5.0" />
+  </head>
+  <body data-analytics="plausible">
+    <div class="page-col page-col-docs">
+      <header class="site-header">
+        <a class="brand-link" href="./" aria-label="AgentFlight home">
+          <svg class="brand-wordmark-svg" width="196" height="36" viewBox="0 0 218 40" fill="none" role="img" aria-label="agentflight">
+            <rect x="2" y="5" width="28" height="28" rx="8" fill="#7cc6fe" stroke="#14213d" stroke-width="2.6" />
+            <rect x="7" y="10" width="18" height="18" rx="4" fill="#fffdf2" stroke="#14213d" stroke-width="1.8" />
+            <circle cx="12.5" cy="15.5" r="2.1" fill="#ffd166" stroke="#14213d" stroke-width="1.4" />
+            <circle cx="19.5" cy="15.5" r="2.1" fill="#ffd166" stroke="#14213d" stroke-width="1.4" />
+            <path d="M9.5 22.5H13L15 20.5L17 24L19 22.5H22.5" stroke="#026aa7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <text x="38" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22.5" font-weight="800" letter-spacing="-0.6" fill="none" stroke="#14213d" stroke-width="4" stroke-linejoin="round">agentflight</text>
+            <text x="38" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22.5" font-weight="800" letter-spacing="-0.6" fill="#7cc6fe">agentflight</text>
+          </svg>
+        </a>
+
+        <nav class="header-nav" aria-label="Primary navigation">
+          <a href="./studio.html">studio</a>
+          <a href="./proof.html">proof</a>
+          <a href="./docs.html">docs</a>
+          <a class="active" href="./rules.html" aria-current="page">rules</a>
+          <a
+            class="icon-link"
+            href="https://github.com/codesphere-u/agentflight"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="AgentFlight on GitHub"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+              />
+            </svg>
+          </a>
+          <a
+            class="nav-pill"
+            href="https://github.com/codesphere-u/agentflight/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            v1.5.0
+          </a>
+        </nav>
+      </header>
+
+      <main>
+        <div class="docs-mobile-nav" aria-label="Rule categories filter mobile">
+          <button type="button" class="docs-mobile-chip active" data-pillarfilter="all">All (15)</button>
+          <button type="button" class="docs-mobile-chip" data-pillarfilter="Schema Clarity">Clarity</button>
+          <button type="button" class="docs-mobile-chip" data-pillarfilter="Structure & Bounds">Structure</button>
+          <button type="button" class="docs-mobile-chip" data-pillarfilter="Suite & Safety">Safety</button>
+          <button type="button" class="docs-mobile-chip" data-pillarfilter="Circuit Breakers">Breakers</button>
+        </div>
+
+        <div class="docs-layout">
+          <aside class="docs-sidebar" aria-label="Rule categories">
+            <nav>
+              <ul class="docs-rail">
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link active" data-pillarfilter="all">All 15 Rules</button>
+                </li>
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-pillarfilter="Schema Clarity">Schema Clarity</button>
+                </li>
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-pillarfilter="Structure & Bounds">Structure &amp; Bounds</button>
+                </li>
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-pillarfilter="Suite & Safety">Suite &amp; Safety</button>
+                </li>
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-pillarfilter="Circuit Breakers">Circuit Breakers</button>
+                </li>
+                <li class="doc-nav-item">
+                  <a class="doc-nav-link" href="#autofix">Auto-Hardening CLI</a>
+                </li>
+                <li class="doc-nav-item">
+                  <a class="doc-nav-link" href="#scoring">Scoring Formula</a>
+                </li>
+                <li class="doc-nav-item">
+                  <a class="doc-nav-link" href="#faq">Technical FAQ</a>
+                </li>
+              </ul>
+            </nav>
+          </aside>
+
+          <article class="doc-content">
+            <h1 id="rules-page-title">15 Deterministic Rules</h1>
+            <p>
+              AgentFlight combines <strong>10 static MCP schema ergonomics rules</strong> (<code>TS001–TS010</code>) with <strong>5 runtime circuit-breaker guards</strong> (<code>CB001–CB005</code>). Filter by group on the left rail or search below.
+            </p>
+
+            <section id="rules" aria-labelledby="rubric-table-title">
+              <h2 id="rubric-table-title">Rule Explorer</h2>
+              <div class="rules-filter">
+                <input
+                  id="rule-search"
+                  class="input"
+                  type="search"
+                  placeholder="Search rules (e.g. TS008, enum, ping-pong, token, delete_)"
+                  aria-label="Filter rules by keyword"
+                />
+                <select id="rule-pillar" class="select" aria-label="Filter by rule group">
+                  <option value="all">All Groups (15)</option>
+                  <option value="Schema Clarity">Schema Clarity</option>
+                  <option value="Structure & Bounds">Structure &amp; Bounds</option>
+                  <option value="Suite & Safety">Suite &amp; Safety</option>
+                  <option value="Circuit Breakers">Circuit Breakers</option>
+                </select>
+              </div>
+
+              <div class="doc-table-wrap">
+                <table class="doc-table">
+                  <thead>
+                    <tr>
+                      <th>Rule ID</th>
+                      <th>Group</th>
+                      <th>Check Description &amp; Threshold</th>
+                      <th>Severity / Penalty</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rules-tbody"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section id="autofix" aria-labelledby="autofix-heading">
+              <h2 id="autofix-heading">Automated Schema Hardening</h2>
+              <p>
+                Running <code>agentflight fix tools.json</code> automatically resolves common ergonomics findings by adding missing property descriptions, adding explicit <code>confirm</code> guards on destructive functions, and injecting missing <code>required</code> fields.
+              </p>
+
+              <div class="doc-codeblock">
+                <pre><span class="syn-cmd">agentflight fix</span> <span class="syn-arg">tools.json</span> <span class="syn-arg">--output</span> <span class="syn-str">hardened_tools.json</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="agentflight fix tools.json --output hardened_tools.json" aria-label="Copy agentflight fix command">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </section>
+
+            <section id="scoring" aria-labelledby="scoring-heading">
+              <h2 id="scoring-heading">Ergonomics Scoring &amp; CI Grades</h2>
+              <ul>
+                <li><strong>Score Calculation:</strong> Every MCP suite begins at <code>100</code>. Each unique violation subtracts its deterministic penalty weight (<code>-5</code> to <code>-12</code>) down to a floor of <code>0</code>.</li>
+                <li><strong>Letter Grades:</strong> <code>90–100 = A+ / A</code>, <code>80–89 = B</code>, <code>70–79 = C</code>, <code>60–69 = D</code>, <code>&lt;60 = F</code>.</li>
+                <li><strong>Strict CI Gate:</strong> <code>agentflight ci --schema-file tools.json --fail-on-smell</code> exits non-zero whenever any violation remains.</li>
+              </ul>
+            </section>
+
+            <section id="faq" aria-labelledby="faq-heading">
+              <h2 id="faq-heading">Technical FAQ</h2>
+              <div class="faq-stack">
+                <details class="faq-item">
+                  <summary>How does TS008 detect overlapping MCP tool names?</summary>
+                  <p>
+                    <code>ToolSmellLinter</code> computes normalized bag-of-words cosine similarity across tool names and descriptions in the same suite. Any pair meeting or exceeding <code>0.72</code> similarity is flagged so models do not route randomly between lookalike tools.
+                  </p>
+                </details>
+                <details class="faq-item">
+                  <summary>Does redaction affect SHA-256 chain verification on replay?</summary>
+                  <p>
+                    No. <code>FlightRecorder</code> scrubs secrets prior to computing the canonical-JSON SHA-256 step digest, and <code>CassetteReplayer</code> checks both raw and redacted input digests during key-rotated CI runs.
+                  </p>
+                </details>
+                <details class="faq-item">
+                  <summary>Can I enforce rules TS001–TS010 on remote MCP servers like OpenAny?</summary>
+                  <p>
+                    Yes. Run <code>agentflight openany lint-tools --json</code> or call <code>agentflight_lint_tools</code> directly over Streamable HTTP via <code>https://agentflight-tau.vercel.app/mcp</code>.
+                  </p>
+                </details>
+              </div>
+            </section>
+          </article>
+        </div>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-links">
+          <a href="./">home</a>
+          <span>·</span>
+          <a href="./studio.html">studio</a>
+          <span>·</span>
+          <a href="./proof.html">proof</a>
+          <span>·</span>
+          <a href="./docs.html">docs</a>
+          <span>·</span>
+          <a href="./rules.html">rules</a>
+          <span>·</span>
+          <a href="https://github.com/codesphere-u/agentflight" target="_blank" rel="noopener noreferrer">github</a>
+        </div>
+        <div>MIT Licensed · 10 TS rules + 5 Circuit Breakers · Works cleanly with Plausible &amp; OTel</div>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js?v=1.5.0" defer></script>
+  </body>
+</html>

@@ -1,0 +1,29 @@
+# AgentFlight — Complete Repository Knowledge Pack (`v1.5.0`)
+
+> Repository: https://github.com/codesphere-u/agentflight
+> Website: https://codesphere-u.github.io/agentflight/
+> Hosted MCP Endpoint: https://agentflight-tau.vercel.app/mcp
+> License: MIT (Akandwanaho Ivan Alvin)
+
+## Python Package & Entry Points (`pyproject.toml`)
+
+- Distribution name: `agentflight-mcp` (`v1.5.0`)
+- Import package: `agentflight` (`src/agentflight/`)
+- Console script: `agentflight = agentflight.cli:main`
+- Pytest entry point: `agentflight = _agentflight_pytest`
+- Core stdlib dependency footprint: Zero runtime dependencies inside `src/agentflight/`. FastAPI/Pydantic/Uvicorn power the optional hosted gateway (`api/index.py`).
+
+## CLI Subcommands (`agentflight <cmd>`)
+
+- `doctor [--json]` — Verifies Python 3.10+, stdlib core modules, lazy pytest plugin registration, SHA-256 chain + secret redaction, and circuit breaker tripping.
+- `demo` — Offline end-to-end showcase of recording, replay, loop tripping, and trajectory diffing.
+- `lint [--schema-file <path>] [--json]` — Runs static `TS001`–`TS010` MCP tool ergonomics checks.
+- `fix <schema_file> [--output <path> | --in-place]` — Hardens smelly MCP schemas to Glama TDQS Gold Standard.
+- `ci [--schema-file <path>] [--cassette <path>] [--max-cost <usd>] [--fail-on-smell] [--github-summary]` — CI/CD pre-flight gate.
+- `diff <baseline> <candidate> [--similarity-threshold 0.80] [--json]` — Computes Levenshtein/LCS sequence similarity and cost/error deltas.
+- `post-mortem <cassette> [--output <path>] [--json]` — Produces AAIB/NTSB incident analysis reports.
+- `export-otel <cassette> [--output <path>] [--service-name <name>]` — Emits W3C TraceContext / OpenTelemetry JSON spans.
+- `benchmark [--json]` — Reproducible throughput benchmarks across all subsystems.
+- `serve-mcp` / `mcp` / `serve-stdio` — Starts JSON-RPC 2.0 stdio MCP server.
+- `serve-http [--host 0.0.0.0] [--port 8000]` — Starts standalone HTTP/SSE MCP server with `/metrics` and `/health`.
+- `openany {models, chat, lint-tools, replay}` — OpenAny multi-model router integration with pre-execution budget protection.

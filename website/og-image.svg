@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="AgentFlight v1.5.0 Editorial Ivory Social Card showing 100 Grade A+">
+  <rect width="1200" height="630" fill="#fffdf2" />
+  <rect x="28" y="28" width="1144" height="574" rx="28" fill="none" stroke="#14213d" stroke-opacity="0.18" stroke-width="2" />
+
+  <rect x="82" y="84" width="256" height="44" rx="22" fill="#7cc6fe" />
+  <text x="210" y="112" text-anchor="middle" fill="#0a2e52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700">agentflight • v1.5.0</text>
+
+  <text x="82" y="218" fill="#14213d" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="66" font-weight="700" letter-spacing="-1.5">record, replay &amp; guard</text>
+  <text x="82" y="294" fill="#14213d" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="66" font-weight="700" letter-spacing="-1.5">every agent turn.</text>
+
+  <text x="82" y="364" fill="#14213d" fill-opacity="0.72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="27" font-weight="500">0.08 us replay • $0.00 CI spend • SHA-256 chain • 10 MCP rules</text>
+
+  <rect x="82" y="438" width="668" height="68" rx="14" fill="#ffd166" fill-opacity="0.34" stroke="#4a2c00" stroke-opacity="0.22" stroke-width="1.5" />
+  <text x="110" y="480" fill="#4a2c00" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="21" font-weight="700">$ pip install agentflight-mcp &amp;&amp; agentflight doctor</text>
+
+  <rect x="810" y="138" width="308" height="368" rx="24" fill="#fcf9ec" stroke="#14213d" stroke-opacity="0.16" stroke-width="2" />
+  <circle cx="964" cy="288" r="76" fill="#7cc6fe" fill-opacity="0.25" stroke="#14213d" stroke-width="4" />
+  <text x="964" y="298" text-anchor="middle" fill="#14213d" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="800">100</text>
+  <rect x="886" y="400" width="156" height="44" rx="22" fill="#ffd166" />
+  <text x="964" y="428" text-anchor="middle" fill="#4a2c00" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800">Grade A+ • Safe</text>
+</svg>

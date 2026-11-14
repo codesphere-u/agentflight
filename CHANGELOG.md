@@ -2,6 +2,16 @@
 
 All notable changes to `agentflight` are documented in this file.
 
+## [1.5.0] - 2026-11-14
+
+### Added
+- **Editorial Website, Interactive Studio & Multi-Page Docs (`website/`, `.github/workflows/pages.yml`):**
+  - Launched the warm editorial multi-page documentation and sandbox site on GitHub Pages (`https://codesphere-u.github.io/agentflight/`) in AgentFlight's **Stratosphere Sky Blue (`#7cc6fe`) & Black-Box Amber (`#ffd166`)** palette on cream ivory paper (`#fffdf2`) with custom avionics SVG icons and dual-layer outlined wordmark.
+  - Added 5 clean pages: Landing Overview (`index.html`), Interactive Studio (`studio.html` featuring a browser-side `TS001`–`TS010` MCP tool linter, loop/budget circuit breaker simulator, and flight artifact inspector), Verified Proof (`proof.html`), Chaptered Documentation (`docs.html` with `940px` 2-column sticky border rail and nested sub-anchors), and Rule Rubric Explorer (`rules.html`).
+  - Added `?v=1.5.0` cache-busted asset links, `[hidden]` layout guards, and HTTPS clean URL normalization (`normalizeCleanUrl()`).
+- **GEO/AEO & Onboarding Documentation (`docs/`, `llms.txt`, `llms-full.txt`):**
+  - Added role-based onboarding tutorials (`docs/GETTING_STARTED.md`), MCP/CI integration manual (`docs/MCP_AND_AGENTS.md`), machine-readable `llms.txt` / `llms-full.txt`, `sitemap.xml`, `robots.txt`, `manifest.webmanifest`, and Schema.org `@graph` structured data achieving `100/100 (Grade A+)`.
+
 ## [1.4.0] - 2026-11-13
 
 ### Enterprise & Operational Readiness

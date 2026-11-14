@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentFlight — Documentation, SDK, CLI &amp; MCP Guide</title>
+    <meta
+      name="description"
+      content="Install agentflight-mcp, wrap OpenAI/Anthropic clients, record SHA-256 cassettes, run $0 pytest CI replay, wire Claude MCP, and export OpenTelemetry traces."
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#fffdf2" />
+    <link rel="canonical" href="https://codesphere-u.github.io/agentflight/docs.html" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.5.0" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://codesphere-u.github.io/agentflight/docs.html" />
+    <meta property="og:title" content="AgentFlight — Documentation, SDK, CLI &amp; MCP Guide" />
+    <meta
+      property="og:description"
+      content="Complete guide for drop-in SDK wrappers, deterministic pytest replay, circuit-breaker configuration, and hosted/local MCP tools."
+    />
+    <meta property="og:image" content="https://codesphere-u.github.io/agentflight/og-image.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AgentFlight — Documentation, SDK, CLI &amp; MCP Guide" />
+    <meta
+      name="twitter:description"
+      content="Record tamper-evident agent cassettes, replay at $0 spend in pytest, and catch MCP tool smells in CI."
+    />
+    <meta name="twitter:image" content="https://codesphere-u.github.io/agentflight/og-image.svg" />
+
+    <style>
+      [hidden] { display: none !important; }
+      .page-col-docs { width: min(940px, 100% - 2rem); margin-inline: auto; }
+      .brand-wordmark-svg { height: 36px; width: 196px; display: block; }
+      .docs-layout { display: flex; align-items: flex-start; gap: 2.75rem; width: 100%; min-width: 0; }
+      .docs-sidebar { flex: 0 0 196px; width: 196px; position: sticky; top: 2rem; }
+      .docs-mobile-nav { display: none; }
+    </style>
+    <link rel="stylesheet" href="./styles.css?v=1.5.0" />
+  </head>
+  <body data-analytics="plausible">
+    <div class="page-col page-col-docs">
+      <header class="site-header">
+        <a class="brand-link" href="./" aria-label="AgentFlight home">
+          <svg class="brand-wordmark-svg" width="196" height="36" viewBox="0 0 218 40" fill="none" role="img" aria-label="agentflight">
+            <rect x="2" y="5" width="28" height="28" rx="8" fill="#7cc6fe" stroke="#14213d" stroke-width="2.6" />
+            <rect x="7" y="10" width="18" height="18" rx="4" fill="#fffdf2" stroke="#14213d" stroke-width="1.8" />
+            <circle cx="12.5" cy="15.5" r="2.1" fill="#ffd166" stroke="#14213d" stroke-width="1.4" />
+            <circle cx="19.5" cy="15.5" r="2.1" fill="#ffd166" stroke="#14213d" stroke-width="1.4" />
+            <path d="M9.5 22.5H13L15 20.5L17 24L19 22.5H22.5" stroke="#026aa7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <text x="38" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22.5" font-weight="800" letter-spacing="-0.6" fill="none" stroke="#14213d" stroke-width="4" stroke-linejoin="round">agentflight</text>
+            <text x="38" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22.5" font-weight="800" letter-spacing="-0.6" fill="#7cc6fe">agentflight</text>
+          </svg>
+        </a>
+
+        <nav class="header-nav" aria-label="Primary navigation">
+          <a href="./studio.html">studio</a>
+          <a href="./proof.html">proof</a>
+          <a class="active" href="./docs.html" aria-current="page">docs</a>
+          <a href="./rules.html">rules</a>
+          <a
+            class="icon-link"
+            href="https://github.com/codesphere-u/agentflight"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="AgentFlight on GitHub"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+              />
+            </svg>
+          </a>
+          <a
+            class="nav-pill"
+            href="https://github.com/codesphere-u/agentflight/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            v1.5.0
+          </a>
+        </nav>
+      </header>
+
+      <main>
+        <div class="docs-mobile-nav" aria-label="Documentation chapters mobile switcher">
+          <button type="button" class="docs-mobile-chip active" data-doc-target="getting-started">Getting Started</button>
+          <button type="button" class="docs-mobile-chip" data-doc-target="wrappers">SDK Wrappers</button>
+          <button type="button" class="docs-mobile-chip" data-doc-target="recorder">Recorder &amp; Replay</button>
+          <button type="button" class="docs-mobile-chip" data-doc-target="pytest-ci">Pytest &amp; CI</button>
+          <button type="button" class="docs-mobile-chip" data-doc-target="circuit-breaker">Circuit Breaker</button>
+          <button type="button" class="docs-mobile-chip" data-doc-target="mcp-server">MCP Server</button>
+          <button type="button" class="docs-mobile-chip" data-doc-target="post-mortem">Post-Mortem &amp; OTel</button>
+          <button type="button" class="docs-mobile-chip" data-doc-target="openany">OpenAny</button>
+          <button type="button" class="docs-mobile-chip" data-doc-target="troubleshooting">Troubleshooting</button>
+        </div>
+
+        <div class="docs-layout">
+          <aside class="docs-sidebar" aria-label="Documentation navigation">
+            <nav>
+              <ul class="docs-rail">
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link active" data-doc-target="getting-started">Getting Started</button>
+                  <ul class="doc-subrail open" data-subrail="getting-started">
+                    <li><a class="doc-sub-link active" href="#doc-install" data-doc-anchor="getting-started">Download &amp; Install</a></li>
+                    <li><a class="doc-sub-link" href="#doc-first-flight" data-doc-anchor="getting-started">First Flight Run</a></li>
+                    <li><a class="doc-sub-link sub-h3" href="#doc-modes" data-doc-anchor="getting-started">Choosing a Mode</a></li>
+                    <li><a class="doc-sub-link" href="#doc-doctor" data-doc-anchor="getting-started">Self-Check (doctor)</a></li>
+                  </ul>
+                </li>
+
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-doc-target="wrappers">SDK Wrappers</button>
+                  <ul class="doc-subrail" data-subrail="wrappers">
+                    <li><a class="doc-sub-link" href="#wrap-openai" data-doc-anchor="wrappers">OpenAI &amp; Compatible</a></li>
+                    <li><a class="doc-sub-link" href="#wrap-anthropic" data-doc-anchor="wrappers">Anthropic Messages</a></li>
+                    <li><a class="doc-sub-link" href="#wrap-callable" data-doc-anchor="wrappers">Callbacks &amp; Decorators</a></li>
+                  </ul>
+                </li>
+
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-doc-target="recorder">Recorder &amp; Replay</button>
+                  <ul class="doc-subrail" data-subrail="recorder">
+                    <li><a class="doc-sub-link" href="#rec-sha256" data-doc-anchor="recorder">SHA-256 Hash Chain</a></li>
+                    <li><a class="doc-sub-link" href="#rec-redact" data-doc-anchor="recorder">Automatic Redaction</a></li>
+                    <li><a class="doc-sub-link" href="#rec-replay" data-doc-anchor="recorder">Deterministic Stubs</a></li>
+                  </ul>
+                </li>
+
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-doc-target="pytest-ci">Pytest &amp; CI</button>
+                  <ul class="doc-subrail" data-subrail="pytest-ci">
+                    <li><a class="doc-sub-link" href="#pytest-markers" data-doc-anchor="pytest-ci">Pytest Plugin &amp; Fixtures</a></li>
+                    <li><a class="doc-sub-link" href="#ci-diff" data-doc-anchor="pytest-ci">Trajectory Diffing</a></li>
+                    <li><a class="doc-sub-link" href="#ci-workflow" data-doc-anchor="pytest-ci">GitHub Actions Gate</a></li>
+                  </ul>
+                </li>
+
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-doc-target="circuit-breaker">Circuit Breaker</button>
+                  <ul class="doc-subrail" data-subrail="circuit-breaker">
+                    <li><a class="doc-sub-link" href="#cb-loops" data-doc-anchor="circuit-breaker">Loop &amp; Ping-Pong Traps</a></li>
+                    <li><a class="doc-sub-link" href="#cb-budget" data-doc-anchor="circuit-breaker">Token &amp; USD Budgets</a></li>
+                  </ul>
+                </li>
+
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-doc-target="mcp-server">MCP Server</button>
+                  <ul class="doc-subrail" data-subrail="mcp-server">
+                    <li><a class="doc-sub-link" href="#mcp-tools" data-doc-anchor="mcp-server">Tools, Resources &amp; Prompts</a></li>
+                    <li><a class="doc-sub-link" href="#mcp-hosted" data-doc-anchor="mcp-server">Hosted vs Stdio Clients</a></li>
+                  </ul>
+                </li>
+
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-doc-target="post-mortem">Post-Mortem &amp; OTel</button>
+                  <ul class="doc-subrail" data-subrail="post-mortem">
+                    <li><a class="doc-sub-link" href="#pm-aaib" data-doc-anchor="post-mortem">Incident Post-Mortem</a></li>
+                    <li><a class="doc-sub-link" href="#pm-otel" data-doc-anchor="post-mortem">W3C TraceContext / OTel</a></li>
+                  </ul>
+                </li>
+
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-doc-target="openany">OpenAny</button>
+                  <ul class="doc-subrail" data-subrail="openany">
+                    <li><a class="doc-sub-link" href="#oa-quickstart" data-doc-anchor="openany">Budget Shield &amp; Streaming</a></li>
+                    <li><a class="doc-sub-link" href="#oa-cli" data-doc-anchor="openany">OpenAny CLI Commands</a></li>
+                  </ul>
+                </li>
+
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-doc-target="troubleshooting">Troubleshooting</button>
+                  <ul class="doc-subrail" data-subrail="troubleshooting">
+                    <li><a class="doc-sub-link" href="#ts-divergence" data-doc-anchor="troubleshooting">TrajectoryDivergenceError</a></li>
+                    <li><a class="doc-sub-link" href="#ts-tamper" data-doc-anchor="troubleshooting">CassetteTamperError</a></li>
+                    <li><a class="doc-sub-link" href="#ts-about" data-doc-anchor="troubleshooting">License &amp; Provenance</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+          </aside>
+
+          <article class="doc-content" id="doc-article">
+            <h1 id="doc-chapter-title">Getting Started</h1>
+
+            <!-- CHAPTER 1 -->
+            <section class="doc-chapter" data-chapter="getting-started">
+              <h2 id="doc-install">Download &amp; Install</h2>
+              <p>
+                Install <code>agentflight-mcp</code> from PyPI (imports stay <code>import agentflight</code> and the CLI stays <code>agentflight</code>), or run it straight through <code>uvx</code> without adding packages to your project.
+              </p>
+
+              <div class="handy-card">
+                <div class="handy-tabs-bar">
+                  <div class="handy-tabs" role="tablist" aria-label="Install method">
+                    <button type="button" class="handy-tab active" role="tab" aria-selected="true" data-install="pypi">
+                      PyPI (pip / uv)
+                    </button>
+                    <button type="button" class="handy-tab" role="tab" aria-selected="false" data-install="claude">
+                      Claude Code
+                    </button>
+                    <button type="button" class="handy-tab" role="tab" aria-selected="false" data-install="cursor">
+                      Cursor / Stdio
+                    </button>
+                    <button type="button" class="handy-tab" role="tab" aria-selected="false" data-install="ci">
+                      GitHub CI
+                    </button>
+                  </div>
+                  <span class="version-tag">v1.5.0</span>
+                </div>
+
+                <p class="eyebrow-label" id="inst-eyebrow">INSTALL PYTHON SDK &amp; CLI</p>
+
+                <div class="handy-btn-row">
+                  <button type="button" class="handy-pill-btn" data-copy="pip install agentflight-mcp">
+                    PyPI Package <span>pip install</span>
+                  </button>
+                  <button type="button" class="handy-pill-btn amber" data-copy="uvx --from agentflight-mcp agentflight doctor">
+                    Zero-Install Run <span>uvx</span>
+                  </button>
+                </div>
+
+                <p style="font-size: 0.9rem; margin-bottom: 0.65rem;" id="inst-note">
+                  Requires Python <code>3.10+</code>. Core recording, replay, redaction, circuit breaking, and linting modules have zero runtime dependencies.
+                </p>
+
+                <div class="doc-codeblock" style="margin-bottom: 0;">
+                  <pre id="inst-code"><span class="syn-cmd">pip install</span> <span class="syn-arg">agentflight-mcp</span> &amp;&amp; <span class="syn-cmd">agentflight doctor</span></pre>
+                  <button type="button" class="copy-icon-btn" id="inst-copy-btn" data-copy="pip install agentflight-mcp && agentflight doctor" aria-label="Copy install command">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <h2 id="doc-first-flight">First Flight Run</h2>
+              <p>Verify every subsystem locally or run the end-to-end demo without API keys:</p>
+
+              <div class="doc-codeblock">
+                <pre><span class="syn-cmd">agentflight demo</span>
+<span class="syn-cmd">agentflight lint</span>
+<span class="syn-cmd">agentflight benchmark</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="agentflight demo && agentflight lint && agentflight benchmark" aria-label="Copy quickstart commands">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+
+              <h3 id="doc-modes">Choosing a Recording Mode</h3>
+              <ul>
+                <li><strong><code>record</code></strong> — Executes live LLM/tool calls and writes an atomic SHA-256 cassette with API keys scrubbed.</li>
+                <li><strong><code>replay</code></strong> — Serves recorded responses offline in microseconds (`$0.00` spend) and fails immediately on structural drift.</li>
+                <li><strong><code>auto</code></strong> (default in pytest) — Records on the first missing cassette, then replays deterministically in CI.</li>
+              </ul>
+
+              <h2 id="doc-doctor">Self-Diagnostics (`agentflight doctor`)</h2>
+              <p>Run built-in diagnostics covering Python 3.10+, zero-dep stdlib core imports, lazy <code>pytest11</code> entry point registration, SHA-256 redaction integrity, and circuit-breaker loop trapping:</p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-cmd">agentflight doctor</span> <span class="syn-arg">--json</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="agentflight doctor --json" aria-label="Copy doctor command">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </section>
+
+            <!-- CHAPTER 2 -->
+            <section class="doc-chapter" data-chapter="wrappers" hidden>
+              <h2 id="wrap-openai">OpenAI &amp; Compatible Clients</h2>
+              <p>
+                Wrap synchronous or async <code>OpenAI</code>, <code>AsyncOpenAI</code>, OpenRouter, vLLM, or OpenAny clients in one line—recording both standard responses and <code>stream=True</code> delta chunks.
+              </p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-arg">from</span> openai <span class="syn-arg">import</span> OpenAI
+<span class="syn-arg">from</span> agentflight <span class="syn-arg">import</span> wrap_openai, TrajectoryCircuitBreaker
+
+client = wrap_openai(OpenAI(), guard=TrajectoryCircuitBreaker(max_cost_usd=0.25))
+resp = client.chat.completions.create(model=<span class="syn-str">"gpt-4o-mini"</span>, messages=[{<span class="syn-str">"role"</span>: <span class="syn-str">"user"</span>, <span class="syn-str">"content"</span>: <span class="syn-str">"Health?"</span>}])
+client.agentflight_recorder.save(<span class="syn-str">"tests/cassettes/health.flight.json"</span>)</pre>
+                <button type="button" class="copy-icon-btn" data-copy='from openai import OpenAI&#10;from agentflight import wrap_openai, TrajectoryCircuitBreaker&#10;&#10;client = wrap_openai(OpenAI(), guard=TrajectoryCircuitBreaker(max_cost_usd=0.25))&#10;resp = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": "Health?"}])&#10;client.agentflight_recorder.save("tests/cassettes/health.flight.json")' aria-label="Copy wrap_openai snippet">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+
+              <h2 id="wrap-anthropic">Anthropic Messages &amp; Streaming</h2>
+              <p>
+                Use <code>wrap_anthropic(Anthropic(), ...)</code> to capture synchronous, async, and streamed Claude messages with coalesced tool-use blocks and token telemetry.
+              </p>
+
+              <h2 id="wrap-callable">Callbacks &amp; Decorators (`wrap_callable`)</h2>
+              <p>
+                Instrument any Python tool function with <code>@wrap_callable</code> or pass <code>FlightCallbackHandler</code> directly into LangChain, LangGraph, or custom agent loops.
+              </p>
+            </section>
+
+            <!-- CHAPTER 3 -->
+            <section class="doc-chapter" data-chapter="recorder" hidden>
+              <h2 id="rec-sha256">Canonical JSON SHA-256 Hash Chain</h2>
+              <p>
+                Every <code>TrajectorySpan</code> hashes canonical sorted JSON (<code>sort_keys=True</code>) chained from <code>GENESIS_HASH</code> via <code>prev_hash -&gt; step_hash</code>. Reordered Python dictionary keys never cause false negatives, whereas silent edits trigger <code>CassetteTamperError</code>.
+              </p>
+
+              <h2 id="rec-redact">Automatic PII &amp; Secret Scrubbing</h2>
+              <p>
+                <code>FlightRecorder(..., redact_secrets=True)</code> scrubs OpenAI, Anthropic, GitHub, AWS keys, Bearer tokens, JWTs, Basic Auth URLs, and auth headers <em>before</em> computing SHA-256 digests so cassettes can be safely committed to Git.
+              </p>
+
+              <h2 id="rec-replay">Deterministic Stubs (`CassetteReplayer`)</h2>
+              <div class="doc-codeblock">
+                <pre><span class="syn-arg">from</span> agentflight <span class="syn-arg">import</span> CassetteReplayer
+
+replayer = CassetteReplayer(<span class="syn-str">"cassettes/incident_8841.flight.json"</span>, strict_order=True)
+query_metrics = replayer.stub_tool(<span class="syn-str">"prometheus.query_metrics"</span>, kind=<span class="syn-str">"mcp_rpc"</span>)
+result = query_metrics(window=<span class="syn-str">"15m"</span>, service=<span class="syn-str">"payment-api"</span>)</pre>
+                <button type="button" class="copy-icon-btn" data-copy='from agentflight import CassetteReplayer&#10;&#10;replayer = CassetteReplayer("cassettes/incident_8841.flight.json", strict_order=True)&#10;query_metrics = replayer.stub_tool("prometheus.query_metrics", kind="mcp_rpc")&#10;result = query_metrics(window="15m", service="payment-api")' aria-label="Copy replayer code">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </section>
+
+            <!-- CHAPTER 4 -->
+            <section class="doc-chapter" data-chapter="pytest-ci" hidden>
+              <h2 id="pytest-markers">Auto-Registered Pytest Plugin (`pytest11`)</h2>
+              <p>
+                Installing <code>agentflight-mcp</code> automatically registers built-in fixtures (<code>flight_recorder</code>, <code>flight_guard</code>, <code>flight_session</code>) plus <code>@pytest.mark.flight_cassette(...)</code>.
+              </p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-arg">import</span> pytest
+
+@pytest.mark.flight_cassette(<span class="syn-str">"tests/cassettes/checkout.flight.json"</span>)
+<span class="syn-arg">def</span> test_checkout_deterministic(flight_session, flight_guard):
+    search = flight_session.stub(<span class="syn-str">"search_catalog"</span>, fallback_fn=<span class="syn-arg">lambda</span> q: {<span class="syn-str">"hits"</span>: [q]})
+    <span class="syn-arg">assert</span> search(q=<span class="syn-str">"router"</span>)[<span class="syn-str">"hits"</span>] == [<span class="syn-str">"router"</span>]</pre>
+                <button type="button" class="copy-icon-btn" data-copy='import pytest&#10;&#10;@pytest.mark.flight_cassette("tests/cassettes/checkout.flight.json")&#10;def test_checkout_deterministic(flight_session, flight_guard):&#10;    search = flight_session.stub("search_catalog", fallback_fn=lambda q: {"hits": [q]})&#10;    assert search(q="router")["hits"] == ["router"]' aria-label="Copy pytest example">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+
+              <h2 id="ci-diff">Behavioral Trajectory Diffing</h2>
+              <p>
+                Compare baseline and candidate cassettes across model or prompt upgrades using Levenshtein/LCS sequence distance plus token/cost/error deltas:
+              </p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-cmd">agentflight diff</span> <span class="syn-arg">baseline.flight.json candidate.flight.json</span> <span class="syn-arg">--similarity-threshold</span> <span class="syn-str">0.85</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="agentflight diff baseline.flight.json candidate.flight.json --similarity-threshold 0.85" aria-label="Copy diff command">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+
+              <h2 id="ci-workflow">GitHub Actions Pre-Flight Gate</h2>
+              <div class="doc-codeblock">
+                <pre><span class="syn-cmd">agentflight ci</span> <span class="syn-arg">--schema-file tools.json --cassette tests/cassettes/run.flight.json --fail-on-smell --github-summary</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="agentflight ci --schema-file tools.json --cassette tests/cassettes/run.flight.json --fail-on-smell --github-summary" aria-label="Copy agentflight ci command">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </section>
+
+            <!-- CHAPTER 5 -->
+            <section class="doc-chapter" data-chapter="circuit-breaker" hidden>
+              <h2 id="cb-loops">Loop &amp; Ping-Pong Detection</h2>
+              <p>
+                <code>TrajectoryCircuitBreaker</code> inspects actor + canonical argument digests on every turn to stop exact identical repeats, two-step <code>A -&gt; B -&gt; A -&gt; B</code> ping-pong loops, three-step cycles, and consecutive error storms.
+              </p>
+
+              <h2 id="cb-budget">Thread-Safe Token &amp; USD Spend Caps</h2>
+              <p>
+                Enforce hard limits globally across worker threads via <code>with breaker.reserve_budget(estimated_usd): ...</code> so parallel tool invocations cannot overshoot budget ceilings.
+              </p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-arg">from</span> agentflight <span class="syn-arg">import</span> TrajectoryCircuitBreaker
+
+guard = TrajectoryCircuitBreaker(max_identical_repeats=3, max_ping_pong_cycles=2, max_total_tokens=25000, max_cost_usd=0.50)</pre>
+                <button type="button" class="copy-icon-btn" data-copy="from agentflight import TrajectoryCircuitBreaker&#10;&#10;guard = TrajectoryCircuitBreaker(max_identical_repeats=3, max_ping_pong_cycles=2, max_total_tokens=25000, max_cost_usd=0.50)" aria-label="Copy circuit breaker config">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </section>
+
+            <!-- CHAPTER 6 -->
+            <section class="doc-chapter" data-chapter="mcp-server" hidden>
+              <h2 id="mcp-tools">Tools, Resources &amp; Prompts</h2>
+              <div class="doc-table-wrap">
+                <table class="doc-table">
+                  <thead>
+                    <tr>
+                      <th>MCP Primitive</th>
+                      <th>Purpose</th>
+                      <th>Transport Availability</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>agentflight_lint_tools</code></td>
+                      <td>Static TS001–TS010 audit &amp; Ergonomics Score</td>
+                      <td>Hosted HTTP + Local Stdio</td>
+                    </tr>
+                    <tr>
+                      <td><code>agentflight_verify_cassette</code></td>
+                      <td>Verify SHA-256 chain integrity</td>
+                      <td>Local Stdio / Self-Hosted</td>
+                    </tr>
+                    <tr>
+                      <td><code>agentflight_diff_cassettes</code></td>
+                      <td>Baseline vs candidate trajectory diff</td>
+                      <td>Local Stdio / Self-Hosted</td>
+                    </tr>
+                    <tr>
+                      <td><code>agentflight_export_otel</code></td>
+                      <td>Export W3C TraceContext spans JSON</td>
+                      <td>Local Stdio / Self-Hosted</td>
+                    </tr>
+                    <tr>
+                      <td><code>agentflight://rules/catalog</code></td>
+                      <td>Machine-readable rule rubric resource</td>
+                      <td>Hosted HTTP + Local Stdio</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h2 id="mcp-hosted">Hosted Vercel HTTP vs Local Stdio</h2>
+              <div class="doc-codeblock">
+                <pre><span class="syn-cmd">claude mcp add</span> <span class="syn-arg">--transport http agentflight</span> <span class="syn-str">https://agentflight-tau.vercel.app/mcp</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="claude mcp add --transport http agentflight https://agentflight-tau.vercel.app/mcp" aria-label="Copy claude mcp command">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </section>
+
+            <!-- CHAPTER 7 -->
+            <section class="doc-chapter" data-chapter="post-mortem" hidden>
+              <h2 id="pm-aaib">AAIB / NTSB Incident Post-Mortems</h2>
+              <p>
+                Generate structured Markdown or JSON failure reports pinpointing root-cause loops, cost explosions, and exact failing tool steps from any saved <code>.flight.json</code> file:
+              </p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-cmd">agentflight post-mortem</span> <span class="syn-arg">crash_incident.flight.json</span> <span class="syn-arg">--output</span> <span class="syn-str">POST_MORTEM.md</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="agentflight post-mortem crash_incident.flight.json --output POST_MORTEM.md" aria-label="Copy post-mortem command">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+
+              <h2 id="pm-otel">W3C TraceContext / OpenTelemetry Export</h2>
+              <p>
+                Export cassettes into <code>gen_ai.*</code> semantic-convention spans ready for StackPulse, Jaeger, Datadog, or Grafana Tempo:
+              </p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-cmd">agentflight export-otel</span> <span class="syn-arg">incident_8841.flight.json</span> <span class="syn-arg">--output</span> <span class="syn-str">spans.json</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="agentflight export-otel incident_8841.flight.json --output spans.json" aria-label="Copy export-otel command">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </section>
+
+            <!-- CHAPTER 8 -->
+            <section class="doc-chapter" data-chapter="openany" hidden>
+              <h2 id="oa-quickstart">Budget Shield &amp; Streaming</h2>
+              <p>
+                <code>OpenAnyProvider</code> adds strict domain isolation, pre-execution cost ceiling checks, SSE streaming, and remote MCP schema discovery across 128+ models with transparent attribution when querying <code>*.openany.si</code>.
+              </p>
+
+              <h2 id="oa-cli">OpenAny CLI Commands</h2>
+              <div class="doc-codeblock">
+                <pre><span class="syn-cmd">agentflight openany models</span>
+<span class="syn-cmd">agentflight openany lint-tools</span>
+<span class="syn-cmd">agentflight openany replay</span> <span class="syn-arg">--cassette</span> <span class="syn-str">paxos.flight.json</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="agentflight openany models && agentflight openany lint-tools" aria-label="Copy openany commands">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </section>
+
+            <!-- CHAPTER 9 -->
+            <section class="doc-chapter" data-chapter="troubleshooting" hidden>
+              <h2 id="ts-divergence">TrajectoryDivergenceError</h2>
+              <p>
+                Raised during <code>replay</code> mode when candidate code calls a different actor or passes modified parameter keys/values compared to the recorded baseline cassette. Inspect <code>exc.missing_keys</code>, <code>exc.extra_keys</code>, and <code>exc.changed_values</code>, or re-record intentionally with <code>pytest --flight-mode=record</code>.
+              </p>
+
+              <h2 id="ts-tamper">CassetteTamperError</h2>
+              <p>
+                Raised by <code>verify_cassette()</code> when any step payload, index, or hash link in a <code>.flight.json</code> file is altered or truncated. Re-record cleanly from a trusted run or validate with <code>agentflight doctor</code>.
+              </p>
+
+              <h2 id="ts-about">License &amp; Provenance</h2>
+              <p>
+                Created and maintained by <a class="inline-link" href="https://alvin.codesphereug.com/" target="_blank" rel="noopener noreferrer">Akandwanaho Ivan Alvin</a> under the permissive MIT License. Source hosted on <a class="inline-link" href="https://github.com/codesphere-u/agentflight" target="_blank" rel="noopener noreferrer">GitHub (`codesphere-u/agentflight`)</a>.
+              </p>
+            </section>
+
+            <nav class="doc-pagination" aria-label="Chapter pagination">
+              <button type="button" class="page-step-btn prev" id="doc-prev" hidden>
+                <small>Previous</small>
+                <strong id="doc-prev-label">← Getting Started</strong>
+              </button>
+              <button type="button" class="page-step-btn next" id="doc-next">
+                <small>Next</small>
+                <strong id="doc-next-label">SDK Wrappers →</strong>
+              </button>
+            </nav>
+          </article>
+        </div>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-links">
+          <a href="./">home</a>
+          <span>·</span>
+          <a href="./studio.html">studio</a>
+          <span>·</span>
+          <a href="./proof.html">proof</a>
+          <span>·</span>
+          <a href="./docs.html">docs</a>
+          <span>·</span>
+          <a href="./rules.html">rules</a>
+          <span>·</span>
+          <a href="https://github.com/codesphere-u/agentflight" target="_blank" rel="noopener noreferrer">github</a>
+        </div>
+        <div>MIT Licensed · AgentFlight v1.5.0 · Works cleanly with Plausible &amp; OTel</div>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js?v=1.5.0" defer></script>
+  </body>
+</html>

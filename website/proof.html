@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentFlight — Verified Benchmarks &amp; Production Proof</title>
+    <meta
+      name="description"
+      content="Measured Python 3.12 benchmarks (353k replay spans/sec, 1,676 tools/sec linting), suite hardening proof (38 to 100), and comparison against live API tests."
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#fffdf2" />
+    <link rel="canonical" href="https://codesphere-u.github.io/agentflight/proof.html" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.5.0" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://codesphere-u.github.io/agentflight/proof.html" />
+    <meta property="og:title" content="AgentFlight — Verified Benchmarks &amp; Production Proof" />
+    <meta
+      property="og:description"
+      content="353,356 replayed spans/sec with $0.00 token cost, SHA-256 tamper protection, and 167 passing tests at >90% coverage."
+    />
+    <meta property="og:image" content="https://codesphere-u.github.io/agentflight/og-image.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AgentFlight — Verified Benchmarks &amp; Production Proof" />
+    <meta
+      name="twitter:description"
+      content="Reproducible subsystem benchmarks and MCP schema hardening results measured with Python 3.12."
+    />
+    <meta name="twitter:image" content="https://codesphere-u.github.io/agentflight/og-image.svg" />
+
+    <style>
+      [hidden] { display: none !important; }
+      .brand-wordmark-svg { height: 36px; width: 196px; display: block; }
+    </style>
+    <link rel="stylesheet" href="./styles.css?v=1.5.0" />
+  </head>
+  <body data-analytics="plausible">
+    <div class="page-col">
+      <header class="site-header">
+        <a class="brand-link" href="./" aria-label="AgentFlight home">
+          <svg class="brand-wordmark-svg" width="196" height="36" viewBox="0 0 218 40" fill="none" role="img" aria-label="agentflight">
+            <rect x="2" y="5" width="28" height="28" rx="8" fill="#7cc6fe" stroke="#14213d" stroke-width="2.6" />
+            <rect x="7" y="10" width="18" height="18" rx="4" fill="#fffdf2" stroke="#14213d" stroke-width="1.8" />
+            <circle cx="12.5" cy="15.5" r="2.1" fill="#ffd166" stroke="#14213d" stroke-width="1.4" />
+            <circle cx="19.5" cy="15.5" r="2.1" fill="#ffd166" stroke="#14213d" stroke-width="1.4" />
+            <path d="M9.5 22.5H13L15 20.5L17 24L19 22.5H22.5" stroke="#026aa7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <text x="38" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22.5" font-weight="800" letter-spacing="-0.6" fill="none" stroke="#14213d" stroke-width="4" stroke-linejoin="round">agentflight</text>
+            <text x="38" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22.5" font-weight="800" letter-spacing="-0.6" fill="#7cc6fe">agentflight</text>
+          </svg>
+        </a>
+
+        <nav class="header-nav" aria-label="Primary navigation">
+          <a href="./studio.html">studio</a>
+          <a class="active" href="./proof.html" aria-current="page">proof</a>
+          <a href="./docs.html">docs</a>
+          <a href="./rules.html">rules</a>
+          <a
+            class="icon-link"
+            href="https://github.com/codesphere-u/agentflight"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="AgentFlight on GitHub"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+              />
+            </svg>
+          </a>
+          <a
+            class="nav-pill"
+            href="https://github.com/codesphere-u/agentflight/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            v1.5.0
+          </a>
+        </nav>
+      </header>
+
+      <main class="editorial-article">
+        <section aria-labelledby="proof-page-title">
+          <h1 id="proof-page-title" style="font-size: 2.4rem; font-weight: 600; margin: 0 0 1rem; line-height: 1.2;">
+            Why AgentFlight &amp; Verified Proof
+          </h1>
+          <p>
+            Multi-step tool-calling agents fail in ways standard HTTP mocks cannot reproduce cleanly: key-order drift across runs, silent parameter omissions on weak MCP schemas, A↔B tool oscillation loops, and $5 overnight token spikes in CI.
+          </p>
+          <p>
+            Created independently by <a class="inline-link" href="https://alvin.codesphereug.com/" target="_blank" rel="noopener noreferrer">Akandwanaho Ivan Alvin</a>, AgentFlight records every step into an atomic SHA-256 cassette with API keys scrubbed automatically so teams test deterministically offline at $0.00 spend.
+          </p>
+        </section>
+
+        <section id="proof" aria-labelledby="case-study-heading">
+          <h2 id="case-study-heading">Before vs. After Schema Hardening (38 → 100)</h2>
+          <p>
+            Inspect how <code>agentflight fix</code> and <code>ToolSmellLinter</code> eliminate MCP schema failures in a single deterministic pass.
+          </p>
+
+          <div class="handy-card">
+            <div class="handy-tabs-bar">
+              <div class="handy-tabs" role="tablist" aria-label="Before and after toggle">
+                <button type="button" class="handy-tab active" role="tab" aria-selected="true" data-stage="before">
+                  Before (38/100)
+                </button>
+                <button type="button" class="handy-tab" role="tab" aria-selected="false" data-stage="after">
+                  After (100/100)
+                </button>
+              </div>
+              <span class="version-tag">agentflight lint &amp; fix</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; flex-wrap: wrap;">
+              <span class="pill pill-amber" id="cs-badge">Grade F • 7 findings detected</span>
+              <strong id="cs-title">Short descriptions, unconstrained strings, and unguarded delete_tool</strong>
+            </div>
+
+            <ul id="cs-list" style="margin-bottom: 0;">
+              <li><code>TS001 (-12)</code> Tool description under 15 characters left model routing ambiguous.</li>
+              <li><code>TS005 (-5)</code> Boolean flag <code>mode</code> had unclear polarity without explicit description.</li>
+              <li><code>TS006 (-6)</code> Unconstrained <code>status</code> string lacked an explicit <code>enum</code> list.</li>
+              <li><code>TS010 (-10)</code> Destructive <code>delete_record</code> lacked a <code>confirm</code> or <code>dry_run</code> guard.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section aria-labelledby="bench-proof-title">
+          <h2 id="bench-proof-title">Measured Subsystem Benchmarks (Python 3.12)</h2>
+          <p>Reproducible directly on any machine with <code>agentflight benchmark</code>:</p>
+          <div class="doc-table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Subsystem Operation</th>
+                  <th>Workload</th>
+                  <th>Total Time</th>
+                  <th>Per Unit</th>
+                  <th class="col-af">Throughput</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>FlightRecorder.record</code> (SHA-256 chain)</td>
+                  <td>1,000 spans</td>
+                  <td>7.42 ms</td>
+                  <td>7.42 us</td>
+                  <td class="col-af">134,770 spans/s</td>
+                </tr>
+                <tr>
+                  <td><code>verify_cassette</code> (tamper check)</td>
+                  <td>1,000 spans</td>
+                  <td>3.40 ms</td>
+                  <td>3.40 us</td>
+                  <td class="col-af">294,117 spans/s</td>
+                </tr>
+                <tr>
+                  <td><code>CassetteReplayer.replay_step</code> ($0 stub)</td>
+                  <td>1,000 spans</td>
+                  <td>2.83 ms</td>
+                  <td>2.83 us</td>
+                  <td class="col-af">353,356 spans/s</td>
+                </tr>
+                <tr>
+                  <td><code>TrajectoryCircuitBreaker.observe_span</code></td>
+                  <td>1,000 spans</td>
+                  <td>3.01 ms</td>
+                  <td>3.01 us</td>
+                  <td class="col-af">332,225 spans/s</td>
+                </tr>
+                <tr>
+                  <td><code>ToolSmellLinter.lint</code> (TS001–TS010)</td>
+                  <td>200 tools</td>
+                  <td>119.27 ms</td>
+                  <td>596.35 us</td>
+                  <td class="col-af">1,676 tools/s</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section aria-labelledby="compare-title">
+          <h2 id="compare-title">How AgentFlight Compares</h2>
+          <div class="doc-table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Capability</th>
+                  <th class="col-af">AgentFlight</th>
+                  <th>Live LLM CI Runs</th>
+                  <th>Hand-Rolled Mocks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>CI run cost &amp; latency</td>
+                  <td class="col-af">&lt; 3 us/span · $0.00</td>
+                  <td>$0.05–$5.00 · 10–45s</td>
+                  <td>Free but fragile</td>
+                </tr>
+                <tr>
+                  <td>Cryptographic tamper protection</td>
+                  <td class="col-af">Canonical SHA-256 chain</td>
+                  <td>None</td>
+                  <td>Silent fixture drift</td>
+                </tr>
+                <tr>
+                  <td>Automatic API key scrubbing</td>
+                  <td class="col-af">Enabled by default</td>
+                  <td>Manual env sanitizers</td>
+                  <td>Manual redaction</td>
+                </tr>
+                <tr>
+                  <td>Ping-pong loop &amp; cost circuit breaker</td>
+                  <td class="col-af">Built-in pre-flight guard</td>
+                  <td>Stops after budget alert</td>
+                  <td>Not included</td>
+                </tr>
+                <tr>
+                  <td>MCP schema linting &amp; auto-repair</td>
+                  <td class="col-af">TS001–TS010 + fix CLI</td>
+                  <td>Manual prompt tuning</td>
+                  <td>Not included</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section aria-labelledby="get-started-proof">
+          <h2 id="get-started-proof">Get Started</h2>
+          <p>
+            Read the <a class="inline-link" href="./docs.html">Documentation</a>, audit schemas live in the <a class="inline-link" href="./studio.html">Interactive Studio</a>, or browse all <a class="inline-link" href="./rules.html">15 linter &amp; guard rules</a>.
+          </p>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-links">
+          <a href="./">home</a>
+          <span>·</span>
+          <a href="./studio.html">studio</a>
+          <span>·</span>
+          <a href="./proof.html">proof</a>
+          <span>·</span>
+          <a href="./docs.html">docs</a>
+          <span>·</span>
+          <a href="./rules.html">rules</a>
+          <span>·</span>
+          <a href="https://github.com/codesphere-u/agentflight" target="_blank" rel="noopener noreferrer">github</a>
+        </div>
+        <div>MIT Licensed · 167 tests passing · Reproducible benchmarks · v1.5.0</div>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js?v=1.5.0" defer></script>
+  </body>
+</html>

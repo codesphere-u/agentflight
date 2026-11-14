@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agentflight-mcp"
-version = "1.4.0"
+version = "1.5.0"
 description = "AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay, Loop/Cost Circuit Breaker & MCP Tool-Smell Linter"
 readme = "README.md"
 license = "MIT"
@@ -56,6 +56,8 @@ agentflight = "_agentflight_pytest"
 [project.urls]
 Homepage = "https://github.com/codesphere-u/agentflight"
 Repository = "https://github.com/codesphere-u/agentflight"
+Website = "https://codesphere-u.github.io/agentflight/"
+Documentation = "https://codesphere-u.github.io/agentflight/docs.html"
 Playground = "https://agentflight-tau.vercel.app"
 Creator = "https://alvin.codesphereug.com/"
 Issues = "https://github.com/codesphere-u/agentflight/issues"
