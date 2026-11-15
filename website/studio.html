@@ -84,7 +84,7 @@
         <section class="page-hero" aria-labelledby="studio-page-title">
           <h1 id="studio-page-title">Interactive Studio</h1>
           <p class="hero-sub">
-            Lint MCP tool schemas across <code>TS001–TS010</code>, simulate trajectory circuit breakers, and inspect real flight artifacts locally.
+            Run real live tests across every AgentFlight engine right in your browser (or verify against the live Vercel MCP server): harden <code>TS001–TS010</code> schemas, trip loop breakers, test custom <code>PF001–PF007</code> payloads, and fork SHA-256 cassettes.
           </p>
         </section>
 
@@ -97,20 +97,38 @@
               <span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span>
               <span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span>
             </div>
-            <span style="font-family:var(--font-mono); font-size:0.72rem; font-weight:700; color:var(--accent-rail);">TS001–CB005</span>
+            <span style="font-family:var(--font-mono); font-size:0.72rem; font-weight:700; color:var(--accent-rail);">22 RULES · LIVE TESTS</span>
           </div>
 
           <div class="flight-pipeline" id="studio-pipeline" style="margin-bottom: 0.95rem;">
             <div class="flight-stage"><small>01 · Parse</small><strong>Inspect JSON / Span</strong><span>Schema + args load</span></div>
-            <div class="flight-stage"><small>02 · Lint</small><strong>Run TS001–TS010</strong><span>Cosine overlap check</span></div>
-            <div class="flight-stage active"><small>03 · Guard</small><strong>Breaker &amp; Redact</strong><span>Stop loops &amp; keys</span></div>
-            <div class="flight-stage amber-hit"><small>04 · Clearance</small><strong>SHA-256 Seal</strong><span>0.08 µs CI replay</span></div>
+            <div class="flight-stage"><small>02 · Lint</small><strong>Run TS001–TS010</strong><span>Cosine overlap + fix</span></div>
+            <div class="flight-stage active"><small>03 · Guard</small><strong>Breaker &amp; Policy</strong><span>Stop loops &amp; SSRF</span></div>
+            <div class="flight-stage amber-hit"><small>04 · Clearance</small><strong>SHA-256 Seal</strong><span>0.08 µs CI + Fork</span></div>
+          </div>
+
+          <!-- Interactive End-to-End Test Suite Runner -->
+          <div class="test-suite-box" id="live-test-runner" aria-label="Live interactive verification test suite">
+            <div class="test-suite-head">
+              <div>
+                <strong style="font-size: 0.94rem;">Live Verification Test Suite</strong>
+                <span class="pill pill-sky" id="test-suite-badge" style="margin-left: 0.4rem;">6 Interactive Tests Ready</span>
+                <div style="font-size: 0.8rem; color: var(--text-70); margin-top: 0.2rem;" id="test-suite-summary">
+                  Execute real in-browser checks (WebCrypto SHA-256, Fork, Breaker, Policy, Contract &amp; Auto-Fix) or verify via live Vercel MCP.
+                </div>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.45rem;">
+                <button type="button" class="action-mini primary" id="run-all-tests-btn">Run All 6 Live Tests</button>
+                <button type="button" class="action-mini amber" id="run-cloud-tests-btn">Verify via Live Vercel MCP</button>
+              </div>
+            </div>
+            <div class="test-grid" id="test-suite-list"></div>
           </div>
 
           <div class="handy-tabs-bar">
             <div class="handy-tabs" role="tablist" aria-label="Studio tools">
               <button type="button" class="handy-tab active" role="tab" aria-selected="true" data-studio="lint">
-                MCP Tool Linter
+                MCP Tool Linter &amp; Fix
               </button>
               <button type="button" class="handy-tab" role="tab" aria-selected="false" data-studio="breaker">
                 Circuit Breaker
@@ -119,22 +137,28 @@
                 Policy &amp; Contracts
               </button>
               <button type="button" class="handy-tab" role="tab" aria-selected="false" data-studio="outputs">
-                Flight Artifacts
+                Fork Lab &amp; Artifacts
               </button>
             </div>
             <span class="version-tag">v1.6.0</span>
           </div>
 
-          <!-- Tab 1: Live MCP Tool-Smell Linter -->
+          <!-- Tab 1: Live MCP Tool-Smell Linter & Auto-Fix -->
           <div class="studio-panel active" id="panel-lint" role="tabpanel">
-            <div class="preset-pills" style="margin-bottom: 0.75rem;" aria-label="Sample MCP schema suites">
-              <button type="button" class="chip-btn active" data-lint-preset="flawed">Flawed Suite (TS Smells)</button>
-              <button type="button" class="chip-btn" data-lint-preset="hardened">Hardened Gold Suite (100)</button>
-              <button type="button" class="chip-btn" data-lint-preset="destructive">Unguarded Delete Tool</button>
+            <div class="toolbar-between" style="margin-bottom: 0.75rem;">
+              <div class="preset-pills" aria-label="Sample MCP schema suites">
+                <button type="button" class="chip-btn active" data-lint-preset="flawed">Flawed Suite (TS Smells)</button>
+                <button type="button" class="chip-btn" data-lint-preset="hardened">Hardened Gold Suite (100)</button>
+                <button type="button" class="chip-btn" data-lint-preset="destructive">Unguarded Delete Tool</button>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                <button type="button" class="action-mini primary" id="lint-fix-btn">Auto-Fix Schemas (agentflight fix)</button>
+                <button type="button" class="action-mini amber" id="lint-cloud-btn">Lint on Live Vercel MCP</button>
+              </div>
             </div>
 
             <div class="field" style="margin-bottom: 0.75rem;">
-              <label for="lint-json-input">MCP Tool Definitions (JSON array)</label>
+              <label for="lint-json-input">MCP Tool Definitions (Editable JSON array)</label>
               <textarea id="lint-json-input" class="textarea" rows="7"></textarea>
             </div>
 
@@ -149,7 +173,7 @@
             <div class="rw-list" id="lint-findings"></div>
           </div>
 
-          <!-- Tab 2: Trajectory Circuit Breaker Simulator -->
+          <!-- Tab 2: Interactive Trajectory Circuit Breaker Runner -->
           <div class="studio-panel" id="panel-breaker" role="tabpanel">
             <div class="form-row-2">
               <div class="field">
@@ -172,10 +196,26 @@
               </div>
             </div>
 
+            <div class="preset-pills" style="margin-bottom: 0.65rem;" aria-label="Append live step to trace">
+              <button type="button" class="chip-btn" data-cb-add="search_logs">+ search_logs ($0.002)</button>
+              <button type="button" class="chip-btn" data-cb-add="refine_query">+ refine_query ($0.002)</button>
+              <button type="button" class="chip-btn" data-cb-add="error_step">+ error_tool (status: error)</button>
+              <button type="button" class="chip-btn" data-cb-add="expensive_llm">+ gpt4o_call ($0.14)</button>
+              <button type="button" class="chip-btn" id="cb-reset-btn">Reset Trace</button>
+            </div>
+
+            <div class="field" style="margin-bottom: 0.75rem;">
+              <label for="cb-trace-input">Editable Execution Steps JSON (Live Breaker State Machine Input)</label>
+              <textarea id="cb-trace-input" class="textarea" rows="5"></textarea>
+            </div>
+
             <div class="toolbar-between" style="margin-bottom: 0.65rem;">
-              <span style="font-size: 0.85rem; color: var(--text-70);">Live guard evaluation</span>
+              <div>
+                <span class="pill pill-sky" id="cb-verdict-badge">READY</span>
+                <span style="font-size: 0.85rem; color: var(--text-70); margin-left: 0.45rem;" id="cb-status-note">Step-by-step live TrajectoryCircuitBreaker evaluation</span>
+              </div>
               <div style="display: flex; gap: 0.4rem;">
-                <button type="button" class="action-mini" id="cb-run-btn">Run guard trace</button>
+                <button type="button" class="action-mini primary" id="cb-run-btn">Run guard trace</button>
                 <button type="button" class="action-mini" id="cb-copy-btn">Copy report</button>
               </div>
             </div>
@@ -183,7 +223,7 @@
             <pre class="code-block" id="cb-output"></pre>
           </div>
 
-          <!-- Tab 3: Runtime Policy Firewall & Behavioral Contract Studio -->
+          <!-- Tab 3: Live Runtime Policy Firewall & Behavioral Contract Studio -->
           <div class="studio-panel" id="panel-policy" role="tabpanel">
             <div class="form-row-2">
               <div class="field">
@@ -192,24 +232,56 @@
                   <option value="strict">strict (SSRF/SQL/Secret Block + Mutation Warn)</option>
                   <option value="read-only">read-only (Block All Mutating Actors)</option>
                   <option value="standard">standard (Safety Guardrails Active)</option>
+                  <option value="permissive">permissive (Audit Only, Allow Calls)</option>
                 </select>
               </div>
               <div class="field">
-                <label for="pf-preset">Tool Call / Contract Scenario</label>
+                <label for="pf-preset">Load Test Preset (or Edit Fields Below)</label>
                 <select id="pf-preset" class="select">
                   <option value="ssrf">PF003: Cloud Metadata SSRF Probe (169.254.169.254)</option>
                   <option value="sql">PF005: Destructive DROP TABLE Statement</option>
-                  <option value="secret">PF006: Live API Secret Exfiltration (sk-proj-...)</option>
+                  <option value="secret">PF006: Live API Secret Exfiltration</option>
                   <option value="traversal">PF004: Sensitive Path Traversal (../../etc/passwd)</option>
                   <option value="contract-pass">FlightContract SLA: Ordered Plan → Query → Summary (PASS)</option>
                 </select>
               </div>
             </div>
 
+            <div class="form-row-2">
+              <div class="field">
+                <label for="pf-tool-input">Tool / Actor Name (Editable)</label>
+                <input id="pf-tool-input" class="input" type="text" value="http_fetch" />
+              </div>
+              <div class="field">
+                <label for="pf-max-cost">FlightContract Max Cost (USD)</label>
+                <input id="pf-max-cost" class="input" type="number" step="0.01" min="0" value="0.25" />
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="field">
+                <label for="pf-must-call">Contract must_call (comma-separated)</label>
+                <input id="pf-must-call" class="input" type="text" value="search_logs" />
+              </div>
+              <div class="field">
+                <label for="pf-must-not-call">Contract must_not_call (comma-separated)</label>
+                <input id="pf-must-not-call" class="input" type="text" value="drop_database, exec_shell" />
+              </div>
+            </div>
+
+            <div class="field" style="margin-bottom: 0.75rem;">
+              <label for="pf-args-input">Tool Arguments Payload JSON (Try editing URL, SQL, file path, or secret!)</label>
+              <textarea id="pf-args-input" class="textarea" rows="3"></textarea>
+            </div>
+
             <div class="toolbar-between" style="margin-bottom: 0.65rem;">
-              <span style="font-size: 0.85rem; color: var(--text-70);">Live pre-flight firewall &amp; SLA evaluation</span>
-              <div style="display: flex; gap: 0.4rem;">
-                <button type="button" class="action-mini" id="pf-run-btn">Run Policy Check</button>
+              <div>
+                <span class="pill pill-bad" id="pf-verdict-badge">BLOCKED</span>
+                <span style="font-size: 0.85rem; color: var(--text-70); margin-left: 0.4rem;" id="pf-source-note">Evaluated locally by JS PF001–PF007 Engine</span>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                <button type="button" class="action-mini primary" id="pf-run-btn">Run Policy Check</button>
+                <button type="button" class="action-mini amber" id="pf-cloud-btn">Verify on Live Vercel MCP</button>
                 <button type="button" class="action-mini" id="pf-copy-btn">Copy report</button>
               </div>
             </div>
@@ -217,8 +289,27 @@
             <pre class="code-block" id="pf-output"></pre>
           </div>
 
-          <!-- Tab 4: Flight Artifacts Explorer -->
+          <!-- Tab 4: Interactive Time-Travel Fork & Tamper Lab + Artifacts -->
           <div class="studio-panel" id="panel-outputs" role="tabpanel">
+            <div class="chain-box" aria-label="Interactive SHA-256 Chain and Time-Travel Fork Playground">
+              <div class="test-suite-head">
+                <div>
+                  <strong style="font-size: 0.9rem;">Black-Box SHA-256 Chain &amp; Time-Travel Fork Lab</strong>
+                  <span class="pill pill-good" id="fk-status-pill" style="margin-left: 0.45rem;">SHA-256 VERIFIED</span>
+                  <div style="font-size: 0.79rem; color: var(--text-70); margin-top: 0.18rem;" id="fk-summary-note">
+                    Live WebCrypto SHA-256 Merkle chain. Fork at Step 2 at $0.00 prefix cost or tamper Step 1 to trigger CassetteTamperError.
+                  </div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                  <button type="button" class="action-mini" id="fk-verify-btn">Verify Chain</button>
+                  <button type="button" class="action-mini primary" id="fk-fork-btn">Fork @ Step 2 ($0.00)</button>
+                  <button type="button" class="action-mini danger" id="fk-tamper-btn">Tamper Step 1</button>
+                  <button type="button" class="action-mini" id="fk-reset-btn">Reset</button>
+                </div>
+              </div>
+              <div class="chain-grid" id="fk-chain-list"></div>
+            </div>
+
             <div class="preset-pills" style="margin-bottom: 0.75rem;" aria-label="AgentFlight artifact selector">
               <button type="button" class="chip-btn active" data-out="cassette">.flight.json</button>
               <button type="button" class="chip-btn" data-out="diff">diff-report.json</button>

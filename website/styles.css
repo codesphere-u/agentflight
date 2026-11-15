@@ -1137,6 +1137,142 @@ code {
   border-color: var(--accent);
 }
 
+.action-mini.primary {
+  background: var(--accent);
+  color: var(--accent-dark);
+  border-color: var(--accent-rail);
+}
+
+.action-mini.primary:hover {
+  background: var(--accent-hover);
+}
+
+.action-mini.amber {
+  background: var(--amber);
+  color: var(--amber-dark);
+  border-color: var(--amber-dark);
+}
+
+.action-mini.amber:hover {
+  background: var(--amber-hover);
+}
+
+.action-mini.danger {
+  background: var(--bad-bg);
+  color: var(--bad-ink);
+  border-color: rgba(153, 27, 27, 0.28);
+}
+
+/* Interactive Studio Live Self-Test & Fork/Tamper Lab */
+.test-suite-box,
+.chain-box {
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 0.95rem 1.05rem;
+  background: var(--bg);
+  margin-bottom: 0.95rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.test-suite-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.6rem;
+}
+
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.65rem;
+}
+
+.test-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.62rem 0.72rem;
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+  background: var(--tint-2);
+  min-width: 0;
+}
+
+.test-row.pass {
+  border-left: 3px solid var(--pass-ink);
+}
+
+.test-row.fail {
+  border-left: 3px solid var(--bad-ink);
+  background: var(--bad-bg);
+}
+
+.test-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.test-row strong {
+  font-size: 0.84rem;
+  color: var(--text);
+}
+
+.test-row small {
+  font-size: 0.77rem;
+  line-height: 1.45;
+  color: var(--text-70);
+  word-break: break-word;
+}
+
+.chain-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.65rem;
+}
+
+.chain-card {
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+  padding: 0.6rem 0.72rem;
+  background: var(--tint-2);
+  font-size: 0.79rem;
+  min-width: 0;
+}
+
+.chain-card.tampered {
+  border-color: var(--bad-ink);
+  background: var(--bad-bg);
+}
+
+.chain-card.forked {
+  border-color: var(--accent-rail);
+  background: var(--accent-light);
+}
+
+.chain-hash {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.71rem;
+  color: var(--text-55);
+  word-break: break-all;
+}
+
+@media (max-width: 680px) {
+  .test-grid,
+  .chain-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Handy /download-Style Centered Platform Hub */
 .download-hub {
   display: flex;
