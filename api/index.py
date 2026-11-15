@@ -124,7 +124,11 @@ def _rate_limited(request: Request) -> Optional[int]:
 # Tools hidden and refused on the public hosted deployment (filesystem / process access).
 HOSTED_BLOCKED_TOOLS = frozenset(['agentflight_diff_cassettes', 'agentflight_export_otel', 'agentflight_verify_cassette'])
 # Per-tool arguments that are refused (and stripped from the advertised schema) when hosted.
-HOSTED_FORBIDDEN_ARGS: Dict[str, List[str]] = {}
+HOSTED_FORBIDDEN_ARGS: Dict[str, List[str]] = {
+    "agentflight_post_mortem": ["cassette_path"],
+    "agentflight_audit_policy": ["cassette_path"],
+    "agentflight_evaluate_contract": ["cassette_path"],
+}
 
 PARSE_ERROR = -32700
 INVALID_REQUEST = -32600

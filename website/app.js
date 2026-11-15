@@ -30,7 +30,7 @@ TrajectoryCircuitBreaker: tripped ping_pong_oscillation (A -> B -> A -> B)
 ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
     cassette: JSON.stringify(
       {
-        schema_version: "1.5.0",
+        schema_version: "1.6.0",
         agent_id: "sre-incident-responder",
         genesis_hash: "0000000000000000000000000000000000000000000000000000000000000000",
         spans: [
@@ -254,6 +254,56 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
         2
       ),
     },
+    policy: {
+      title: "policy-audit.json — Runtime Policy Firewall & Contract Report",
+      badge: "Policy Firewall",
+      code: JSON.stringify(
+        {
+          mode: "strict",
+          evaluated_steps: 4,
+          passed: false,
+          blocked_count: 1,
+          violations: [
+            {
+              rule_id: "PF003",
+              severity: "critical",
+              step_index: 2,
+              tool_name: "fetch_url",
+              message: "Blocked internal/cloud-metadata URL (169.254.169.254)",
+            },
+          ],
+          contract: {
+            passed: true,
+            must_call_satisfied: ["search_logs", "summarize_incident"],
+            max_cost_usd: 0.25,
+            observed_cost_usd: 0.0084,
+          },
+        },
+        null,
+        2
+      ),
+    },
+    fork: {
+      title: "fork-diff.json — Time-Travel Cassette Fork ($0.00 Prefix)",
+      badge: "Time-Travel Fork",
+      code: JSON.stringify(
+        {
+          schema_version: "1.6.0",
+          parent_agent_id: "sre-incident-responder",
+          forked_agent_id: "sre-incident-responder:fork@step-2",
+          fork_step_index: 2,
+          prefix_reused_spans: 2,
+          prefix_replay_cost_usd: 0.0,
+          hash_chain_rebuilt: true,
+          override_applied: {
+            step_index: 2,
+            output_payload: { status: "200 OK", patched_fix: true },
+          },
+        },
+        null,
+        2
+      ),
+    },
     postmortem: {
       title: "POST_MORTEM.md — AAIB/NTSB Incident Report",
       badge: "Post-Mortem",
@@ -265,13 +315,14 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
       code: JSON.stringify(
         {
           healthy: true,
-          version: "1.5.0",
+          version: "1.6.0",
           checks: [
             { name: "python_version", ok: true },
             { name: "stdlib_core", ok: true },
             { name: "pytest_plugin", ok: true },
             { name: "recorder_and_redaction", ok: true },
             { name: "circuit_breaker", ok: true },
+            { name: "policy_and_contracts", ok: true },
           ],
         },
         null,
@@ -296,6 +347,13 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
     { id: "CB003", pillar: "Circuit Breakers", check: "Consecutive tool error storm breaker", sev: "TRIP" },
     { id: "CB004", pillar: "Circuit Breakers", check: "Thread-safe USD spend cap & reserve_budget() shield", sev: "TRIP" },
     { id: "CB005", pillar: "Circuit Breakers", check: "Hard total prompt + completion token ceiling", sev: "TRIP" },
+    { id: "PF001", pillar: "Policy Firewall", check: "Explicit tool allowlist/blocklist enforcement", sev: "BLOCK" },
+    { id: "PF002", pillar: "Policy Firewall", check: "Destructive tool gate & read-only flight enforcement", sev: "BLOCK" },
+    { id: "PF003", pillar: "Policy Firewall", check: "SSRF / private-network / cloud metadata URL block", sev: "CRITICAL" },
+    { id: "PF004", pillar: "Policy Firewall", check: "Path traversal (`../`) & sensitive host path block", sev: "CRITICAL" },
+    { id: "PF005", pillar: "Policy Firewall", check: "Destructive SQL (`DROP` / `TRUNCATE` / unguarded `DELETE`) block", sev: "CRITICAL" },
+    { id: "PF006", pillar: "Policy Firewall", check: "Unredacted API key / secret exfiltration guard", sev: "CRITICAL" },
+    { id: "PF007", pillar: "Policy Firewall", check: "Per-flight mutating-call mutation budget ceiling", sev: "BLOCK" },
   ];
 
   const CHAPTER_ORDER = [
@@ -743,6 +801,7 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
     const panels = {
       lint: $("#panel-lint"),
       breaker: $("#panel-breaker"),
+      policy: $("#panel-policy"),
       outputs: $("#panel-outputs"),
     };
 
@@ -1075,6 +1134,110 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
     renderRules();
   }
 
+  function initPolicyAndContractStudio() {
+    const modeEl = $("#pf-mode");
+    const presetEl = $("#pf-preset");
+    const runBtn = $("#pf-run-btn");
+    const copyBtn = $("#pf-copy-btn");
+    const outEl = $("#pf-output");
+    if (!modeEl || !presetEl || !outEl) return;
+
+    const scenarios = {
+      ssrf: {
+        tool: "http_fetch",
+        args: { url: "http://169.254.169.254/latest/meta-data/iam/" },
+        rule_id: "PF003",
+        severity: "critical",
+        reason: "Blocked SSRF attempt targeting AWS link-local metadata endpoint",
+        mutation: false,
+      },
+      sql: {
+        tool: "query_warehouse",
+        args: { sql: "DROP TABLE production_invoices CASCADE;" },
+        rule_id: "PF005",
+        severity: "critical",
+        reason: "Blocked destructive DDL statement (DROP TABLE)",
+        mutation: true,
+      },
+      secret: {
+        tool: "send_webhook",
+        args: { payload: "Authorization: Bearer demo_token_example_9999" },
+        rule_id: "PF006",
+        severity: "critical",
+        reason: "Blocked unredacted secret pattern before outbound tool call",
+        mutation: true,
+      },
+      traversal: {
+        tool: "read_workspace_file",
+        args: { path: "../../../../etc/passwd" },
+        rule_id: "PF004",
+        severity: "critical",
+        reason: "Blocked directory traversal outside workspace root",
+        mutation: false,
+      },
+      "contract-pass": {
+        tool: "search_logs",
+        args: { service: "checkout-api", window: "15m" },
+        rule_id: null,
+        severity: "info",
+        reason: "All PF001-PF007 checks and FlightContract assertions satisfied",
+        mutation: false,
+      },
+    };
+
+    function evaluateScenario() {
+      const mode = modeEl.value || "strict";
+      const preset = presetEl.value || "ssrf";
+      const s = scenarios[preset] || scenarios.ssrf;
+      const violations = [];
+
+      if (s.rule_id) {
+        violations.push({
+          rule_id: s.rule_id,
+          severity: s.severity,
+          tool: s.tool,
+          message: s.reason,
+          blocked: mode !== "permissive",
+        });
+      }
+      if (mode === "read-only" && s.mutation) {
+        violations.push({
+          rule_id: "PF002",
+          severity: "high",
+          tool: s.tool,
+          message: "Blocked mutating action in read-only flight mode",
+          blocked: true,
+        });
+      }
+
+      const blocked = violations.some((v) => v.blocked);
+      const report = {
+        mode,
+        preset,
+        decision: blocked ? "BLOCKED" : "ALLOWED",
+        evaluated_call: { tool: s.tool, args: s.args },
+        policy_violations: violations,
+        flight_contract: {
+          must_call: ["search_logs"],
+          must_not_call: ["drop_database", "exec_shell"],
+          require_valid_hash_chain: true,
+          require_no_secret_leaks: true,
+          max_cost_usd: 0.25,
+          observed_cost_usd: 0.0042,
+          contract_passed: violations.length === 0,
+        },
+        cli_equivalent: `agentflight policy-audit cassette.json --mode ${mode}`,
+      };
+      outEl.textContent = JSON.stringify(report, null, 2);
+    }
+
+    if (runBtn) runBtn.addEventListener("click", evaluateScenario);
+    modeEl.addEventListener("change", evaluateScenario);
+    presetEl.addEventListener("change", evaluateScenario);
+    if (copyBtn) copyBtn.addEventListener("click", () => copyText(outEl.textContent || "", "Copied report JSON"));
+    evaluateScenario();
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     normalizeCleanUrl();
     initCTA();
@@ -1086,6 +1249,7 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
     initStudioTabs();
     initLinterStudio();
     initBreakerSimulator();
+    initPolicyAndContractStudio();
     initOutputs();
     initProof();
     initRubric();

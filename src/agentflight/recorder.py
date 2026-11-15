@@ -19,7 +19,7 @@ import threading
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, List, Literal, Mapping, Optional, Sequence, Tuple, Union
 
 from .redact import redact_sensitive
 
@@ -418,6 +418,109 @@ class FlightRecorder:
         recorder._spans = spans
         return recorder
 
+    @classmethod
+    def from_cassette_dict(
+        cls,
+        cassette_dict: Mapping[str, Any],
+        *,
+        verify: bool = True,
+    ) -> "FlightRecorder":
+        """Construct a `FlightRecorder` from an in-memory cassette dictionary."""
+        data = dict(cassette_dict)
+        if verify:
+            verify_cassette(data)
+        spans = [
+            s if isinstance(s, TrajectorySpan) else TrajectorySpan.from_dict(dict(s))
+            for s in data.get("spans", [])
+        ]
+        recorder = cls(
+            agent_id=str(data.get("agent_id", "default-agent")),
+            metadata=dict(data.get("metadata", {})),
+        )
+        recorder._spans = spans
+        return recorder
+
+    @classmethod
+    def fork_from(
+        cls,
+        source: Union["FlightRecorder", "CassetteReplayer", Mapping[str, Any], str, Path],
+        up_to_step: int,
+        *,
+        agent_id: Optional[str] = None,
+        override_output: Optional[Mapping[str, Any]] = None,
+        override_status: SpanStatus = "ok",
+        metadata: Optional[Mapping[str, Any]] = None,
+    ) -> "FlightRecorder":
+        """
+        Time-travel fork a verified cassette at `up_to_step`.
+
+        Copies steps `[0 .. up_to_step)` into a new cryptographically chained `FlightRecorder`
+        at $0.00 prefix cost. When `override_output` is supplied and `up_to_step < len(source_spans)`,
+        also appends step `up_to_step` with the original actor/input and patched output payload so
+        counterfactual trajectories can continue or be diffed immediately.
+        """
+        if isinstance(source, (str, Path)):
+            src_rec = cls.load(source, verify=True)
+            src_agent_id = src_rec.agent_id
+            src_spans = src_rec.spans
+            src_head = src_rec.head_hash
+        elif isinstance(source, FlightRecorder):
+            verify_cassette(source)
+            src_agent_id = source.agent_id
+            src_spans = source.spans
+            src_head = source.head_hash
+        elif isinstance(source, CassetteReplayer):
+            src_agent_id = source.agent_id
+            src_spans = source.spans
+            src_head = src_spans[-1].step_hash if src_spans else GENESIS_HASH
+        elif isinstance(source, Mapping):
+            src_rec = cls.from_cassette_dict(source, verify=True)
+            src_agent_id = src_rec.agent_id
+            src_spans = src_rec.spans
+            src_head = src_rec.head_hash
+        else:
+            raise TypeError(f"Unsupported cassette source type: {type(source).__name__}")
+
+        if up_to_step < 0 or up_to_step > len(src_spans):
+            raise ValueError(
+                f"up_to_step={up_to_step} out of range for cassette with {len(src_spans)} spans."
+            )
+
+        merged_meta: Dict[str, Any] = {
+            "forked_from_agent_id": src_agent_id,
+            "forked_at_step": up_to_step,
+            "source_head_hash": src_head,
+        }
+        if metadata:
+            merged_meta.update(metadata)
+
+        forked = cls(
+            agent_id=agent_id or f"{src_agent_id}-fork-{up_to_step}",
+            metadata=merged_meta,
+        )
+        for sp in src_spans[:up_to_step]:
+            forked._append_verified(sp)
+
+        if override_output is not None:
+            if up_to_step >= len(src_spans):
+                raise ValueError(
+                    f"Cannot apply override_output at up_to_step={up_to_step}: no step exists at that index."
+                )
+            base_sp = src_spans[up_to_step]
+            forked.record(
+                kind=base_sp.kind,
+                actor=base_sp.actor,
+                input_payload=dict(base_sp.input_payload),
+                output_payload=dict(override_output),
+                latency_ms=0.0,
+                prompt_tokens=0,
+                completion_tokens=0,
+                cost_usd=0.0,
+                status=override_status,
+            )
+
+        return forked
+
 
 def verify_cassette(cassette: Union[FlightRecorder, Dict[str, Any], Sequence[TrajectorySpan]]) -> bool:
     """
@@ -660,3 +763,25 @@ class CassetteReplayer:
             return self.replay_step(kind=kind, actor=actor, input_payload=kwargs)
 
         return _stub
+
+    def fork_at(
+        self,
+        step_index: Optional[int] = None,
+        *,
+        agent_id: Optional[str] = None,
+        override_output: Optional[Mapping[str, Any]] = None,
+        override_status: SpanStatus = "ok",
+        metadata: Optional[Mapping[str, Any]] = None,
+    ) -> FlightRecorder:
+        """
+        Time-travel fork this replayer at `step_index` (defaults to current `cursor`).
+        """
+        idx = self.cursor if step_index is None else step_index
+        return FlightRecorder.fork_from(
+            self,
+            idx,
+            agent_id=agent_id,
+            override_output=override_output,
+            override_status=override_status,
+            metadata=metadata,
+        )

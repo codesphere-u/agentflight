@@ -169,7 +169,8 @@ def test_cli_doctor_text_and_json(capsys: pytest.CaptureFixture[str]) -> None:
     assert cli_main(["doctor", "--json"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["healthy"] is True
-    assert len(payload["checks"]) == 5
+    assert len(payload["checks"]) == 6
+    assert any(c["name"] == "policy_and_contracts" for c in payload["checks"])
     assert all(c["ok"] is True for c in payload["checks"])
 
 

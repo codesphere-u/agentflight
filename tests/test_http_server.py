@@ -52,10 +52,12 @@ def test_json_rpc_tools_list_over_http(http_server):
         assert data["jsonrpc"] == "2.0"
         assert data["id"] == 1
         tools = data["result"]["tools"]
-        assert len(tools) == 4
+        assert len(tools) == 8
         tool_names = [t["name"] for t in tools]
         assert "agentflight_lint_tools" in tool_names
         assert "agentflight_diff_cassettes" in tool_names
+        assert "agentflight_audit_policy" in tool_names
+        assert "agentflight_evaluate_contract" in tool_names
 
 
 def test_cors_options(http_server):

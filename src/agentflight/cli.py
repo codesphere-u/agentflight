@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
 from ._version import __version__
+from .assertions import FlightContract
 from .diff import compare_cassettes
 from .eval import TrajectoryEvaluator
 from .guard import CircuitBreakerTripped, TrajectoryCircuitBreaker
@@ -32,6 +33,7 @@ from .linter import (
 )
 from .mcp_server import AgentFlightMCPServer
 from .otel_export import export_cassette_to_otel
+from .policy import TrajectoryPolicyEngine
 from .recorder import CassetteReplayer, FlightRecorder, verify_cassette
 from .redact import REDACTED
 
@@ -528,14 +530,65 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_ci = sub.add_parser(
         "ci",
-        help="Run CI/CD pre-flight gate (Tool-Smell audits, cassette integrity, budget & latency SLA verification).",
+        help="Run CI/CD pre-flight gate (Tool-Smell audits, cassette integrity, policy, & contract SLA verification).",
     )
     p_ci.add_argument("--schema-file", type=str, default=None, help="Path to MCP tool schemas JSON to audit.")
     p_ci.add_argument("--cassette", type=str, default=None, help="Path to recorded cassette to verify.")
     p_ci.add_argument("--max-cost", type=float, default=2.00, help="Maximum allowed cost in USD (default: $2.00).")
+    p_ci.add_argument("--contract", type=str, default=None, help="Optional JSON FlightContract file to enforce.")
+    p_ci.add_argument(
+        "--policy-mode",
+        choices=("standard", "strict", "read-only"),
+        default=None,
+        help="Optional Runtime Policy Firewall profile to enforce on --cassette.",
+    )
     p_ci.add_argument("--fail-on-smell", action="store_true", help="Exit code 1 if any tool smells detected.")
     p_ci.add_argument("--github-summary", action="store_true", help="Append markdown report to $GITHUB_STEP_SUMMARY.")
     p_ci.set_defaults(func=_run_ci_command)
+
+    p_replay = sub.add_parser(
+        "replay",
+        help="Deterministically replay a verified cassette or time-travel fork it at a given step.",
+    )
+    p_replay.add_argument("cassette", type=str, help="Path to .flight.json or .flight.jsonl cassette.")
+    p_replay.add_argument("--fork-at", type=int, default=None, help="Fork prefix up to step index N.")
+    p_replay.add_argument("--fork-out", type=str, default=None, help="Output file path for forked cassette.")
+    p_replay.add_argument(
+        "--override-output-json",
+        type=str,
+        default=None,
+        help="Optional JSON payload overriding step N's output during time-travel fork.",
+    )
+    p_replay.add_argument("--json", action="store_true", help="Emit JSON replay/fork telemetry.")
+    p_replay.set_defaults(func=_run_replay_command)
+
+    p_policy = sub.add_parser(
+        "policy-audit",
+        help="Scan a recorded cassette against the Runtime Policy Firewall (PF001-PF007).",
+    )
+    p_policy.add_argument("cassette", type=str, help="Path to cassette to audit.")
+    p_policy.add_argument(
+        "--mode",
+        choices=("standard", "strict", "read-only"),
+        default="standard",
+        help="Policy strictness profile (default: standard).",
+    )
+    p_policy.add_argument("--json", action="store_true", help="Emit JSON policy audit report.")
+    p_policy.set_defaults(func=_run_policy_audit_command)
+
+    p_contract = sub.add_parser(
+        "contract",
+        help="Evaluate a behavioral FlightContract specification or CLI SLA flags against a cassette.",
+    )
+    p_contract.add_argument("cassette", type=str, help="Path to cassette to verify.")
+    p_contract.add_argument("--contract", type=str, default=None, help="Path to JSON FlightContract spec.")
+    p_contract.add_argument("--must-call", action="append", default=[], help="Actor that must be invoked (>=1 call).")
+    p_contract.add_argument("--must-not-call", action="append", default=[], help="Actor that must never be called.")
+    p_contract.add_argument("--max-cost", type=float, default=None, help="Maximum allowed USD cost.")
+    p_contract.add_argument("--max-steps", type=int, default=None, help="Maximum allowed trajectory steps.")
+    p_contract.add_argument("--zero-errors", action="store_true", help="Fail if any step recorded status='error'.")
+    p_contract.add_argument("--json", action="store_true", help="Emit JSON contract evaluation report.")
+    p_contract.set_defaults(func=_run_contract_command)
 
     p_fix = sub.add_parser(
         "fix",
@@ -776,6 +829,35 @@ def _run_ci_command(args: argparse.Namespace) -> int:
         else:
             lines.append(f"| **Flight Safety & Budget SLA** | ✅ PASS | Cost ${pm.total_cost_usd:.4f} within ${args.max_cost:.2f} limit |")
 
+        if getattr(args, "policy_mode", None):
+            policy_rep = TrajectoryPolicyEngine(mode=args.policy_mode).audit_cassette(args.cassette)
+            if policy_rep.passed:
+                lines.append(
+                    f"| **Runtime Policy Firewall (`{args.policy_mode}`)** | ✅ PASS | "
+                    f"0 blocking violations across {policy_rep.steps_scanned} steps |"
+                )
+            else:
+                lines.append(
+                    f"| **Runtime Policy Firewall (`{args.policy_mode}`)** | ❌ FAIL | "
+                    f"{policy_rep.block_count} blocking violation(s) |"
+                )
+                exit_code = 1
+
+        if getattr(args, "contract", None):
+            contract_spec = FlightContract.from_file(args.contract)
+            contract_rep = contract_spec.evaluate(args.cassette)
+            if contract_rep.passed:
+                lines.append(
+                    f"| **Behavioral Contract (`{contract_spec.name}`)** | ✅ PASS | "
+                    f"{contract_rep.passed_rules}/{contract_rep.total_rules} rules satisfied |"
+                )
+            else:
+                lines.append(
+                    f"| **Behavioral Contract (`{contract_spec.name}`)** | ❌ FAIL | "
+                    f"{contract_rep.failed_rules} rule failure(s) |"
+                )
+                exit_code = 1
+
     summary_md = "\n".join(lines)
     print(summary_md)
 
@@ -900,6 +982,23 @@ def _run_doctor_command(args: argparse.Namespace) -> int:
     except Exception as exc:  # pragma: no cover
         add_check("circuit_breaker", False, f"Circuit breaker error: {exc}")
 
+    # 6. Runtime Policy Firewall & Behavioral Contract self-test
+    try:
+        fw = TrajectoryPolicyEngine(mode="strict")
+        blocked = not fw.evaluate("http_fetch", {"url": "http://169.254.169.254/latest/meta-data/"}).allowed
+        sample_rec = FlightRecorder("doctor-contract-probe")
+        sample_rec.record("tool_call", "plan", {"q": "ok"}, {"ok": True}, cost_usd=0.01)
+        c_rep = FlightContract("doctor").must_call("plan").max_cost_usd(0.05).zero_errors().evaluate(sample_rec)
+        add_check(
+            "policy_and_contracts",
+            blocked and c_rep.passed,
+            "Policy firewall blocked SSRF probe & behavioral contract SLA verified"
+            if (blocked and c_rep.passed)
+            else "Policy firewall or behavioral contract check failed",
+        )
+    except Exception as exc:  # pragma: no cover
+        add_check("policy_and_contracts", False, f"Policy/contract self-test error: {exc}")
+
     duration_ms = round((time.perf_counter() - t0) * 1000.0, 2)
     healthy = all(c["ok"] for c in checks)
 
@@ -924,6 +1023,111 @@ def _run_doctor_command(args: argparse.Namespace) -> int:
             print(f"  [{mark}] {item['name']}: {item['detail']}")
 
     return 0 if healthy else 1
+
+
+def _run_replay_command(args: argparse.Namespace) -> int:
+    replayer = CassetteReplayer(args.cassette)
+    if args.fork_at is not None:
+        override = json.loads(args.override_output_json) if args.override_output_json else None
+        forked = replayer.fork_at(args.fork_at, override_output=override)
+        saved_path: Optional[str] = None
+        if args.fork_out:
+            saved_path = str(forked.save(args.fork_out))
+        payload = {
+            "source": args.cassette,
+            "forked_at_step": args.fork_at,
+            "forked_agent_id": forked.agent_id,
+            "step_count": len(forked.spans),
+            "head_hash": forked.head_hash,
+            "saved_to": saved_path,
+        }
+        if args.json:
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(
+                f"Forked '{replayer.agent_id}' at step {args.fork_at} -> "
+                f"{len(forked.spans)} step(s), head_hash={forked.head_hash[:12]}..."
+            )
+            if saved_path:
+                print(f"Saved forked cassette to: {saved_path}")
+        return 0
+
+    t0 = time.perf_counter()
+    steps: List[Dict[str, Any]] = []
+    while not replayer.is_exhausted:
+        sp = replayer.advance()
+        steps.append(
+            {
+                "step_index": sp.step_index,
+                "kind": sp.kind,
+                "actor": sp.actor,
+                "status": sp.status,
+                "latency_ms": sp.latency_ms,
+                "cost_usd": sp.cost_usd,
+            }
+        )
+    elapsed_us = round((time.perf_counter() - t0) * 1_000_000.0, 2)
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "agent_id": replayer.agent_id,
+                    "steps_replayed": len(steps),
+                    "replay_elapsed_us": elapsed_us,
+                    "tokens_saved": replayer.tokens_saved,
+                    "cost_saved_usd": replayer.cost_saved_usd,
+                    "steps": steps,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+    else:
+        print(
+            f"Replayed {len(steps)} verified step(s) for '{replayer.agent_id}' "
+            f"in {elapsed_us:.2f} us ($0.00 API cost, saved ${replayer.cost_saved_usd:.4f}):"
+        )
+        for s in steps:
+            print(
+                f"  [{s['step_index']}] ({s['kind']}) {s['actor']} -> "
+                f"{s['status']} ({s['latency_ms']} ms, ${s['cost_usd']:.4f})"
+            )
+    return 0
+
+
+def _run_policy_audit_command(args: argparse.Namespace) -> int:
+    engine = TrajectoryPolicyEngine(mode=args.mode)
+    report = engine.audit_cassette(args.cassette)
+    if args.json:
+        print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
+    else:
+        print(report.to_markdown())
+    return 0 if report.passed else 1
+
+
+def _run_contract_command(args: argparse.Namespace) -> int:
+    contract = (
+        FlightContract.from_file(args.contract)
+        if args.contract
+        else FlightContract(name=Path(args.cassette).stem)
+    )
+    for actor in args.must_call:
+        contract.must_call(actor)
+    for actor in args.must_not_call:
+        contract.must_not_call(actor)
+    if args.max_cost is not None:
+        contract.max_cost_usd(args.max_cost)
+    if args.max_steps is not None:
+        contract.max_steps(args.max_steps)
+    if args.zero_errors:
+        contract.zero_errors()
+
+    report = contract.evaluate(args.cassette)
+    if args.json:
+        print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
+    else:
+        print(report.to_markdown())
+    return 0 if report.passed else 1
 
 
 def _run_serve_mcp_command(args: argparse.Namespace) -> int:

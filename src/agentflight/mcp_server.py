@@ -17,10 +17,14 @@ import sys
 from typing import IO, Any, Dict, List, Optional
 
 from ._version import __version__
+from .assertions import FlightContract
 from .diff import compare_cassettes
 from .linter import RULE_CATALOG, SHOWCASE_HARDENED_MCP_TOOLS, ToolSmellLinter
 from .otel_export import export_cassette_to_otel
+from .policy import TrajectoryPolicyEngine
+from .post_mortem import FlightPostMortemAnalyzer
 from .recorder import FlightRecorder, verify_cassette
+from .schema_optimizer import ToolSchemaOptimizer
 
 MCP_PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "agentflight-mcp"
@@ -365,6 +369,220 @@ MCP_TOOLS: List[Dict[str, Any]] = [
             },
         },
     },
+    {
+        "name": "agentflight_optimize_tools",
+        "description": (
+            "Automatically refactor flawed MCP tool JSON schemas into hardened, Glama/AgentFlight Gold Standard definitions.\n\n"
+            "### Purpose\n"
+            "Applies deterministic remediation transformations via `ToolSchemaOptimizer` to fix `TS001`-`TS010` ergonomics smells, inferring parameter types, adding explicit constraints, marking required arrays, and upgrading descriptions with Purpose, When to use, and Behavior sections.\n\n"
+            "### When to use\n"
+            "- Automatically fixing low Agent Ergonomics Scores reported by `agentflight_lint_tools` before publishing an MCP server.\n"
+            "- Enforcing typed JSON schemas and bounded enums across legacy tool wrappers.\n\n"
+            "### When NOT to use\n"
+            "- Do NOT use when you only need a non-mutating lint audit without generating refactored schemas; use `agentflight_lint_tools` instead.\n\n"
+            "### Behavior & Side Effects\n"
+            "- Read-only: Transforms schemas purely in memory and returns hardened copies without modifying disk files.\n"
+            "- Deterministic & Idempotent: Running optimization multiple times converges cleanly."
+        ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+        "inputSchema": {
+            "type": "object",
+            "required": ["tools"],
+            "properties": {
+                "tools": {
+                    "type": "array",
+                    "description": "Array of raw MCP tool schema objects containing name, description, and inputSchema.",
+                    "items": {"type": "object"},
+                },
+            },
+        },
+        "outputSchema": {
+            "type": "object",
+            "required": ["tools_optimized", "smells_resolved", "hardened_tools", "post_lint_score"],
+            "properties": {
+                "tools_optimized": {"type": "integer", "description": "Count of MCP tools processed."},
+                "smells_resolved": {"type": "integer", "description": "Total tool-smell findings resolved across all schemas."},
+                "post_lint_score": {"type": "number", "description": "Agent Ergonomics Score (0-100) after optimization."},
+                "hardened_tools": {
+                    "type": "array",
+                    "description": "Refactored MCP tool schemas conforming to TS001-TS010 standards.",
+                    "items": {"type": "object"},
+                },
+            },
+        },
+    },
+    {
+        "name": "agentflight_post_mortem",
+        "description": (
+            "Run automated NTSB/AAIB-grade Flight Data Recorder incident analysis on a recorded agent trajectory.\n\n"
+            "### Purpose\n"
+            "Inspects a recorded `.flight.json` cassette (inline `cassette_json` or local `cassette_path`) to classify incident severity, isolate fault inception step, trace state-mutating blast radius, and produce actionable remediation steps.\n\n"
+            "### When to use\n"
+            "- Diagnosing why a production or staging AI agent looped, exhausted budget, spiked in latency, or crashed mid-run.\n"
+            "- Generating structured Markdown or JSON post-mortem reports for engineering incidents.\n\n"
+            "### When NOT to use\n"
+            "- Do NOT use to check two trajectories side-by-side; use `agentflight_diff_cassettes` instead.\n\n"
+            "### Behavior & Side Effects\n"
+            "- Read-only: Parses telemetry spans in memory and leaves source cassettes completely untouched.\n"
+            "- Deterministic: Identical cassettes yield identical root-cause classifications and fault steps."
+        ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "cassette_json": {
+                    "type": "object",
+                    "description": "Inline cassette JSON object containing agent_id, head_hash, and spans to investigate.",
+                },
+                "cassette_path": {
+                    "type": "string",
+                    "description": "Local filesystem path to a .flight.json or .flight.jsonl cassette file (stdio/local only).",
+                },
+                "max_cost_ceiling_usd": {
+                    "type": "number",
+                    "description": "Optional USD budget ceiling used to classify budget exhaustion incidents (default 2.0).",
+                    "default": 2.0,
+                },
+            },
+        },
+        "outputSchema": {
+            "type": "object",
+            "required": ["severity", "root_cause", "is_hash_chain_valid", "summary", "markdown_report"],
+            "properties": {
+                "severity": {"type": "string", "description": "Incident severity (CRITICAL, HIGH, MEDIUM, LOW, CLEAN)."},
+                "root_cause": {"type": "string", "description": "Classified root cause category."},
+                "is_hash_chain_valid": {"type": "boolean", "description": "True if SHA-256 chain integrity succeeded."},
+                "summary": {"type": "string", "description": "Concise narrative of what failed and where."},
+                "markdown_report": {"type": "string", "description": "Full Markdown post-mortem report."},
+            },
+        },
+    },
+    {
+        "name": "agentflight_audit_policy",
+        "description": (
+            "Audit an agent trajectory cassette or candidate tool call against the AgentFlight Runtime Policy Firewall (PF001-PF007).\n\n"
+            "### Purpose\n"
+            "Enforces deterministic security guardrails checking for SSRF private/metadata URLs, path traversal, destructive SQL, live secret exfiltration, unauthorized actors, and per-flight mutation caps.\n\n"
+            "### When to use\n"
+            "- Pre-screening a live candidate tool call (`actor` + `input_payload`) before executing side effects.\n"
+            "- Auditing an entire recorded flight cassette (`cassette_json` or `cassette_path`) under `standard`, `strict`, or `read-only` policy modes.\n\n"
+            "### When NOT to use\n"
+            "- Do NOT use to validate static MCP tool schema syntax; use `agentflight_lint_tools` instead.\n\n"
+            "### Behavior & Side Effects\n"
+            "- Read-only: Evaluates rules deterministically in memory without mutating state or calling networks."
+        ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "mode": {
+                    "type": "string",
+                    "description": "Firewall enforcement profile.",
+                    "enum": ["standard", "strict", "read-only"],
+                    "default": "standard",
+                },
+                "actor": {
+                    "type": "string",
+                    "description": "Candidate tool or MCP actor name when auditing a single tool call.",
+                },
+                "input_payload": {
+                    "type": "object",
+                    "description": "Candidate argument dictionary paired with `actor` for single-call preflight evaluation.",
+                },
+                "cassette_json": {
+                    "type": "object",
+                    "description": "Inline cassette JSON object containing spans to audit across the full flight.",
+                },
+                "cassette_path": {
+                    "type": "string",
+                    "description": "Local filesystem path to a cassette file to audit (stdio/local only).",
+                },
+            },
+        },
+        "outputSchema": {
+            "type": "object",
+            "required": ["passed", "violation_count", "violations"],
+            "properties": {
+                "passed": {"type": "boolean", "description": "True if zero blocking policy violations were detected."},
+                "violation_count": {"type": "integer", "description": "Total policy violations found."},
+                "violations": {
+                    "type": "array",
+                    "description": "List of PF001-PF007 policy findings with rule_id, severity, step_index, and message.",
+                    "items": {"type": "object"},
+                },
+            },
+        },
+    },
+    {
+        "name": "agentflight_evaluate_contract",
+        "description": (
+            "Evaluate a declarative FlightContract behavioral specification against a recorded AI agent trajectory.\n\n"
+            "### Purpose\n"
+            "Checks recorded trajectories against formal SLAs and invariants including required tool calls (`must_call`), forbidden tools (`must_not_call`), ordered tool sequences (`must_follow_order`), step/cost/token/latency ceilings, zero-error tolerance, and SHA-256 integrity.\n\n"
+            "### When to use\n"
+            "- Running deterministic behavioral regression gates on recorded cassettes in CI or post-deployment checks.\n"
+            "- Validating that an agent obeyed cost budgets and required workflow ordering.\n\n"
+            "### When NOT to use\n"
+            "- Do NOT use to compare two cassettes without an explicit contract; use `agentflight_diff_cassettes` instead.\n\n"
+            "### Behavior & Side Effects\n"
+            "- Read-only: Evaluates the supplied `contract` against cassette spans purely in memory."
+        ),
+        "annotations": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+        "inputSchema": {
+            "type": "object",
+            "required": ["contract"],
+            "properties": {
+                "contract": {
+                    "type": "object",
+                    "description": "FlightContract specification object (name, must_call, must_not_call, must_follow_order, max_cost_usd, max_steps, max_tokens, max_error_rate).",
+                },
+                "cassette_json": {
+                    "type": "object",
+                    "description": "Inline cassette JSON object to evaluate against the behavioral contract.",
+                },
+                "cassette_path": {
+                    "type": "string",
+                    "description": "Local filesystem path to a recorded cassette file (stdio/local only).",
+                },
+            },
+        },
+        "outputSchema": {
+            "type": "object",
+            "required": ["passed", "score", "total_rules", "passed_rules", "failed_rules", "results"],
+            "properties": {
+                "passed": {"type": "boolean", "description": "True if all contract rules passed."},
+                "score": {"type": "number", "description": "Percentage score (0-100) across contract rules."},
+                "total_rules": {"type": "integer", "description": "Number of rules evaluated."},
+                "passed_rules": {"type": "integer", "description": "Count of rules passing."},
+                "failed_rules": {"type": "integer", "description": "Count of rules failing."},
+                "results": {
+                    "type": "array",
+                    "description": "Per-rule pass/fail breakdown with expected vs actual evidence.",
+                    "items": {"type": "object"},
+                },
+            },
+        },
+    },
 ]
 
 
@@ -485,6 +703,20 @@ class AgentFlightMCPServer:
             }
         raise KeyError(f"Unknown prompt: {name}")
 
+    @staticmethod
+    def _resolve_cassette_source(arguments: Dict[str, Any]) -> Any:
+        if "cassette_json" in arguments and arguments["cassette_json"] is not None:
+            raw = arguments["cassette_json"]
+            if isinstance(raw, str):
+                return json.loads(raw)
+            if isinstance(raw, dict):
+                return raw
+            raise ValueError("'cassette_json' must be a JSON object or JSON string.")
+        cassette_path = arguments.get("cassette_path")
+        if cassette_path:
+            return str(cassette_path)
+        raise ValueError("Provide either 'cassette_json' or 'cassette_path'.")
+
     def _call_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         if name == "agentflight_diff_cassettes":
             baseline_path = arguments.get("baseline_path")
@@ -532,6 +764,65 @@ class AgentFlightMCPServer:
                     "head_hash": rec.head_hash,
                 }
             )
+
+        if name == "agentflight_optimize_tools":
+            tools = arguments.get("tools")
+            if not isinstance(tools, list):
+                raise ValueError("'tools' must be a list of MCP tool definitions.")
+            optimizer = ToolSchemaOptimizer()
+            results = optimizer.optimize_tools(tools)
+            hardened = [r.hardened_tool for r in results]
+            post_lint = self.linter.lint(hardened)
+            return self._tool_response(
+                {
+                    "tools_optimized": len(results),
+                    "smells_resolved": sum(r.smells_resolved for r in results),
+                    "post_lint_score": post_lint.ergonomics_score,
+                    "post_lint_grade": post_lint.grade,
+                    "hardened_tools": hardened,
+                }
+            )
+
+        if name == "agentflight_post_mortem":
+            source = self._resolve_cassette_source(arguments)
+            ceiling = float(arguments.get("max_cost_ceiling_usd", 2.0))
+            incident_report = FlightPostMortemAnalyzer(max_cost_ceiling_usd=ceiling).analyze(source)
+            payload = incident_report.to_dict()
+            payload["markdown_report"] = incident_report.to_markdown()
+            return self._tool_response(payload)
+
+        if name == "agentflight_audit_policy":
+            mode = str(arguments.get("mode", "standard"))
+            engine = TrajectoryPolicyEngine(mode=mode)  # type: ignore[arg-type]
+            actor = arguments.get("actor")
+            if actor and "cassette_json" not in arguments and "cassette_path" not in arguments:
+                raw_payload = arguments.get("input_payload")
+                input_payload = raw_payload if isinstance(raw_payload, dict) else {}
+                decision = engine.evaluate(str(actor), input_payload, raise_on_block=False)
+                return self._tool_response(
+                    {
+                        "passed": decision.allowed,
+                        "action": decision.action,
+                        "violation_count": len(decision.violations),
+                        "violations": [v.to_dict() for v in decision.violations],
+                    }
+                )
+            source = self._resolve_cassette_source(arguments)
+            audit = engine.audit_cassette(source)
+            return self._tool_response(audit.to_dict())
+
+        if name == "agentflight_evaluate_contract":
+            spec = arguments.get("contract")
+            if isinstance(spec, str):
+                spec = json.loads(spec)
+            if not isinstance(spec, dict):
+                raise ValueError("'contract' must be a JSON object.")
+            source = self._resolve_cassette_source(arguments)
+            contract = FlightContract.from_dict(spec)
+            eval_report = contract.evaluate(source)
+            payload = eval_report.to_dict()
+            payload["markdown_report"] = eval_report.to_markdown()
+            return self._tool_response(payload)
 
         raise KeyError(f"Unknown tool: {name}")
 

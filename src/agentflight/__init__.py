@@ -6,6 +6,7 @@ Loop/Cost Circuit Breaker & MCP Tool-Smell Linter.
 """
 
 from ._version import __version__
+from .assertions import ContractReport, FlightContract, RuleResult, assert_trajectory
 from .diff import (
     TrajectoryDifferentialAnalyzer,
     TrajectoryDiffReport,
@@ -26,6 +27,14 @@ from .linter import (
 )
 from .mcp_server import MCP_TOOLS, AgentFlightMCPServer
 from .otel_export import OTelSpanPayload, export_cassette_to_otel
+from .policy import (
+    PolicyAuditReport,
+    PolicyDecision,
+    PolicyRule,
+    PolicyViolation,
+    PolicyViolationError,
+    TrajectoryPolicyEngine,
+)
 from .post_mortem import FlightPostMortemAnalyzer, IncidentReport
 from .providers import get_provider, list_providers, register_provider
 from .providers.openany import (
@@ -100,6 +109,16 @@ __all__ = [
     "flight_test",
     "FlightPostMortemAnalyzer",
     "IncidentReport",
+    "PolicyRule",
+    "PolicyDecision",
+    "PolicyViolation",
+    "PolicyViolationError",
+    "PolicyAuditReport",
+    "TrajectoryPolicyEngine",
+    "FlightContract",
+    "ContractReport",
+    "RuleResult",
+    "assert_trajectory",
     "ToolSchemaOptimizer",
     "SchemaOptimizationResult",
     "FlightCallbackHandler",

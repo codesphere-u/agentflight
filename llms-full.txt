@@ -1,4 +1,4 @@
-# AgentFlight — Complete Repository Knowledge Pack (`v1.5.0`)
+# AgentFlight — Complete Repository Knowledge Pack (`v1.6.0`)
 
 > Repository: https://github.com/codesphere-u/agentflight
 > Website: https://codesphere-u.github.io/agentflight/
@@ -7,7 +7,7 @@
 
 ## Python Package & Entry Points (`pyproject.toml`)
 
-- Distribution name: `agentflight-mcp` (`v1.5.0`)
+- Distribution name: `agentflight-mcp` (`v1.6.0`)
 - Import package: `agentflight` (`src/agentflight/`)
 - Console script: `agentflight = agentflight.cli:main`
 - Pytest entry point: `agentflight = _agentflight_pytest`
@@ -15,11 +15,14 @@
 
 ## CLI Subcommands (`agentflight <cmd>`)
 
-- `doctor [--json]` — Verifies Python 3.10+, stdlib core modules, lazy pytest plugin registration, SHA-256 chain + secret redaction, and circuit breaker tripping.
+- `doctor [--json]` — Verifies Python 3.10+, stdlib core modules, lazy pytest plugin registration, SHA-256 chain + secret redaction, circuit breaker tripping, and policy/contract engines.
 - `demo` — Offline end-to-end showcase of recording, replay, loop tripping, and trajectory diffing.
 - `lint [--schema-file <path>] [--json]` — Runs static `TS001`–`TS010` MCP tool ergonomics checks.
 - `fix <schema_file> [--output <path> | --in-place]` — Hardens smelly MCP schemas to Glama TDQS Gold Standard.
-- `ci [--schema-file <path>] [--cassette <path>] [--max-cost <usd>] [--fail-on-smell] [--github-summary]` — CI/CD pre-flight gate.
+- `replay <cassette> [--fork-at <idx>] [--fork-out <path>] [--override-output-json <json>]` — Deterministic `$0.00` replay and counterfactual time-travel cassette forking.
+- `policy-audit <cassette> [--mode {strict,read-only,standard}] [--allow-tool ...] [--block-tool ...] [--json]` — Offline `PF001`–`PF007` Policy Firewall audit.
+- `contract <cassette> [--contract-file <json>] [--must-call ...] [--must-not-call ...] [--max-cost <usd>] [--json]` — Behavioral trajectory contract verification.
+- `ci [--schema-file <path>] [--cassette <path>] [--contract <json>] [--policy-mode <mode>] [--max-cost <usd>] [--fail-on-smell] [--github-summary]` — CI/CD pre-flight gate.
 - `diff <baseline> <candidate> [--similarity-threshold 0.80] [--json]` — Computes Levenshtein/LCS sequence similarity and cost/error deltas.
 - `post-mortem <cassette> [--output <path>] [--json]` — Produces AAIB/NTSB incident analysis reports.
 - `export-otel <cassette> [--output <path>] [--service-name <name>]` — Emits W3C TraceContext / OpenTelemetry JSON spans.

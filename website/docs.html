@@ -11,7 +11,7 @@
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#fffdf2" />
     <link rel="canonical" href="https://codesphere-u.github.io/agentflight/docs.html" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.5.0" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.6.0" />
     <link rel="manifest" href="./manifest.webmanifest" />
 
     <meta property="og:type" content="website" />
@@ -38,7 +38,7 @@
       .docs-sidebar { flex: 0 0 196px; width: 196px; position: sticky; top: 2rem; }
       .docs-mobile-nav { display: none; }
     </style>
-    <link rel="stylesheet" href="./styles.css?v=1.5.0" />
+    <link rel="stylesheet" href="./styles.css?v=1.6.0" />
   </head>
   <body data-analytics="plausible">
     <div class="page-col page-col-docs">
@@ -79,7 +79,7 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            v1.5.0
+            v1.6.0
           </a>
         </nav>
       </header>
@@ -208,7 +208,7 @@
                       GitHub CI
                     </button>
                   </div>
-                  <span class="version-tag">v1.5.0</span>
+                  <span class="version-tag">v1.6.0</span>
                 </div>
 
                 <p class="eyebrow-label" id="inst-eyebrow">INSTALL PYTHON SDK &amp; CLI</p>
@@ -396,6 +396,26 @@ guard = TrajectoryCircuitBreaker(max_identical_repeats=3, max_ping_pong_cycles=2
                         <td><span class="pill pill-good">Hosted HTTP + Stdio</span></td>
                       </tr>
                       <tr>
+                        <td><code>agentflight_optimize_tools</code></td>
+                        <td>Compute actionable fixes for weak MCP schemas</td>
+                        <td><span class="pill pill-good">Hosted HTTP + Stdio</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>agentflight_post_mortem</code></td>
+                        <td>AAIB/NTSB Markdown &amp; JSON root-cause report</td>
+                        <td><span class="pill pill-good">Hosted HTTP + Stdio</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>agentflight_audit_policy</code></td>
+                        <td>Evaluate PF001–PF007 Policy Firewall rules</td>
+                        <td><span class="pill pill-good">Hosted HTTP + Stdio</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>agentflight_evaluate_contract</code></td>
+                        <td>Verify FlightContract assertions &amp; cost budgets</td>
+                        <td><span class="pill pill-good">Hosted HTTP + Stdio</span></td>
+                      </tr>
+                      <tr>
                         <td><code>agentflight_verify_cassette</code></td>
                         <td>Verify SHA-256 chain integrity</td>
                         <td><span class="pill pill-sky">Local Stdio / Self-Hosted</span></td>
@@ -412,7 +432,7 @@ guard = TrajectoryCircuitBreaker(max_identical_repeats=3, max_ping_pong_cycles=2
                       </tr>
                       <tr>
                         <td><code>agentflight://rules/catalog</code></td>
-                        <td>Machine-readable rule rubric resource</td>
+                        <td>Machine-readable 22-rule rubric resource</td>
                         <td><span class="pill pill-amber">Hosted HTTP + Stdio</span></td>
                       </tr>
                     </tbody>
@@ -436,8 +456,11 @@ guard = TrajectoryCircuitBreaker(max_identical_repeats=3, max_ping_pong_cycles=2
                 Generate structured Markdown or JSON failure reports pinpointing root-cause loops, cost explosions, and exact failing tool steps from any saved <code>.flight.json</code> file:
               </p>
               <div class="doc-codeblock">
-                <pre><span class="syn-cmd">agentflight post-mortem</span> <span class="syn-arg">crash_incident.flight.json</span> <span class="syn-arg">--output</span> <span class="syn-str">POST_MORTEM.md</span></pre>
-                <button type="button" class="copy-icon-btn" data-copy="agentflight post-mortem crash_incident.flight.json --output POST_MORTEM.md" aria-label="Copy post-mortem command">
+                <pre><span class="syn-cmd">agentflight post-mortem</span> <span class="syn-arg">crash_incident.flight.json</span> <span class="syn-arg">--output</span> <span class="syn-str">POST_MORTEM.md</span>
+<span class="syn-cmd">agentflight policy-audit</span> <span class="syn-arg">crash_incident.flight.json</span> <span class="syn-arg">--mode strict --json</span>
+<span class="syn-cmd">agentflight contract</span> <span class="syn-arg">crash_incident.flight.json</span> <span class="syn-arg">--must-call</span> <span class="syn-str">search_logs</span> <span class="syn-arg">--max-cost 0.25</span>
+<span class="syn-cmd">agentflight replay</span> <span class="syn-arg">crash_incident.flight.json</span> <span class="syn-arg">--fork-at 2 --fork-out</span> <span class="syn-str">forked.flight.json</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="agentflight policy-audit crash_incident.flight.json --mode strict --json" aria-label="Copy v1.6 CLI command">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
               </div>
@@ -518,11 +541,11 @@ guard = TrajectoryCircuitBreaker(max_identical_repeats=3, max_ping_pong_cycles=2
           <span>·</span>
           <a href="https://github.com/codesphere-u/agentflight" target="_blank" rel="noopener noreferrer">github</a>
         </div>
-        <div>MIT Licensed · AgentFlight v1.5.0 · Works cleanly with Plausible &amp; OTel</div>
+        <div>MIT Licensed · AgentFlight v1.6.0 · Works cleanly with Plausible &amp; OTel</div>
       </footer>
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="./app.js?v=1.5.0" defer></script>
+    <script src="./app.js?v=1.6.0" defer></script>
   </body>
 </html>

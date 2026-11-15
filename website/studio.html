@@ -11,7 +11,7 @@
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#fffdf2" />
     <link rel="canonical" href="https://codesphere-u.github.io/agentflight/studio.html" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.5.0" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.6.0" />
     <link rel="manifest" href="./manifest.webmanifest" />
 
     <meta property="og:type" content="website" />
@@ -34,7 +34,7 @@
       [hidden] { display: none !important; }
       .brand-wordmark-svg { height: 36px; width: 196px; display: block; }
     </style>
-    <link rel="stylesheet" href="./styles.css?v=1.5.0" />
+    <link rel="stylesheet" href="./styles.css?v=1.6.0" />
   </head>
   <body data-analytics="plausible">
     <div class="page-col">
@@ -75,7 +75,7 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            v1.5.0
+            v1.6.0
           </a>
         </nav>
       </header>
@@ -115,11 +115,14 @@
               <button type="button" class="handy-tab" role="tab" aria-selected="false" data-studio="breaker">
                 Circuit Breaker
               </button>
+              <button type="button" class="handy-tab" role="tab" aria-selected="false" data-studio="policy">
+                Policy &amp; Contracts
+              </button>
               <button type="button" class="handy-tab" role="tab" aria-selected="false" data-studio="outputs">
                 Flight Artifacts
               </button>
             </div>
-            <span class="version-tag">v1.5.0</span>
+            <span class="version-tag">v1.6.0</span>
           </div>
 
           <!-- Tab 1: Live MCP Tool-Smell Linter -->
@@ -180,11 +183,47 @@
             <pre class="code-block" id="cb-output"></pre>
           </div>
 
-          <!-- Tab 3: Flight Artifacts Explorer -->
+          <!-- Tab 3: Runtime Policy Firewall & Behavioral Contract Studio -->
+          <div class="studio-panel" id="panel-policy" role="tabpanel">
+            <div class="form-row-2">
+              <div class="field">
+                <label for="pf-mode">Policy Firewall Mode</label>
+                <select id="pf-mode" class="select">
+                  <option value="strict">strict (SSRF/SQL/Secret Block + Mutation Warn)</option>
+                  <option value="read-only">read-only (Block All Mutating Actors)</option>
+                  <option value="standard">standard (Safety Guardrails Active)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="pf-preset">Tool Call / Contract Scenario</label>
+                <select id="pf-preset" class="select">
+                  <option value="ssrf">PF003: Cloud Metadata SSRF Probe (169.254.169.254)</option>
+                  <option value="sql">PF005: Destructive DROP TABLE Statement</option>
+                  <option value="secret">PF006: Live API Secret Exfiltration (sk-proj-...)</option>
+                  <option value="traversal">PF004: Sensitive Path Traversal (../../etc/passwd)</option>
+                  <option value="contract-pass">FlightContract SLA: Ordered Plan → Query → Summary (PASS)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="toolbar-between" style="margin-bottom: 0.65rem;">
+              <span style="font-size: 0.85rem; color: var(--text-70);">Live pre-flight firewall &amp; SLA evaluation</span>
+              <div style="display: flex; gap: 0.4rem;">
+                <button type="button" class="action-mini" id="pf-run-btn">Run Policy Check</button>
+                <button type="button" class="action-mini" id="pf-copy-btn">Copy report</button>
+              </div>
+            </div>
+
+            <pre class="code-block" id="pf-output"></pre>
+          </div>
+
+          <!-- Tab 4: Flight Artifacts Explorer -->
           <div class="studio-panel" id="panel-outputs" role="tabpanel">
             <div class="preset-pills" style="margin-bottom: 0.75rem;" aria-label="AgentFlight artifact selector">
               <button type="button" class="chip-btn active" data-out="cassette">.flight.json</button>
               <button type="button" class="chip-btn" data-out="diff">diff-report.json</button>
+              <button type="button" class="chip-btn" data-out="policy">policy-audit.json</button>
+              <button type="button" class="chip-btn" data-out="fork">fork-diff.json</button>
               <button type="button" class="chip-btn" data-out="otel">spans.otel.json</button>
               <button type="button" class="chip-btn" data-out="postmortem">POST_MORTEM.md</button>
               <button type="button" class="chip-btn" data-out="doctor">doctor.json</button>
@@ -206,7 +245,7 @@
 
         <section class="download-hub" id="install" aria-labelledby="download-title">
           <h2 id="download-title">Install AgentFlight</h2>
-          <div class="download-version">v1.5.0</div>
+          <div class="download-version">v1.6.0</div>
 
           <div class="download-stack">
             <h3>Python SDK &amp; CLI</h3>
@@ -251,6 +290,6 @@
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="./app.js?v=1.5.0" defer></script>
+    <script src="./app.js?v=1.6.0" defer></script>
   </body>
 </html>

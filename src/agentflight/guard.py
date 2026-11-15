@@ -15,9 +15,12 @@ from __future__ import annotations
 
 import threading
 from dataclasses import dataclass
-from typing import Any, Dict, List, Literal, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple
 
 from .recorder import SpanKind, SpanStatus, TrajectorySpan, canonical_hash
+
+if TYPE_CHECKING:  # pragma: no cover
+    from .policy import TrajectoryPolicyEngine
 
 TripReason = Literal[
     "exact_call_loop",
@@ -113,6 +116,7 @@ class TrajectoryCircuitBreaker:
         max_consecutive_errors: int = 3,
         max_total_tokens: Optional[int] = 50_000,
         max_cost_usd: Optional[float] = 1.00,
+        policy: Optional["TrajectoryPolicyEngine"] = None,
     ) -> None:
         if max_identical_repeats < 2:
             raise ValueError("max_identical_repeats must be >= 2")
@@ -126,6 +130,7 @@ class TrajectoryCircuitBreaker:
         self.max_consecutive_errors = max_consecutive_errors
         self.max_total_tokens = max_total_tokens
         self.max_cost_usd = max_cost_usd
+        self.policy = policy
 
         self._history: List[Tuple[str, str]] = []  # (actor, input_hash)
         self.stats = CircuitBreakerStats()
@@ -136,6 +141,8 @@ class TrajectoryCircuitBreaker:
         with self._lock:
             self._history.clear()
             self.stats = CircuitBreakerStats()
+            if self.policy is not None:
+                self.policy.reset()
 
     def reserve_budget(self, estimated_cost_usd: float) -> BudgetReservation:
         """
@@ -194,6 +201,14 @@ class TrajectoryCircuitBreaker:
         """
         with self._lock:
             step_idx = self.stats.steps_observed
+            if self.policy is not None:
+                self.policy.evaluate(
+                    actor,
+                    input_payload,
+                    kind=kind,
+                    step_index=step_idx,
+                    raise_on_block=True,
+                )
             self.stats.steps_observed += 1
             self.stats.total_tokens += int(prompt_tokens) + int(completion_tokens)
             self.stats.total_cost_usd = round(self.stats.total_cost_usd + float(cost_usd), 8)

@@ -6,7 +6,7 @@
 
 [![CI & Reliability Gate](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/agentflight/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/agentflight-mcp.svg?color=blue)](https://pypi.org/project/agentflight-mcp/)
-[![Release v1.5.0](https://img.shields.io/badge/release-v1.5.0-7cc6fe.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.5.0)
+[![Release v1.6.0](https://img.shields.io/badge/release-v1.6.0-7cc6fe.svg)](https://github.com/codesphere-u/agentflight/releases/tag/v1.6.0)
 [![Docs & Website](https://img.shields.io/badge/website-codesphere--u.github.io%2Fagentflight-ffd166.svg)](https://codesphere-u.github.io/agentflight/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05-7c3aed.svg)](https://modelcontextprotocol.io/)
@@ -14,13 +14,13 @@
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-✔%20Connected-10b981?logo=anthropic&logoColor=white)](#hosted-endpoint-vercel)
 [![Glama Score](https://glama.ai/mcp/servers/codesphere-u/agentflight/badges/score.svg)](https://glama.ai/mcp/servers/codesphere-u/agentflight)
 [![Smithery Ready](https://img.shields.io/badge/Smithery-Ready-purple)](smithery.yaml)
-[![Tests Passed](https://img.shields.io/badge/tests-167%20passed%20(91%25%20cov)-brightgreen.svg)](tests/)
+[![Tests Passed](https://img.shields.io/badge/tests-177%20passed%20(90%25%20cov)-brightgreen.svg)](tests/)
 [![Core SDK Stdlib](https://img.shields.io/badge/core%20SDK-100%25%20Python%20stdlib-brightgreen.svg)](src/agentflight/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
-**AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay (`<0.02 ms`, `$0.00` CI Spend), Differential Regression Detector, OpenTelemetry / W3C TraceContext Exporter (for `stackpulse`), Real-Time Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter.**
+**AI Agent Black-Box Flight Recorder, Deterministic Trajectory Replay & Time-Travel Forking (`<0.02 ms`, `$0.00` CI Spend), Runtime Policy Firewall (`PF001`–`PF007`), Behavioral Trajectory Contracts (`FlightContract`), OpenTelemetry / W3C TraceContext Exporter (for `stackpulse`), Real-Time Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter.**
 
-> 🌐 **Editorial Website, Interactive MCP Studio & Full Docs:** Explore [`https://codesphere-u.github.io/agentflight/`](https://codesphere-u.github.io/agentflight/) — featuring the browser-side [Interactive Studio](https://codesphere-u.github.io/agentflight/studio.html), [Verified Proof](https://codesphere-u.github.io/agentflight/proof.html), [Chaptered Documentation](https://codesphere-u.github.io/agentflight/docs.html), and [15 Rules Rubric](https://codesphere-u.github.io/agentflight/rules.html).
+> 🌐 **Editorial Website, Interactive MCP Studio & Full Docs:** Explore [`https://codesphere-u.github.io/agentflight/`](https://codesphere-u.github.io/agentflight/) — featuring the browser-side [Interactive Studio](https://codesphere-u.github.io/agentflight/studio.html), [Verified Proof](https://codesphere-u.github.io/agentflight/proof.html), [Chaptered Documentation](https://codesphere-u.github.io/agentflight/docs.html), and [22 Rules Rubric](https://codesphere-u.github.io/agentflight/rules.html).
 >
 > 🚀 **Live Hosted MCP Endpoint:** Connect Claude Code, Cursor, or Windsurf directly via Streamable HTTP at [`https://agentflight-tau.vercel.app/mcp`](https://agentflight-tau.vercel.app).
 >
@@ -89,8 +89,8 @@ Production AI agent engineering in 2026 faces two compounding bottlenecks:
 # Install from PyPI (module import & CLI command remain `agentflight`):
 pip install agentflight-mcp
 
-# Or install v1.5.0 directly from GitHub:
-pip install "git+https://github.com/codesphere-u/agentflight.git@v1.5.0"
+# Or install v1.6.0 directly from GitHub:
+pip install "git+https://github.com/codesphere-u/agentflight.git@v1.6.0"
 
 # Contributors:
 pip install -e ".[dev]"

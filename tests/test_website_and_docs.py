@@ -10,8 +10,8 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 WEBSITE_DIR = ROOT_DIR / "website"
 
 
-def test_version_is_1_5_0() -> None:
-    assert agentflight.__version__ == "1.5.0"
+def test_version_is_1_6_0() -> None:
+    assert agentflight.__version__ == "1.6.0"
 
 
 def test_website_pages_and_assets_present() -> None:
@@ -40,9 +40,9 @@ def test_html_pages_have_cache_busted_assets_and_hidden_guard() -> None:
     html_pages = ["index.html", "studio.html", "proof.html", "docs.html", "rules.html"]
     for page in html_pages:
         content = (WEBSITE_DIR / page).read_text(encoding="utf-8")
-        assert "styles.css?v=1.5.0" in content
-        assert "app.js?v=1.5.0" in content
-        assert "favicon.svg?v=1.5.0" in content
+        assert "styles.css?v=1.6.0" in content
+        assert "app.js?v=1.6.0" in content
+        assert "favicon.svg?v=1.6.0" in content
         assert "[hidden]" in content
         assert 'width="196" height="36"' in content
 

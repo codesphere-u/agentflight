@@ -2,6 +2,21 @@
 
 All notable changes to `agentflight` are documented in this file.
 
+## [1.6.0] - 2026-11-15
+
+### Added
+- **Runtime Policy Firewall (`src/agentflight/policy.py`, `PF001`–`PF007`):**
+  - Added pure-stdlib `TrajectoryPolicyEngine`, `PolicyRule`, `PolicyDecision`, `PolicyViolation`, `PolicyViolationError`, and `PolicyAuditReport` blocking unsafe tool calls pre-execution and auditing saved cassettes offline.
+  - Enforces allowlist/blocklists (`PF001`), destructive-tool & read-only gates (`PF002`), SSRF/cloud-metadata URLs (`PF003`), path traversal (`PF004`), destructive SQL (`PF005`), unredacted secret exfiltration (`PF006`), and mutating-call ceilings (`PF007`), plus `policy=...` integration directly in `TrajectoryCircuitBreaker`.
+- **Behavioral Trajectory Contracts (`src/agentflight/assertions.py`):**
+  - Added declarative `FlightContract`, `ContractReport`, `RuleResult`, and `assert_trajectory(...)` plus `FlightSession.assert_contract(...)` supporting `must_call`, `must_not_call`, `must_follow_order`, latency/token/cost ceilings, error rates, SHA-256 hash-chain verification, and zero-leak checks.
+- **Time-Travel Cassette Forking (`src/agentflight/recorder.py`):**
+  - Added `FlightRecorder.from_cassette_dict`, `FlightRecorder.fork_from`, and `CassetteReplayer.fork_at` to branch trajectories from any step with `$0.00` prefix replay and counterfactual step patching while rebuilding valid SHA-256 hash chains.
+- **8-Tool MCP Server, CLI Subcommands & Website Studio v1.6.0 (`src/agentflight/mcp_server.py`, `src/agentflight/cli.py`, `website/`):**
+  - Added 4 stateless MCP tools (`agentflight_optimize_tools`, `agentflight_post_mortem`, `agentflight_audit_policy`, `agentflight_evaluate_contract`) and stripped `cassette_path` in hosted HTTP mode (`HOSTED_FORBIDDEN_ARGS`) for Vercel isolation.
+  - Added CLI subcommands `agentflight replay --fork-at`, `agentflight policy-audit`, and `agentflight contract`, `--contract` / `--policy-mode` on `ci`, and `policy_and_contracts` checks in `doctor`.
+  - Upgraded `website/` (`Policy & Contracts` studio tab, `PF001`–`PF007` rules rubric, `Forks & Artifacts` samples, and 8-tool docs).
+
 ## [1.5.0] - 2026-11-14
 
 ### Added

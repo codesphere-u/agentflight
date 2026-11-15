@@ -1,4 +1,4 @@
-# AgentFlight — Extended Website & Technical Knowledge Pack (`v1.5.0`)
+# AgentFlight — Extended Website & Technical Knowledge Pack (`v1.6.0`)
 
 > Live Website: https://codesphere-u.github.io/agentflight/
 > Dedicated Pages: `/studio.html`, `/proof.html`, `/docs.html`, `/rules.html`
@@ -22,5 +22,7 @@
    - Audits MCP tool definitions across `TS001`–`TS010` at `1,676 tools/sec` and repairs flaky schemas via `agentflight fix`.
 5. **Post-Mortems & OpenTelemetry Export**:
    - Generates AAIB/NTSB Markdown/JSON incident reports (`agentflight post-mortem`) and W3C TraceContext spans (`agentflight export-otel`).
-6. **Hosted & Local MCP Server**:
-   - `agentflight serve-mcp` over stdio, plus hosted Streamable HTTP at `https://agentflight-tau.vercel.app/mcp`.
+6. **Runtime Policy Firewall (`TrajectoryPolicyEngine`, `PF001`–`PF007`) & Trajectory Contracts (`FlightContract`)**:
+   - Blocks SSRF, path traversal, destructive SQL, unredacted secret exfiltration, and read-only mutations before execution, and asserts `must_call` / `must_not_call` / order / latency / cost invariants in pytest or CI.
+7. **Time-Travel Cassette Forking (`fork_from` / `fork_at`) & 8-Tool MCP Server**:
+   - Branches any saved cassette from step `k` (`$0.00` prefix replay) with custom output overrides, alongside 8 MCP tools over stdio or Streamable HTTP at `https://agentflight-tau.vercel.app/mcp`.

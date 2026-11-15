@@ -208,6 +208,15 @@ class FlightSession:
 
         return _wrapper
 
+    def assert_contract(self, contract: Any) -> Any:
+        """
+        Evaluate a `FlightContract` (or dict specification) against this session's
+        recorded spans, raising `AssertionError` if any behavioral invariant fails.
+        """
+        from .assertions import assert_trajectory
+
+        return assert_trajectory(self.recorder, contract)
+
     def __enter__(self) -> FlightSession:
         return self
 

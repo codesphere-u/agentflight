@@ -1,18 +1,18 @@
 # AgentFlight
 
-> AI Agent Black-Box Flight Recorder, 0.08 us Deterministic Trajectory Replay ($0.00 CI spend), Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter (`TS001`–`TS010`).
+> AI Agent Black-Box Flight Recorder, <0.02 ms Deterministic Trajectory Replay & Time-Travel Forking ($0.00 CI spend), Runtime Policy Firewall (`PF001`–`PF007`), Behavioral Contracts (`FlightContract`), Loop/Cost Circuit Breaker (`CB001`–`CB005`) & 10-Rule MCP Tool-Smell Linter (`TS001`–`TS010`).
 
 ## Website Pages
 
 - [Home](https://codesphere-u.github.io/agentflight/): Overview, Black-Box Flight Recorder overview, CLI/Pytest installer & interactive preview.
-- [Interactive Studio](https://codesphere-u.github.io/agentflight/studio.html): Browser-side 10-rule MCP Tool-Smell Linter, Circuit Breaker simulator & artifact explorer.
+- [Interactive Studio](https://codesphere-u.github.io/agentflight/studio.html): Browser-side 10-rule MCP Tool-Smell Linter, Circuit Breaker simulator, Policy & Contracts Lab & artifact explorer.
 - [Verified Proof](https://codesphere-u.github.io/agentflight/proof.html): Python 3.12 benchmarks (353k replay spans/s), before/after hardening & CI comparison.
-- [Documentation](https://codesphere-u.github.io/agentflight/docs.html): Installation, SDK wrappers (`wrap_openai`, `wrap_anthropic`), SHA-256 cassettes, pytest plugin, MCP server & OTel export.
-- [15 Rules Reference](https://codesphere-u.github.io/agentflight/rules.html): Complete rubric for `TS001`–`TS010` and `CB001`–`CB005`.
+- [Documentation](https://codesphere-u.github.io/agentflight/docs.html): Installation, SDK wrappers (`wrap_openai`, `wrap_anthropic`), SHA-256 cassettes, pytest plugin, 8 MCP tools & OTel export.
+- [22 Rules Reference](https://codesphere-u.github.io/agentflight/rules.html): Complete rubric for `TS001`–`TS010`, `CB001`–`CB005`, and `PF001`–`PF007`.
 - [Full Knowledge Pack (`llms-full.txt`)](https://codesphere-u.github.io/agentflight/llms-full.txt): Complete SDK, CLI, MCP, pytest, and architecture reference.
 
 ## Hosted Endpoints & Repository
 
-- [Live MCP Streamable HTTP Gateway](https://agentflight-tau.vercel.app/mcp): Stateless public endpoint exposing `agentflight_lint_tools` and `agentflight://rules/catalog`.
-- [GitHub Repository](https://github.com/codesphere-u/agentflight): MIT-licensed Python 3.10+ source code (`v1.5.0`), Dockerfile, and CI workflows.
+- [Live MCP Streamable HTTP Gateway](https://agentflight-tau.vercel.app/mcp): Stateless public endpoint exposing `agentflight_lint_tools`, `agentflight_optimize_tools`, `agentflight_post_mortem`, `agentflight_audit_policy`, `agentflight_evaluate_contract`, and `agentflight://rules/catalog`.
+- [GitHub Repository](https://github.com/codesphere-u/agentflight): MIT-licensed Python 3.10+ source code (`v1.6.0`), Dockerfile, and CI workflows.
 - [PyPI Package (`agentflight-mcp`)](https://pypi.org/project/agentflight-mcp/): Installable via `pip install agentflight-mcp` or `uvx --from agentflight-mcp agentflight doctor`.

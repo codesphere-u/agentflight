@@ -11,7 +11,7 @@
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#fffdf2" />
     <link rel="canonical" href="https://codesphere-u.github.io/agentflight/rules.html" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.5.0" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.6.0" />
     <link rel="manifest" href="./manifest.webmanifest" />
 
     <meta property="og:type" content="website" />
@@ -38,7 +38,7 @@
       .docs-sidebar { flex: 0 0 196px; width: 196px; position: sticky; top: 2rem; }
       .docs-mobile-nav { display: none; }
     </style>
-    <link rel="stylesheet" href="./styles.css?v=1.5.0" />
+    <link rel="stylesheet" href="./styles.css?v=1.6.0" />
   </head>
   <body data-analytics="plausible">
     <div class="page-col page-col-docs">
@@ -79,18 +79,19 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            v1.5.0
+            v1.6.0
           </a>
         </nav>
       </header>
 
       <main>
         <div class="docs-mobile-nav" aria-label="Rule categories filter mobile">
-          <button type="button" class="docs-mobile-chip active" data-pillarfilter="all">All (15)</button>
+          <button type="button" class="docs-mobile-chip active" data-pillarfilter="all">All (22)</button>
           <button type="button" class="docs-mobile-chip" data-pillarfilter="Schema Clarity">Clarity</button>
           <button type="button" class="docs-mobile-chip" data-pillarfilter="Structure & Bounds">Structure</button>
           <button type="button" class="docs-mobile-chip" data-pillarfilter="Suite & Safety">Safety</button>
           <button type="button" class="docs-mobile-chip" data-pillarfilter="Circuit Breakers">Breakers</button>
+          <button type="button" class="docs-mobile-chip" data-pillarfilter="Policy Firewall">Firewall</button>
         </div>
 
         <div class="docs-layout">
@@ -98,7 +99,7 @@
             <nav>
               <ul class="docs-rail">
                 <li class="doc-nav-item">
-                  <button type="button" class="doc-nav-link active" data-pillarfilter="all">All 15 Rules</button>
+                  <button type="button" class="doc-nav-link active" data-pillarfilter="all">All 22 Rules</button>
                 </li>
                 <li class="doc-nav-item">
                   <button type="button" class="doc-nav-link" data-pillarfilter="Schema Clarity">Schema Clarity</button>
@@ -111,6 +112,9 @@
                 </li>
                 <li class="doc-nav-item">
                   <button type="button" class="doc-nav-link" data-pillarfilter="Circuit Breakers">Circuit Breakers</button>
+                </li>
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-pillarfilter="Policy Firewall">Policy Firewall</button>
                 </li>
                 <li class="doc-nav-item">
                   <a class="doc-nav-link" href="#autofix">Auto-Hardening CLI</a>
@@ -126,9 +130,9 @@
           </aside>
 
           <article class="doc-content">
-            <h1 id="rules-page-title">15 Deterministic Rules</h1>
+            <h1 id="rules-page-title">22 Deterministic Rules</h1>
             <p>
-              AgentFlight combines <strong>10 static MCP schema ergonomics rules</strong> (<code>TS001–TS010</code>) with <strong>5 runtime circuit-breaker guards</strong> (<code>CB001–CB005</code>). Filter by group on the left rail or search below.
+              AgentFlight combines <strong>10 static MCP schema ergonomics rules</strong> (<code>TS001–TS010</code>), <strong>5 runtime circuit-breaker guards</strong> (<code>CB001–CB005</code>), and <strong>7 runtime policy firewall rules</strong> (<code>PF001–PF007</code>). Filter by group on the left rail or search below.
             </p>
 
             <section id="rules" aria-labelledby="rubric-table-title">
@@ -138,15 +142,16 @@
                   id="rule-search"
                   class="input"
                   type="search"
-                  placeholder="Search rules (e.g. TS008, enum, ping-pong, token, delete_)"
+                  placeholder="Search rules (e.g. TS008, SSRF, PF003, ping-pong, DROP TABLE)"
                   aria-label="Filter rules by keyword"
                 />
                 <select id="rule-pillar" class="select" aria-label="Filter by rule group">
-                  <option value="all">All Groups (15)</option>
+                  <option value="all">All Groups (22)</option>
                   <option value="Schema Clarity">Schema Clarity</option>
                   <option value="Structure & Bounds">Structure &amp; Bounds</option>
                   <option value="Suite & Safety">Suite &amp; Safety</option>
                   <option value="Circuit Breakers">Circuit Breakers</option>
+                  <option value="Policy Firewall">Policy Firewall</option>
                 </select>
               </div>
 
@@ -236,6 +241,6 @@
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="./app.js?v=1.5.0" defer></script>
+    <script src="./app.js?v=1.6.0" defer></script>
   </body>
 </html>

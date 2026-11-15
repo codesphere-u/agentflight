@@ -1,20 +1,20 @@
-# AgentFlight (`v1.5.0`)
+# AgentFlight (`v1.6.0`)
 
-> AI Agent Black-Box Flight Recorder, 0.08 us Deterministic Trajectory Replay ($0.00 CI spend), Loop/Cost Circuit Breaker & 10-Rule MCP Tool-Smell Linter (`TS001`–`TS010`).
+> AI Agent Black-Box Flight Recorder, <0.02 ms Deterministic Trajectory Replay & Time-Travel Forking ($0.00 CI spend), Runtime Policy Firewall (`PF001`–`PF007`), Behavioral Contracts (`FlightContract`), Loop/Cost Circuit Breaker (`CB001`–`CB005`) & 10-Rule MCP Tool-Smell Linter (`TS001`–`TS010`).
 
 ## Website & Documentation
 
 - [Project Website](https://codesphere-u.github.io/agentflight/): Overview, installer & live demo preview.
-- [Interactive Studio](https://codesphere-u.github.io/agentflight/studio.html): Live MCP Tool-Smell Linter, Circuit Breaker simulator & artifact viewer.
+- [Interactive Studio](https://codesphere-u.github.io/agentflight/studio.html): Live MCP Tool-Smell Linter, Circuit Breaker simulator, Policy & Contracts Lab & artifact viewer.
 - [Documentation (`website/docs.html`)](https://codesphere-u.github.io/agentflight/docs.html): Guided SDK, CLI, Pytest, MCP & OTel manual.
 - [Getting Started Guide](docs/GETTING_STARTED.md): Role-based CLI & Python SDK onboarding.
-- [MCP & Agents Setup](docs/MCP_AND_AGENTS.md): Claude Code, Cursor, Windsurf, Smithery, Glama & GitHub Actions setup.
+- [MCP & Agents Setup](docs/MCP_AND_AGENTS.md): Claude Code, Cursor, Windsurf, Smithery, Glama & GitHub Actions setup (8 MCP tools).
 - [Architecture Specification](docs/architecture.md): Core SHA-256 chain & determinism internals.
-- [15 Rules Rubric](https://codesphere-u.github.io/agentflight/rules.html): Complete `TS001`–`TS010` & `CB001`–`CB005` reference.
+- [22 Rules Rubric](https://codesphere-u.github.io/agentflight/rules.html): Complete `TS001`–`TS010`, `CB001`–`CB005`, and `PF001`–`PF007` reference.
 
 ## Quick Commands
 
 - `pip install agentflight-mcp && agentflight doctor --json`
 - `uvx --from agentflight-mcp agentflight serve-mcp`
-- `agentflight lint` / `agentflight fix tools.json` / `agentflight ci --fail-on-smell`
+- `agentflight lint` / `agentflight fix tools.json` / `agentflight policy-audit run.flight.json --mode strict` / `agentflight contract run.flight.json --must-call search_logs` / `agentflight replay run.flight.json --fork-at 2 --fork-out fork.flight.json`
 - `claude mcp add --transport http agentflight https://agentflight-tau.vercel.app/mcp`

@@ -16,7 +16,7 @@
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#fffdf2" />
     <link rel="canonical" href="https://codesphere-u.github.io/agentflight/" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.5.0" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=1.6.0" />
     <link rel="manifest" href="./manifest.webmanifest" />
 
     <meta property="og:type" content="website" />
@@ -44,7 +44,7 @@
       [hidden] { display: none !important; }
       .brand-wordmark-svg { height: 36px; width: 196px; display: block; }
     </style>
-    <link rel="stylesheet" href="./styles.css?v=1.5.0" />
+    <link rel="stylesheet" href="./styles.css?v=1.6.0" />
 
     <script type="application/ld+json">
       {
@@ -80,7 +80,7 @@
             "name": "AgentFlight",
             "applicationCategory": "DeveloperApplication",
             "operatingSystem": "macOS, Linux, Windows",
-            "softwareVersion": "1.5.0",
+            "softwareVersion": "1.6.0",
             "license": "https://opensource.org/licenses/MIT",
             "url": "https://codesphere-u.github.io/agentflight/",
             "downloadUrl": "https://pypi.org/project/agentflight-mcp/",
@@ -166,7 +166,7 @@
             target="_blank"
             rel="noopener noreferrer"
           >
-            v1.5.0
+            v1.6.0
           </a>
         </nav>
       </header>
@@ -176,7 +176,7 @@
           <div class="hero-left">
             <div class="live-pill">
               <span class="live-dot" aria-hidden="true"></span>
-              <span>SHA-256 CASSETTES · $0 CI REPLAY · 15 GUARD RULES</span>
+              <span>SHA-256 CASSETTES · POLICY FIREWALL · 22 GUARD RULES · 8 MCP TOOLS</span>
             </div>
 
             <div class="hero-identity">
@@ -265,8 +265,8 @@
             <div class="hero-kpis" aria-label="Measured flight benchmarks">
               <div class="hero-kpi"><strong>2.83 µs</strong><span>Span Replay</span></div>
               <div class="hero-kpi"><strong>1,676/s</strong><span>Tools Linted</span></div>
-              <div class="hero-kpi"><strong>15 Rules</strong><span>TS + Breakers</span></div>
-              <div class="hero-kpi"><strong>$0.00</strong><span>CI Token Spend</span></div>
+              <div class="hero-kpi"><strong>22 Rules</strong><span>TS + CB + Policy</span></div>
+              <div class="hero-kpi"><strong>8 MCP</strong><span>Live Tools</span></div>
             </div>
           </div>
 
@@ -318,7 +318,7 @@ ToolSmellLinter:   200 MCP tools in 119.3 ms (1,676/sec)</pre>
               <strong>Live 4-Stage Preflight Pipeline &amp; Telemetry Switchboard</strong>
               <span style="display:block; font-size:0.86rem; color:var(--text-70);">Select any flight scenario to trace SHA-256 hashing, secret redaction, loop breaking, and CI replay.</span>
             </div>
-            <a class="action-mini" href="./rules.html">Inspect 15 Rules →</a>
+            <a class="action-mini" href="./rules.html">Inspect 22 Rules →</a>
           </div>
 
           <div class="flight-pipeline" id="home-pipeline">
@@ -367,8 +367,8 @@ ToolSmellLinter:   200 MCP tools in 119.3 ms (1,676/sec)</pre>
                 </span>
                 <span class="bento-stat">353,356 spans/s</span>
               </div>
-              <h3>$0.00 Microsecond CI Replay</h3>
-              <p>Replace slow, non-deterministic live LLM CI runs with local cassette stubs that verify argument equality and flag <code>TrajectoryDivergenceError</code>.</p>
+              <h3>$0.00 Replay &amp; Time-Travel Forking</h3>
+              <p>Replay full cassettes in microseconds or call <code>fork_at(step)</code> to patch a failed step and test counterfactual trajectories without re-running upstream prefixes.</p>
             </article>
 
             <article class="bento-card">
@@ -376,10 +376,10 @@ ToolSmellLinter:   200 MCP tools in 119.3 ms (1,676/sec)</pre>
                 <span class="bento-icon amber" aria-hidden="true">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                 </span>
-                <span class="bento-stat">CB001–CB005</span>
+                <span class="bento-stat">CB001–PF007</span>
               </div>
-              <h3>Loop &amp; USD Spend Shield</h3>
-              <p>Stop identical call loops, alternating A↔B ping-pong cycles, error storms, and thread-safe token/USD cap overruns before dispatching requests.</p>
+              <h3>Loop Breaker &amp; Policy Firewall</h3>
+              <p>Stop identical repeats, ping-pong cycles, USD overspend, SSRF metadata fetches, path traversal, destructive SQL, and raw secret exfiltration pre-execution.</p>
             </article>
 
             <article class="bento-card">
@@ -387,10 +387,10 @@ ToolSmellLinter:   200 MCP tools in 119.3 ms (1,676/sec)</pre>
                 <span class="bento-icon" aria-hidden="true">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 </span>
-                <span class="bento-stat">TS001–TS010</span>
+                <span class="bento-stat">TS001–TS010 + SLA</span>
               </div>
-              <h3>Static MCP Tool Linter</h3>
-              <p>Audit schemas statically across 10 rules at 1,676 tools/sec to catch short descriptions, sibling overlap, deep nesting, and unguarded delete actions.</p>
+              <h3>MCP Linter &amp; Behavioral Contracts</h3>
+              <p>Auto-harden flawed schemas across 10 rules and enforce declarative <code>FlightContract</code> tool ordering, error bounds, and budget SLAs in pytest &amp; CI.</p>
             </article>
           </div>
         </section>
@@ -410,7 +410,7 @@ ToolSmellLinter:   200 MCP tools in 119.3 ms (1,676/sec)</pre>
                     <th>Reliability Gate</th>
                     <th>Live API CI Runs</th>
                     <th>Hand-Rolled Mocks</th>
-                    <th>AgentFlight v1.5.0</th>
+                    <th>AgentFlight v1.6.0</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -443,6 +443,18 @@ ToolSmellLinter:   200 MCP tools in 119.3 ms (1,676/sec)</pre>
                     <td>Manual trial &amp; error</td>
                     <td>Not included</td>
                     <td><span class="pill pill-sky">TS001–TS010 + Fix CLI</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Runtime Policy &amp; Contracts</strong></td>
+                    <td>Ad-hoc if/else checks</td>
+                    <td>No SLA or SSRF blocks</td>
+                    <td><span class="pill pill-amber">PF001–PF007 + FlightContract</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Counterfactual Forking</strong></td>
+                    <td>Re-run full workflow ($)</td>
+                    <td>Single static fixture</td>
+                    <td><span class="pill pill-good">fork_at(step) @ $0.00 prefix</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -543,6 +555,6 @@ ToolSmellLinter:   200 MCP tools in 119.3 ms (1,676/sec)</pre>
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="./app.js?v=1.5.0" defer></script>
+    <script src="./app.js?v=1.6.0" defer></script>
   </body>
 </html>
