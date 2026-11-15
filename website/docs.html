@@ -91,6 +91,7 @@
           <button type="button" class="docs-mobile-chip" data-doc-target="recorder">Recorder &amp; Replay</button>
           <button type="button" class="docs-mobile-chip" data-doc-target="pytest-ci">Pytest &amp; CI</button>
           <button type="button" class="docs-mobile-chip" data-doc-target="circuit-breaker">Circuit Breaker</button>
+          <button type="button" class="docs-mobile-chip" data-doc-target="policy-contracts">Policy &amp; Contracts</button>
           <button type="button" class="docs-mobile-chip" data-doc-target="mcp-server">MCP Server</button>
           <button type="button" class="docs-mobile-chip" data-doc-target="post-mortem">Post-Mortem &amp; OTel</button>
           <button type="button" class="docs-mobile-chip" data-doc-target="openany">OpenAny</button>
@@ -126,6 +127,7 @@
                     <li><a class="doc-sub-link" href="#rec-sha256" data-doc-anchor="recorder">SHA-256 Hash Chain</a></li>
                     <li><a class="doc-sub-link" href="#rec-redact" data-doc-anchor="recorder">Automatic Redaction</a></li>
                     <li><a class="doc-sub-link" href="#rec-replay" data-doc-anchor="recorder">Deterministic Stubs</a></li>
+                    <li><a class="doc-sub-link" href="#rec-fork" data-doc-anchor="recorder">Time-Travel Forking</a></li>
                   </ul>
                 </li>
 
@@ -143,6 +145,15 @@
                   <ul class="doc-subrail" data-subrail="circuit-breaker">
                     <li><a class="doc-sub-link" href="#cb-loops" data-doc-anchor="circuit-breaker">Loop &amp; Ping-Pong Traps</a></li>
                     <li><a class="doc-sub-link" href="#cb-budget" data-doc-anchor="circuit-breaker">Token &amp; USD Budgets</a></li>
+                  </ul>
+                </li>
+
+                <li class="doc-nav-item">
+                  <button type="button" class="doc-nav-link" data-doc-target="policy-contracts">Policy &amp; Contracts</button>
+                  <ul class="doc-subrail" data-subrail="policy-contracts">
+                    <li><a class="doc-sub-link" href="#pc-firewall" data-doc-anchor="policy-contracts">Runtime Policy Firewall</a></li>
+                    <li><a class="doc-sub-link" href="#pc-contract" data-doc-anchor="policy-contracts">Behavioral Contracts</a></li>
+                    <li><a class="doc-sub-link" href="#pc-ci" data-doc-anchor="policy-contracts">CLI &amp; Studio Sandbox</a></li>
                   </ul>
                 </li>
 
@@ -315,6 +326,25 @@ result = query_metrics(window=<span class="syn-str">"15m"</span>, service=<span 
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
               </div>
+
+              <h2 id="rec-fork">Time-Travel Cassette Forking (<code>fork_from</code> / <code>fork_at</code>)</h2>
+              <p>
+                Branch any saved trajectory from step <code>k</code> with a simulated counterfactual output override—reusing upstream steps at <code>$0.00</code> cost while rebuilding valid SHA-256 chain hashes.
+              </p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-arg">from</span> agentflight <span class="syn-arg">import</span> CassetteReplayer, verify_cassette
+
+forked = CassetteReplayer(<span class="syn-str">"cassettes/failed_run.flight.json"</span>).fork_at(
+    step_index=2,
+    agent_id=<span class="syn-str">"sre-counterfactual"</span>,
+    override_output={<span class="syn-str">"status"</span>: <span class="syn-str">"200 OK"</span>, <span class="syn-str">"latency_p99_ms"</span>: 42.0},
+)
+forked.save(<span class="syn-str">"cassettes/patched.flight.json"</span>)
+<span class="syn-arg">assert</span> verify_cassette(forked) <span class="syn-arg">is</span> True</pre>
+                <button type="button" class="copy-icon-btn" data-copy='from agentflight import CassetteReplayer, verify_cassette&#10;&#10;forked = CassetteReplayer("cassettes/failed_run.flight.json").fork_at(&#10;    step_index=2,&#10;    agent_id="sre-counterfactual",&#10;    override_output={"status": "200 OK", "latency_p99_ms": 42.0},&#10;)&#10;forked.save("cassettes/patched.flight.json")&#10;assert verify_cassette(forked) is True' aria-label="Copy fork_at code">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
             </section>
 
             <!-- CHAPTER 4 -->
@@ -376,7 +406,60 @@ guard = TrajectoryCircuitBreaker(max_identical_repeats=3, max_ping_pong_cycles=2
               </div>
             </section>
 
-            <!-- CHAPTER 6 -->
+            <!-- CHAPTER 6: POLICY & CONTRACTS -->
+            <section class="doc-chapter" data-chapter="policy-contracts" hidden>
+              <h2 id="pc-firewall">Runtime Policy Firewall (PF001–PF007)</h2>
+              <p>
+                Pass <code>TrajectoryPolicyEngine</code> into <code>TrajectoryCircuitBreaker</code> to block dangerous tool arguments pre-execution: SSRF/cloud-metadata URLs (<code>PF003</code>), path traversal (<code>PF004</code>), destructive SQL DDL (<code>PF005</code>), unredacted secrets (<code>PF006</code>), and read-only violations (<code>PF002</code>).
+              </p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-arg">from</span> agentflight <span class="syn-arg">import</span> TrajectoryCircuitBreaker, TrajectoryPolicyEngine
+
+policy = TrajectoryPolicyEngine(mode=<span class="syn-str">"strict"</span>, max_mutations=2)
+guard = TrajectoryCircuitBreaker(max_cost_usd=0.25, policy=policy)
+guard.observe(<span class="syn-str">"fetch_url"</span>, {<span class="syn-str">"url"</span>: <span class="syn-str">"http://169.254.169.254/latest/meta-data/"</span>})  <span class="syn-cmt"># Raises PolicyViolationError (PF003)</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy='from agentflight import TrajectoryCircuitBreaker, TrajectoryPolicyEngine&#10;&#10;policy = TrajectoryPolicyEngine(mode="strict", max_mutations=2)&#10;guard = TrajectoryCircuitBreaker(max_cost_usd=0.25, policy=policy)&#10;guard.observe("fetch_url", {"url": "http://169.254.169.254/latest/meta-data/"})' aria-label="Copy policy firewall snippet">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+
+              <h2 id="pc-contract">Behavioral Trajectory Contracts (<code>FlightContract</code>)</h2>
+              <p>
+                Go beyond brittle string assertions: enforce which tools ran, their exact sequence, cost/latency budgets, zero-error rates, and valid cryptographic chains directly inside pytest or CI.
+              </p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-arg">from</span> agentflight <span class="syn-arg">import</span> FlightContract, assert_trajectory
+
+contract = (
+    FlightContract(<span class="syn-str">"checkout-sla"</span>)
+    .must_call(<span class="syn-str">"search_logs"</span>, min_calls=1)
+    .must_not_call(<span class="syn-str">"drop_database"</span>)
+    .must_follow_order([<span class="syn-str">"search_logs"</span>, <span class="syn-str">"summarize_incident"</span>])
+    .max_cost_usd(0.25)
+    .zero_errors()
+    .require_valid_hash_chain()
+)
+report = assert_trajectory(<span class="syn-str">"tests/cassettes/triage.flight.json"</span>, contract)
+<span class="syn-arg">assert</span> report.passed, report.summary()</pre>
+                <button type="button" class="copy-icon-btn" data-copy='from agentflight import FlightContract, assert_trajectory&#10;&#10;contract = (&#10;    FlightContract("checkout-sla")&#10;    .must_call("search_logs", min_calls=1)&#10;    .must_not_call("drop_database")&#10;    .must_follow_order(["search_logs", "summarize_incident"])&#10;    .max_cost_usd(0.25)&#10;    .zero_errors()&#10;    .require_valid_hash_chain()&#10;)&#10;report = assert_trajectory("tests/cassettes/triage.flight.json", contract)&#10;assert report.passed, report.summary()' aria-label="Copy contract snippet">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+
+              <h2 id="pc-ci">CLI Verification &amp; Interactive Studio Sandbox</h2>
+              <p>
+                Run offline audits from the terminal or test SSRF, SQL DDL, secret-leak, and read-only modes live inside the <a href="./studio.html">Interactive Studio → Policy &amp; Contracts</a>.
+              </p>
+              <div class="doc-codeblock">
+                <pre><span class="syn-cmd">agentflight policy-audit</span> <span class="syn-arg">run.flight.json --mode strict --json</span>
+<span class="syn-cmd">agentflight contract</span> <span class="syn-arg">run.flight.json --must-call search_logs --max-cost 0.25 --zero-errors</span></pre>
+                <button type="button" class="copy-icon-btn" data-copy="agentflight policy-audit run.flight.json --mode strict --json" aria-label="Copy policy-audit command">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </section>
+
+            <!-- CHAPTER 7 -->
             <section class="doc-chapter" data-chapter="mcp-server" hidden>
               <h2 id="mcp-tools">Tools, Resources &amp; Prompts</h2>
               <div class="mesh-table-card">
@@ -441,6 +524,9 @@ guard = TrajectoryCircuitBreaker(max_identical_repeats=3, max_ping_pong_cycles=2
               </div>
 
               <h2 id="mcp-hosted">Hosted Vercel HTTP vs Local Stdio</h2>
+              <p>
+                The public Vercel endpoint exposes <strong>5 stateless tools</strong> (pass inline <code>cassette_json</code> for post-mortem, policy-audit, and contract checks; local disk <code>cassette_path</code> is blocked for tenant isolation). Run <code>agentflight serve-mcp</code> locally for all <strong>8 tools</strong> with local <code>.flight.json</code> file access.
+              </p>
               <div class="doc-codeblock">
                 <pre><span class="syn-cmd">claude mcp add</span> <span class="syn-arg">--transport http agentflight</span> <span class="syn-str">https://agentflight-tau.vercel.app/mcp</span></pre>
                 <button type="button" class="copy-icon-btn" data-copy="claude mcp add --transport http agentflight https://agentflight-tau.vercel.app/mcp" aria-label="Copy claude mcp command">

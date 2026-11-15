@@ -8,6 +8,8 @@
 - [Interactive Studio](https://codesphere-u.github.io/agentflight/studio.html): Live MCP Tool-Smell Linter, Circuit Breaker simulator, Policy & Contracts Lab & artifact viewer.
 - [Documentation (`website/docs.html`)](https://codesphere-u.github.io/agentflight/docs.html): Guided SDK, CLI, Pytest, MCP & OTel manual.
 - [Getting Started Guide](docs/GETTING_STARTED.md): Role-based CLI & Python SDK onboarding.
+- [Copy-Paste Cookbook](docs/COOKBOOK.md): 6 real-world recipes for wrappers, pytest contracts, CI gates & forking.
+- [Policy Firewall & Contracts](docs/POLICY_AND_CONTRACTS.md): Deep dive into `PF001`–`PF007`, custom rules, `FlightContract` & time-travel forking.
 - [MCP & Agents Setup](docs/MCP_AND_AGENTS.md): Claude Code, Cursor, Windsurf, Smithery, Glama & GitHub Actions setup (8 MCP tools).
 - [Architecture Specification](docs/architecture.md): Core SHA-256 chain & determinism internals.
 - [22 Rules Rubric](https://codesphere-u.github.io/agentflight/rules.html): Complete `TS001`–`TS010`, `CB001`–`CB005`, and `PF001`–`PF007` reference.
