@@ -402,6 +402,138 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
     applyMode("pypi");
   }
 
+  let avionicsCtx = null;
+  function playAvionicsTone() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!avionicsCtx) avionicsCtx = new AC();
+      if (avionicsCtx.state === "suspended") avionicsCtx.resume();
+      const notes = [440, 554.37, 659.25];
+      const now = avionicsCtx.currentTime;
+      notes.forEach((freq, i) => {
+        const osc = avionicsCtx.createOscillator();
+        const gain = avionicsCtx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, now + i * 0.08);
+        gain.gain.setValueAtTime(0.0001, now + i * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.032, now + i * 0.08 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.08 + 0.14);
+        osc.connect(gain);
+        gain.connect(avionicsCtx.destination);
+        osc.start(now + i * 0.08);
+        osc.stop(now + i * 0.08 + 0.15);
+      });
+    } catch (err) {
+      if (window.console && typeof window.console.debug === "function") {
+        window.console.debug("WebAudio telemetry cue unavailable:", err);
+      }
+    }
+  }
+
+  function pulseFlightPipeline(containerId, stripId, withSound) {
+    const strip = stripId ? document.getElementById(stripId) : null;
+    if (strip) {
+      strip.classList.add("playing");
+      clearTimeout(strip._t);
+      strip._t = setTimeout(() => strip.classList.remove("playing"), 1500);
+    }
+    const container = containerId ? document.getElementById(containerId) : null;
+    if (container) {
+      const stages = container.querySelectorAll(".flight-stage");
+      stages.forEach((st, idx) => {
+        setTimeout(() => {
+          stages.forEach((s) => s.classList.remove("active"));
+          st.classList.add("active");
+        }, idx * 240);
+      });
+    }
+    if (withSound) playAvionicsTone();
+  }
+
+  function initFlightAnimations() {
+    const reveals = $$(".reveal");
+    const metricBars = $$(".metric-bar-fill[data-width]");
+
+    function fillBars() {
+      metricBars.forEach((bar) => {
+        const target = bar.getAttribute("data-width") || "0%";
+        requestAnimationFrame(() => {
+          bar.style.width = target;
+        });
+      });
+    }
+
+    if ("IntersectionObserver" in window && reveals.length > 0) {
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("in-view");
+              obs.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.08 }
+      );
+      reveals.forEach((el) => obs.observe(el));
+      setTimeout(fillBars, 120);
+    } else {
+      reveals.forEach((el) => el.classList.add("in-view"));
+      fillBars();
+    }
+
+    const playFlightBtn = $("#play-flight-btn");
+    if (playFlightBtn) {
+      playFlightBtn.addEventListener("click", () => {
+        pulseFlightPipeline("home-pipeline", "home-telemetry-strip", true);
+      });
+    }
+
+    const studioFlightBtn = $("#studio-flight-btn");
+    if (studioFlightBtn) {
+      studioFlightBtn.addEventListener("click", () => {
+        pulseFlightPipeline("studio-pipeline", "studio-telemetry-strip", true);
+      });
+    }
+
+    const flightNote = $("#flight-sample-note");
+    const previewCode = $("#home-preview-code");
+    const SCENARIO_CODE = {
+      demo: HOME_PREVIEWS.term,
+      breaker: `$ agentflight guard --scenario pingpong --max-usd 0.25\n\nCircuitBreakerTripped [CB002 ping_pong_oscillation]\n  Pattern:  ['search_logs', 'refine_query'] x 2 cycles\n  Action:   Aborted pre-execution; $1.42 projected overshoot saved`,
+      redact: `$ agentflight record --scrub-secrets --out incident.flight.json\n\nFlightRecorder · Secret Scrubber Enabled\n  Detected: sk-live-***, Bearer eyJ*** -> [REDACTED_SECRET]\n  Digest:   SHA-256 chain intact (genesis -> span 4)`,
+      pytest: `$ pytest -v --flight-mode=replay\n\n========================= 42 passed in 0.14s =========================\n  Replayed: 168 spans (2.83 us avg) · Live LLM Spend: $0.0000`,
+      otel: `$ agentflight export-otel incident.flight.json --out spans.otel.json\n\nExported 4 W3C TraceContext spans (gen_ai.system = "agentflight")\n  trace_id: 0af7651916cd43dd8448eb211c80319c`,
+      lint: HOME_PREVIEWS.linter,
+    };
+
+    $$(".flight-chip[data-flight-note]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        $$(".flight-chip[data-flight-note]").forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        if (flightNote) flightNote.textContent = chip.getAttribute("data-flight-note");
+        const key = chip.getAttribute("data-flight-key") || "";
+        if (previewCode && SCENARIO_CODE[key]) {
+          previewCode.textContent = SCENARIO_CODE[key];
+        }
+        pulseFlightPipeline("home-pipeline", "home-telemetry-strip", false);
+      });
+    });
+
+    $$("[data-bench-filter]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        $$("[data-bench-filter]").forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        const target = chip.getAttribute("data-bench-filter") || "all";
+        $$("tbody tr[data-bench-cat]").forEach((row) => {
+          const cat = row.getAttribute("data-bench-cat") || "";
+          row.style.display = target === "all" || cat === target ? "" : "none";
+        });
+      });
+    });
+  }
+
   function initHomePreview() {
     const pre = $("#home-preview-code");
     const tabs = $$("[data-homeview]");
@@ -416,6 +548,7 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
           t.classList.toggle("active", active);
           t.setAttribute("aria-selected", String(active));
         });
+        pulseFlightPipeline("home-pipeline", "home-telemetry-strip", false);
       });
     });
   }
@@ -756,12 +889,13 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
     runLint();
 
     inputEl.addEventListener("input", runLint);
-    $$("[data-lint-preset]").forEach((btn) => {
+      $$("[data-lint-preset]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const key = btn.dataset.lintPreset || "flawed";
         $$("[data-lint-preset]").forEach((b) => b.classList.toggle("active", b === btn));
         inputEl.value = JSON.stringify(LINTER_PRESETS[key] || LINTER_PRESETS.flawed, null, 2);
         runLint();
+        pulseFlightPipeline("studio-pipeline", "studio-telemetry-strip", false);
       });
     });
   }
@@ -780,6 +914,7 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
       const lines = [...(BREAKER_SCENARIOS[scen] || BREAKER_SCENARIOS.pingpong)];
       lines.unshift(`TrajectoryCircuitBreaker(max_identical_repeats=3, max_ping_pong_cycles=2, max_cost_usd=${cap})\n`);
       outEl.textContent = lines.join("\n");
+      pulseFlightPipeline("studio-pipeline", "studio-telemetry-strip", false);
     }
 
     if (runBtn) runBtn.addEventListener("click", render);
@@ -944,6 +1079,7 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)`,
     normalizeCleanUrl();
     initCTA();
     initHomePreview();
+    initFlightAnimations();
     initCopyButtons();
     initInstallTabs();
     initDocsNavigation();

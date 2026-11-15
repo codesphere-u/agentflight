@@ -379,43 +379,45 @@ guard = TrajectoryCircuitBreaker(max_identical_repeats=3, max_ping_pong_cycles=2
             <!-- CHAPTER 6 -->
             <section class="doc-chapter" data-chapter="mcp-server" hidden>
               <h2 id="mcp-tools">Tools, Resources &amp; Prompts</h2>
-              <div class="doc-table-wrap">
-                <table class="doc-table">
-                  <thead>
-                    <tr>
-                      <th>MCP Primitive</th>
-                      <th>Purpose</th>
-                      <th>Transport Availability</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><code>agentflight_lint_tools</code></td>
-                      <td>Static TS001–TS010 audit &amp; Ergonomics Score</td>
-                      <td>Hosted HTTP + Local Stdio</td>
-                    </tr>
-                    <tr>
-                      <td><code>agentflight_verify_cassette</code></td>
-                      <td>Verify SHA-256 chain integrity</td>
-                      <td>Local Stdio / Self-Hosted</td>
-                    </tr>
-                    <tr>
-                      <td><code>agentflight_diff_cassettes</code></td>
-                      <td>Baseline vs candidate trajectory diff</td>
-                      <td>Local Stdio / Self-Hosted</td>
-                    </tr>
-                    <tr>
-                      <td><code>agentflight_export_otel</code></td>
-                      <td>Export W3C TraceContext spans JSON</td>
-                      <td>Local Stdio / Self-Hosted</td>
-                    </tr>
-                    <tr>
-                      <td><code>agentflight://rules/catalog</code></td>
-                      <td>Machine-readable rule rubric resource</td>
-                      <td>Hosted HTTP + Local Stdio</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="mesh-table-card">
+                <div class="mesh-table-scroll">
+                  <table class="mesh-table">
+                    <thead>
+                      <tr>
+                        <th>MCP Primitive</th>
+                        <th>Purpose</th>
+                        <th>Transport Availability</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><code>agentflight_lint_tools</code></td>
+                        <td>Static TS001–TS010 audit &amp; Ergonomics Score</td>
+                        <td><span class="pill pill-good">Hosted HTTP + Stdio</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>agentflight_verify_cassette</code></td>
+                        <td>Verify SHA-256 chain integrity</td>
+                        <td><span class="pill pill-sky">Local Stdio / Self-Hosted</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>agentflight_diff_cassettes</code></td>
+                        <td>Baseline vs candidate trajectory diff</td>
+                        <td><span class="pill pill-sky">Local Stdio / Self-Hosted</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>agentflight_export_otel</code></td>
+                        <td>Export W3C TraceContext spans JSON</td>
+                        <td><span class="pill pill-sky">Local Stdio / Self-Hosted</span></td>
+                      </tr>
+                      <tr>
+                        <td><code>agentflight://rules/catalog</code></td>
+                        <td>Machine-readable rule rubric resource</td>
+                        <td><span class="pill pill-amber">Hosted HTTP + Stdio</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               <h2 id="mcp-hosted">Hosted Vercel HTTP vs Local Stdio</h2>

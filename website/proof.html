@@ -128,104 +128,136 @@
 
         <section aria-labelledby="bench-proof-title">
           <h2 id="bench-proof-title">Measured Subsystem Benchmarks (Python 3.12)</h2>
+          <section class="metric-grid reveal" aria-label="Subsystem throughput highlights">
+            <div class="metric-card">
+              <div class="metric-head"><strong>353,356/s</strong><span>CASSETTE REPLAY</span></div>
+              <div class="metric-bar-track"><div class="metric-bar-fill" data-width="100%"></div></div>
+              <p style="margin:0; font-size:0.86rem;">2.83 µs per 1,000-span replay with $0.00 live token spend.</p>
+            </div>
+            <div class="metric-card">
+              <div class="metric-head"><strong>332,225/s</strong><span>BREAKER GUARD</span></div>
+              <div class="metric-bar-track"><div class="metric-bar-fill amber" data-width="94%"></div></div>
+              <p style="margin:0; font-size:0.86rem;">Loop, ping-pong, error storm &amp; spend cap enforcement per turn.</p>
+            </div>
+            <div class="metric-card">
+              <div class="metric-head"><strong>294,117/s</strong><span>SHA-256 VERIFY</span></div>
+              <div class="metric-bar-track"><div class="metric-bar-fill" data-width="83%"></div></div>
+              <p style="margin:0; font-size:0.86rem;">Canonical-JSON hash chain tamper verification across stored spans.</p>
+            </div>
+            <div class="metric-card">
+              <div class="metric-head"><strong>1,676/s</strong><span>MCP SCHEMA LINT</span></div>
+              <div class="metric-bar-track"><div class="metric-bar-fill amber" data-width="76%"></div></div>
+              <p style="margin:0; font-size:0.86rem;">Static TS001–TS010 safety &amp; ergonomics checks per second.</p>
+            </div>
+          </section>
+
           <p>Reproducible directly on any machine with <code>agentflight benchmark</code>:</p>
-          <div class="doc-table-wrap">
-            <table class="doc-table">
-              <thead>
-                <tr>
-                  <th>Subsystem Operation</th>
-                  <th>Workload</th>
-                  <th>Total Time</th>
-                  <th>Per Unit</th>
-                  <th class="col-af">Throughput</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><code>FlightRecorder.record</code> (SHA-256 chain)</td>
-                  <td>1,000 spans</td>
-                  <td>7.42 ms</td>
-                  <td>7.42 us</td>
-                  <td class="col-af">134,770 spans/s</td>
-                </tr>
-                <tr>
-                  <td><code>verify_cassette</code> (tamper check)</td>
-                  <td>1,000 spans</td>
-                  <td>3.40 ms</td>
-                  <td>3.40 us</td>
-                  <td class="col-af">294,117 spans/s</td>
-                </tr>
-                <tr>
-                  <td><code>CassetteReplayer.replay_step</code> ($0 stub)</td>
-                  <td>1,000 spans</td>
-                  <td>2.83 ms</td>
-                  <td>2.83 us</td>
-                  <td class="col-af">353,356 spans/s</td>
-                </tr>
-                <tr>
-                  <td><code>TrajectoryCircuitBreaker.observe_span</code></td>
-                  <td>1,000 spans</td>
-                  <td>3.01 ms</td>
-                  <td>3.01 us</td>
-                  <td class="col-af">332,225 spans/s</td>
-                </tr>
-                <tr>
-                  <td><code>ToolSmellLinter.lint</code> (TS001–TS010)</td>
-                  <td>200 tools</td>
-                  <td>119.27 ms</td>
-                  <td>596.35 us</td>
-                  <td class="col-af">1,676 tools/s</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="preset-pills" style="margin: 0.4rem 0 0.85rem;" role="group" aria-label="Filter subsystems">
+            <button type="button" class="chip-btn active" data-bench-filter="all">All Subsystems (5)</button>
+            <button type="button" class="chip-btn" data-bench-filter="core">Recorder &amp; Replay (3)</button>
+            <button type="button" class="chip-btn" data-bench-filter="guard">Guards &amp; Linter (2)</button>
+          </div>
+          <div class="mesh-table-card">
+            <div class="mesh-table-scroll">
+              <table class="mesh-table">
+                <thead>
+                  <tr>
+                    <th>Subsystem Operation</th>
+                    <th>Workload</th>
+                    <th>Total Time</th>
+                    <th>Per Unit</th>
+                    <th class="col-af">Throughput</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-bench-cat="core">
+                    <td><code>FlightRecorder.record</code> (SHA-256 chain)</td>
+                    <td>1,000 spans</td>
+                    <td>7.42 ms</td>
+                    <td>7.42 us</td>
+                    <td class="col-af"><span class="pill pill-sky">134,770 spans/s</span></td>
+                  </tr>
+                  <tr data-bench-cat="core">
+                    <td><code>verify_cassette</code> (tamper check)</td>
+                    <td>1,000 spans</td>
+                    <td>3.40 ms</td>
+                    <td>3.40 us</td>
+                    <td class="col-af"><span class="pill pill-good">294,117 spans/s</span></td>
+                  </tr>
+                  <tr data-bench-cat="core">
+                    <td><code>CassetteReplayer.replay_step</code> ($0 stub)</td>
+                    <td>1,000 spans</td>
+                    <td>2.83 ms</td>
+                    <td>2.83 us</td>
+                    <td class="col-af"><span class="pill pill-good">353,356 spans/s</span></td>
+                  </tr>
+                  <tr data-bench-cat="guard">
+                    <td><code>TrajectoryCircuitBreaker.observe_span</code></td>
+                    <td>1,000 spans</td>
+                    <td>3.01 ms</td>
+                    <td>3.01 us</td>
+                    <td class="col-af"><span class="pill pill-amber">332,225 spans/s</span></td>
+                  </tr>
+                  <tr data-bench-cat="guard">
+                    <td><code>ToolSmellLinter.lint</code> (TS001–TS010)</td>
+                    <td>200 tools</td>
+                    <td>119.27 ms</td>
+                    <td>596.35 us</td>
+                    <td class="col-af"><span class="pill pill-sky">1,676 tools/s</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
         <section aria-labelledby="compare-title">
           <h2 id="compare-title">How AgentFlight Compares</h2>
-          <div class="doc-table-wrap">
-            <table class="doc-table">
-              <thead>
-                <tr>
-                  <th>Capability</th>
-                  <th class="col-af">AgentFlight</th>
-                  <th>Live LLM CI Runs</th>
-                  <th>Hand-Rolled Mocks</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>CI run cost &amp; latency</td>
-                  <td class="col-af">&lt; 3 us/span · $0.00</td>
-                  <td>$0.05–$5.00 · 10–45s</td>
-                  <td>Free but fragile</td>
-                </tr>
-                <tr>
-                  <td>Cryptographic tamper protection</td>
-                  <td class="col-af">Canonical SHA-256 chain</td>
-                  <td>None</td>
-                  <td>Silent fixture drift</td>
-                </tr>
-                <tr>
-                  <td>Automatic API key scrubbing</td>
-                  <td class="col-af">Enabled by default</td>
-                  <td>Manual env sanitizers</td>
-                  <td>Manual redaction</td>
-                </tr>
-                <tr>
-                  <td>Ping-pong loop &amp; cost circuit breaker</td>
-                  <td class="col-af">Built-in pre-flight guard</td>
-                  <td>Stops after budget alert</td>
-                  <td>Not included</td>
-                </tr>
-                <tr>
-                  <td>MCP schema linting &amp; auto-repair</td>
-                  <td class="col-af">TS001–TS010 + fix CLI</td>
-                  <td>Manual prompt tuning</td>
-                  <td>Not included</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="mesh-table-card">
+            <div class="mesh-table-scroll">
+              <table class="mesh-table">
+                <thead>
+                  <tr>
+                    <th>Capability</th>
+                    <th class="col-af">AgentFlight</th>
+                    <th>Live LLM CI Runs</th>
+                    <th>Hand-Rolled Mocks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>CI run cost &amp; latency</td>
+                    <td class="col-af"><span class="pill pill-good">&lt; 3 us/span · $0.00</span></td>
+                    <td>$0.05–$5.00 · 10–45s</td>
+                    <td>Free but fragile</td>
+                  </tr>
+                  <tr>
+                    <td>Cryptographic tamper protection</td>
+                    <td class="col-af"><span class="pill pill-sky">Canonical SHA-256 chain</span></td>
+                    <td>None</td>
+                    <td>Silent fixture drift</td>
+                  </tr>
+                  <tr>
+                    <td>Automatic API key scrubbing</td>
+                    <td class="col-af"><span class="pill pill-good">Enabled by default</span></td>
+                    <td>Manual env sanitizers</td>
+                    <td>Manual redaction</td>
+                  </tr>
+                  <tr>
+                    <td>Ping-pong loop &amp; cost circuit breaker</td>
+                    <td class="col-af"><span class="pill pill-amber">Built-in pre-flight guard</span></td>
+                    <td>Stops after budget alert</td>
+                    <td>Not included</td>
+                  </tr>
+                  <tr>
+                    <td>MCP schema linting &amp; auto-repair</td>
+                    <td class="col-af"><span class="pill pill-sky">TS001–TS010 + fix CLI</span></td>
+                    <td>Manual prompt tuning</td>
+                    <td>Not included</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 

@@ -1566,3 +1566,737 @@ details.faq-item p {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ==========================================================================
+   AgentFlight Flagship Avionics Animations, Hero Command Deck & Card Tables
+   ========================================================================== */
+
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes beacon-ping {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.16); opacity: 0.55; }
+}
+
+@keyframes pulse-live {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.48); }
+  70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+}
+
+@keyframes scan-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(220%); }
+}
+
+@keyframes span-breathe {
+  0%, 100% { transform: scaleY(0.32); opacity: 0.68; }
+  50% { transform: scaleY(0.86); opacity: 1; }
+}
+
+@keyframes span-active {
+  0%, 100% { transform: scaleY(0.24); }
+  45% { transform: scaleY(1); }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(124, 198, 254, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(124, 198, 254, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(124, 198, 254, 0); }
+}
+
+@keyframes chapter-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mascot-wrap svg {
+  animation: mascot-float 5.5s ease-in-out infinite;
+}
+
+.mascot-ping {
+  transform-origin: 90px 16px;
+  animation: beacon-ping 2.2s ease-in-out infinite;
+}
+
+.doc-chapter:not([hidden]) {
+  animation: chapter-in 0.28s ease-out both;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.48s ease, transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Flagship Homepage 2-Column Hero Command Deck */
+.page-col.page-col-home {
+  width: min(1000px, 100% - 2rem);
+  gap: 3rem;
+  position: relative;
+}
+
+.page-col.page-col-home::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 540px;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(640px 280px at 14% 8%, rgba(124, 198, 254, 0.24), transparent 70%),
+    radial-gradient(620px 300px at 88% 12%, rgba(255, 209, 102, 0.22), transparent 72%);
+}
+
+.hero-deck {
+  display: grid;
+  grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.04fr);
+  align-items: center;
+  gap: 2rem;
+  padding-top: 0.35rem;
+}
+
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.02rem;
+  min-width: 0;
+}
+
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.78rem;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--accent-rail);
+  box-shadow: 0 2px 10px rgba(20, 33, 61, 0.04);
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse-live 2.2s infinite;
+  flex-shrink: 0;
+}
+
+.hero-identity {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  min-width: 0;
+}
+
+.hero-identity .mascot-wrap {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 96px;
+  filter: drop-shadow(0 8px 16px rgba(2, 106, 167, 0.16));
+}
+
+.hero-identity h1 {
+  margin: 0;
+  font-size: clamp(1.95rem, 3.2vw, 2.68rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.hero-highlight {
+  background: linear-gradient(180deg, transparent 58%, rgba(124, 198, 254, 0.56) 58%);
+  padding-inline: 0.12rem;
+  border-radius: 4px;
+}
+
+.hero-deck .hero-sub {
+  font-size: 1.06rem;
+  line-height: 1.5;
+  color: var(--text-70);
+  margin: 0;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  position: relative;
+}
+
+.hero-actions .cta-popover {
+  top: calc(100% + 0.55rem);
+  left: 0;
+  transform: none;
+}
+
+.hero-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.76rem 1.15rem;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--accent-rail);
+  font-size: 0.94rem;
+  font-weight: 700;
+  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+.hero-secondary-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-rail);
+  background: var(--accent-light);
+}
+
+.hero-deck .cmd-caption {
+  width: 100%;
+  text-align: left;
+}
+
+.hero-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  width: 100%;
+}
+
+.hero-kpi {
+  background: var(--bg);
+  border: 1px solid var(--rule-soft);
+  border-radius: 10px;
+  padding: 0.52rem 0.65rem;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.hero-kpi:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-rail);
+}
+
+.hero-kpi strong {
+  display: block;
+  font-size: 1.04rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+.hero-kpi span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-55);
+  text-transform: uppercase;
+  margin-top: 0.12rem;
+}
+
+/* Right Hero Black-Box Console Card */
+.hero-console {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  box-shadow:
+    0 18px 40px -18px rgba(20, 33, 61, 0.16),
+    0 0 0 4px rgba(124, 198, 254, 0.18);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  position: relative;
+}
+
+.hero-console::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-rail), var(--amber-hover), transparent);
+  animation: scan-sweep 4.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.hero-console .frame-bar {
+  padding: 0.56rem 0.78rem;
+  gap: 0.4rem;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+.hero-console .dots {
+  flex-shrink: 0;
+  gap: 0.32rem;
+}
+
+.hero-console .frame-tabs {
+  gap: 0.22rem;
+  flex-wrap: nowrap;
+}
+
+.hero-console .frame-tab {
+  padding: 0.24rem 0.48rem;
+  font-size: 0.73rem;
+  white-space: nowrap;
+}
+
+.hero-console .frame-open-link {
+  padding: 0.22rem 0.52rem;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hero-console .preview-body {
+  padding: 0.82rem 0.92rem 0.62rem;
+}
+
+.hero-console .code-block {
+  font-size: 0.72rem;
+  line-height: 1.48;
+  padding: 0.72rem 0.85rem;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.hero-console-telemetry {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.95rem 0.72rem;
+  border-top: 1px solid var(--rule-soft);
+  background: var(--tint-2);
+}
+
+/* Avionics Span Telemetry Oscilloscope Strip */
+.telemetry-shell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--bg);
+  border: 1px solid var(--rule-soft);
+  border-radius: 12px;
+  padding: 0.55rem 0.85rem;
+}
+
+.telemetry-strip {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 28px;
+  flex: 1 1 auto;
+}
+
+.span-bar {
+  flex: 1 1 0;
+  min-width: 4px;
+  max-width: 10px;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--accent-rail) 0%, var(--accent) 100%);
+  transform-origin: center bottom;
+  animation: span-breathe 1.65s ease-in-out infinite;
+}
+
+.span-bar:nth-child(even) {
+  background: linear-gradient(180deg, var(--amber-strong) 0%, var(--amber) 100%);
+  animation-duration: 1.3s;
+}
+
+.telemetry-strip.playing .span-bar {
+  animation-name: span-active;
+  animation-duration: 0.58s;
+}
+
+.span-bar:nth-child(3n) { animation-delay: 0.14s; }
+.span-bar:nth-child(4n) { animation-delay: 0.28s; }
+.span-bar:nth-child(5n) { animation-delay: 0.42s; }
+
+/* Flight Check Pipeline Stages & Scenario Switchboard */
+.pipeline-card {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-xl);
+  background: var(--tint-2);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.pipeline-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.flight-pipeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.flight-stage {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 11px;
+  padding: 0.72rem 0.78rem;
+  transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+  min-width: 0;
+}
+
+.flight-stage small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-55);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+
+.flight-stage strong {
+  display: block;
+  font-size: 0.86rem;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.flight-stage span {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--text-70);
+  margin-top: 0.15rem;
+}
+
+.flight-stage.active {
+  background: var(--accent-light);
+  border-color: var(--accent-rail);
+  transform: translateY(-2px);
+  animation: pulse-ring 1.6s ease-out infinite;
+}
+
+.flight-stage.active.amber-hit {
+  background: var(--amber-light);
+  border-color: var(--amber-strong);
+}
+
+.flight-ribbon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: center;
+}
+
+.flight-chip {
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0.34rem 0.78rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+}
+
+.flight-chip:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-rail);
+  background: var(--accent-light);
+}
+
+.flight-chip.active {
+  background: var(--amber);
+  border-color: var(--amber-strong);
+  color: var(--amber-dark);
+}
+
+/* Bento Cards & Section Headers */
+.section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.section-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-rail);
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: 1.56rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.section-head p {
+  margin: 0;
+  font-size: 0.96rem;
+  color: var(--text-70);
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.bento-card {
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--bg);
+  padding: 1.2rem 1.3rem;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.48rem;
+  min-width: 0;
+}
+
+.bento-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-rail);
+  box-shadow: 0 12px 28px -16px rgba(20, 33, 61, 0.16);
+}
+
+.bento-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.bento-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  border: 1px solid rgba(2, 106, 167, 0.18);
+}
+
+.bento-icon.amber {
+  background: var(--amber-light);
+  color: var(--amber-dark);
+  border-color: rgba(180, 83, 9, 0.2);
+}
+
+.bento-stat {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  background: var(--tint-4);
+  color: var(--text-70);
+}
+
+.bento-card h3 {
+  margin: 0.18rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.bento-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.54;
+  color: var(--text-70);
+}
+
+/* Rich Card-Wrapped Animated Data Tables */
+.mesh-table-card {
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--bg);
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(20, 33, 61, 0.045);
+  margin: 0.9rem 0 1.45rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.mesh-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mesh-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.mesh-table thead th {
+  background: var(--tint-4);
+  color: var(--text-70);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.78rem 1rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.mesh-table tbody tr {
+  transition: background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.mesh-table tbody tr:hover {
+  background: rgba(124, 198, 254, 0.12);
+  box-shadow: inset 3px 0 0 var(--accent-rail);
+}
+
+.mesh-table td {
+  padding: 0.82rem 1rem;
+  border-bottom: 1px solid var(--rule-soft);
+  vertical-align: middle;
+  color: var(--text);
+}
+
+.mesh-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Animated Benchmark Bars (proof.html) */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.metric-card {
+  border: 1px solid var(--rule);
+  border-radius: 13px;
+  background: var(--tint-2);
+  padding: 1rem 1.15rem;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-rail);
+}
+
+.metric-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.metric-head strong {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.metric-head span {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-rail);
+}
+
+.metric-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--tint-8);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.55rem;
+}
+
+.metric-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-rail) 100%);
+  width: 0;
+  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.metric-bar-fill.amber {
+  background: linear-gradient(90deg, var(--amber) 0%, var(--amber-strong) 100%);
+}
+
+@media (max-width: 860px) {
+  .hero-deck {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .flight-pipeline,
+  .metric-grid,
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .hero-identity .mascot-wrap {
+    flex: 0 0 76px;
+    width: 76px;
+    height: 76px;
+  }
+  .hero-console .frame-bar,
+  .hero-console .frame-tabs {
+    flex-wrap: wrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-wrap svg,
+  .mascot-ping,
+  .span-bar,
+  .flight-stage.active,
+  .live-dot,
+  .hero-console::after {
+    animation: none !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

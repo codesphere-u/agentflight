@@ -89,6 +89,24 @@
         </section>
 
         <section class="studio-frame" id="studio" aria-label="Interactive AgentFlight Studio">
+          <div class="telemetry-shell" style="margin-bottom: 0.85rem;">
+            <button type="button" id="studio-flight-btn" class="action-mini">Pulse Pre-Flight</button>
+            <div class="telemetry-strip" id="studio-telemetry-strip" aria-hidden="true">
+              <span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span>
+              <span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span>
+              <span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span>
+              <span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span>
+            </div>
+            <span style="font-family:var(--font-mono); font-size:0.72rem; font-weight:700; color:var(--accent-rail);">TS001–CB005</span>
+          </div>
+
+          <div class="flight-pipeline" id="studio-pipeline" style="margin-bottom: 0.95rem;">
+            <div class="flight-stage"><small>01 · Parse</small><strong>Inspect JSON / Span</strong><span>Schema + args load</span></div>
+            <div class="flight-stage"><small>02 · Lint</small><strong>Run TS001–TS010</strong><span>Cosine overlap check</span></div>
+            <div class="flight-stage active"><small>03 · Guard</small><strong>Breaker &amp; Redact</strong><span>Stop loops &amp; keys</span></div>
+            <div class="flight-stage amber-hit"><small>04 · Clearance</small><strong>SHA-256 Seal</strong><span>0.08 µs CI replay</span></div>
+          </div>
+
           <div class="handy-tabs-bar">
             <div class="handy-tabs" role="tablist" aria-label="Studio tools">
               <button type="button" class="handy-tab active" role="tab" aria-selected="true" data-studio="lint">

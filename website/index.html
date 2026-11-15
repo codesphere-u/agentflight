@@ -128,7 +128,7 @@
     </script>
   </head>
   <body data-analytics="plausible">
-    <div class="page-col">
+    <div class="page-col page-col-home">
       <header class="site-header">
         <a class="brand-link" href="./" aria-label="AgentFlight home">
           <svg class="brand-wordmark-svg" width="196" height="36" viewBox="0 0 218 40" fill="none" role="img" aria-label="agentflight">
@@ -172,179 +172,287 @@
       </header>
 
       <main>
-        <section class="hero-duo" aria-labelledby="hero-title">
-          <div class="mascot-wrap">
-            <!-- Original AgentFlight Black-Box Flight Recorder & Radar Mascot in Sky Blue & Amber -->
-            <svg
-              width="136"
-              height="136"
-              viewBox="0 0 180 180"
-              fill="none"
-              role="img"
-              aria-label="AgentFlight black-box flight recorder mascot with amber cassette reels and avionics telemetry oscilloscope"
-            >
-              <ellipse cx="90" cy="158" rx="48" ry="8" fill="#14213d" fill-opacity="0.1" />
-              <path d="M70 130L64 147" stroke="#14213d" stroke-width="4" stroke-linecap="round" />
-              <ellipse cx="58" cy="149" rx="12" ry="7" fill="#0a2e52" stroke="#14213d" stroke-width="3.5" />
-              <path d="M110 130L116 147" stroke="#14213d" stroke-width="4" stroke-linecap="round" />
-              <ellipse cx="122" cy="149" rx="12" ry="7" fill="#0a2e52" stroke="#14213d" stroke-width="3.5" />
+        <section class="hero-deck" aria-labelledby="hero-title">
+          <div class="hero-left">
+            <div class="live-pill">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span>SHA-256 CASSETTES · $0 CI REPLAY · 15 GUARD RULES</span>
+            </div>
 
-              <!-- Radar beacon antenna -->
-              <path d="M90 36V20" stroke="#14213d" stroke-width="3.5" stroke-linecap="round" />
-              <circle cx="90" cy="16" r="6.5" fill="#ffd166" stroke="#14213d" stroke-width="3.2" />
-              <path d="M72 19L65 13M108 19L115 13" stroke="#026aa7" stroke-width="2.5" stroke-linecap="round" />
+            <div class="hero-identity">
+              <div class="mascot-wrap">
+                <!-- Original AgentFlight Black-Box Flight Recorder & Radar Mascot in Sky Blue & Amber -->
+                <svg
+                  width="96"
+                  height="96"
+                  viewBox="0 0 180 180"
+                  fill="none"
+                  role="img"
+                  aria-label="AgentFlight black-box flight recorder mascot with amber cassette reels and avionics telemetry oscilloscope"
+                >
+                  <ellipse cx="90" cy="158" rx="48" ry="8" fill="#14213d" fill-opacity="0.1" />
+                  <path d="M70 130L64 147" stroke="#14213d" stroke-width="4" stroke-linecap="round" />
+                  <ellipse cx="58" cy="149" rx="12" ry="7" fill="#0a2e52" stroke="#14213d" stroke-width="3.5" />
+                  <path d="M110 130L116 147" stroke="#14213d" stroke-width="4" stroke-linecap="round" />
+                  <ellipse cx="122" cy="149" rx="12" ry="7" fill="#0a2e52" stroke="#14213d" stroke-width="3.5" />
 
-              <!-- Left & Right aero wings -->
-              <path d="M36 86L18 76L24 98L36 96Z" fill="#ffd166" stroke="#14213d" stroke-width="3.2" stroke-linejoin="round" />
-              <path d="M144 86L162 76L156 98L144 96Z" fill="#ffd166" stroke="#14213d" stroke-width="3.2" stroke-linejoin="round" />
+                  <path d="M90 36V20" stroke="#14213d" stroke-width="3.5" stroke-linecap="round" />
+                  <circle class="mascot-ping" cx="90" cy="16" r="6.5" fill="#ffd166" stroke="#14213d" stroke-width="3.2" />
+                  <path d="M72 19L65 13M108 19L115 13" stroke="#026aa7" stroke-width="2.5" stroke-linecap="round" />
 
-              <!-- Black-box recorder chassis -->
-              <rect x="38" y="38" width="104" height="94" rx="24" fill="#7cc6fe" stroke="#14213d" stroke-width="4" />
-              <rect x="50" y="50" width="80" height="70" rx="14" fill="#fffdf2" stroke="#14213d" stroke-width="3" />
+                  <path d="M36 86L18 76L24 98L36 96Z" fill="#ffd166" stroke="#14213d" stroke-width="3.2" stroke-linejoin="round" />
+                  <path d="M144 86L162 76L156 98L144 96Z" fill="#ffd166" stroke="#14213d" stroke-width="3.2" stroke-linejoin="round" />
 
-              <!-- Cassette spools / friendly eyes -->
-              <circle cx="72" cy="76" r="9.5" fill="#ffd166" stroke="#14213d" stroke-width="2.8" />
-              <circle cx="72" cy="76" r="3.4" fill="#14213d" />
-              <circle cx="108" cy="76" r="9.5" fill="#ffd166" stroke="#14213d" stroke-width="2.8" />
-              <circle cx="108" cy="76" r="3.4" fill="#14213d" />
+                  <rect x="38" y="38" width="104" height="94" rx="24" fill="#7cc6fe" stroke="#14213d" stroke-width="4" />
+                  <rect x="50" y="50" width="80" height="70" rx="14" fill="#fffdf2" stroke="#14213d" stroke-width="3" />
 
-              <!-- Tape bridge + flight waveform smile -->
-              <line x1="81.5" y1="76" x2="98.5" y2="76" stroke="#14213d" stroke-width="2" stroke-dasharray="3 2" />
-              <path d="M62 100H78L84 92L91 107L98 97L103 100H118" stroke="#026aa7" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
+                  <circle cx="72" cy="76" r="9.5" fill="#ffd166" stroke="#14213d" stroke-width="2.8" />
+                  <circle cx="72" cy="76" r="3.4" fill="#14213d" />
+                  <circle cx="108" cy="76" r="9.5" fill="#ffd166" stroke="#14213d" stroke-width="2.8" />
+                  <circle cx="108" cy="76" r="3.4" fill="#14213d" />
 
-          <div class="hero-copy">
-            <h1 id="hero-title">record, replay &amp; guard every agent turn</h1>
+                  <line x1="81.5" y1="76" x2="98.5" y2="76" stroke="#14213d" stroke-width="2" stroke-dasharray="3 2" />
+                  <path d="M62 100H78L84 92L91 107L98 97L103 100H118" stroke="#026aa7" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+
+              <h1 id="hero-title">record, replay &amp; <span class="hero-highlight">guard every turn</span></h1>
+            </div>
+
             <p class="hero-sub">
-              the open-source black-box flight recorder, loop breaker &amp; MCP linter
+              the open-source black-box flight recorder, loop breaker &amp; MCP linter — built in pure Python stdlib for deterministic CI at $0.00 spend.
             </p>
+
+            <div class="hero-actions" aria-label="Install AgentFlight">
+              <div class="split-btn-group">
+                <button type="button" class="split-main" id="cta-main-btn">
+                  <strong>install agentflight</strong>
+                  <span id="hero-cmd-sub">pypi · uvx · claude mcp · pytest</span>
+                </button>
+                <button
+                  type="button"
+                  class="split-caret"
+                  id="cta-caret-btn"
+                  aria-expanded="false"
+                  aria-controls="cta-popover"
+                  aria-label="Choose runtime target"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+              </div>
+
+              <a class="hero-secondary-btn" href="./studio.html">Try Live Studio →</a>
+
+              <div class="cta-popover" id="cta-popover" role="region" aria-label="Installation options" hidden>
+                <div class="pop-tabs" role="tablist" aria-label="Runtime mode">
+                  <button type="button" class="pop-tab active" role="tab" aria-selected="true" data-persona="pypi">PyPI (pip)</button>
+                  <button type="button" class="pop-tab" role="tab" aria-selected="false" data-persona="uvx">uvx Stdio</button>
+                  <button type="button" class="pop-tab" role="tab" aria-selected="false" data-persona="mcp">Claude MCP</button>
+                  <button type="button" class="pop-tab" role="tab" aria-selected="false" data-persona="pytest">Pytest CI</button>
+                </div>
+
+                <div class="pop-cmd">
+                  <code id="pop-cmd-code">pip install agentflight-mcp &amp;&amp; agentflight doctor</code>
+                  <button type="button" class="action-mini" id="pop-copy-btn">Copy</button>
+                </div>
+              </div>
+            </div>
+
+            <code class="cmd-caption" id="hero-cmd">pip install agentflight-mcp</code>
+
+            <div class="hero-kpis" aria-label="Measured flight benchmarks">
+              <div class="hero-kpi"><strong>2.83 µs</strong><span>Span Replay</span></div>
+              <div class="hero-kpi"><strong>1,676/s</strong><span>Tools Linted</span></div>
+              <div class="hero-kpi"><strong>15 Rules</strong><span>TS + Breakers</span></div>
+              <div class="hero-kpi"><strong>$0.00</strong><span>CI Token Spend</span></div>
+            </div>
+          </div>
+
+          <section class="hero-console" aria-label="AgentFlight black-box console preview">
+            <div class="frame-bar">
+              <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              <div class="frame-tabs" role="tablist" aria-label="Preview view">
+                <button type="button" class="frame-tab active" role="tab" aria-selected="true" data-homeview="term">Doctor</button>
+                <button type="button" class="frame-tab" role="tab" aria-selected="false" data-homeview="cassette">.flight.json</button>
+                <button type="button" class="frame-tab" role="tab" aria-selected="false" data-homeview="linter">MCP Lint</button>
+              </div>
+              <a class="frame-open-link" href="./studio.html">studio →</a>
+            </div>
+
+            <div class="preview-body">
+              <pre class="code-block" id="home-preview-code">$ agentflight demo
+
+FlightRecorder:    4 spans chained (SHA-256 · scrubbed)
+CassetteReplayer:  4/4 spans in 0.011 ms  [$0.0000 CI]
+CircuitBreaker:    tripped ping_pong_oscillation (A->B->A->B)
+ToolSmellLinter:   200 MCP tools in 119.3 ms (1,676/sec)</pre>
+            </div>
+
+            <div class="hero-console-telemetry">
+              <button type="button" id="play-flight-btn" class="action-mini">Run Flight Trace</button>
+              <div class="telemetry-strip" id="home-telemetry-strip" aria-hidden="true">
+                <span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span>
+                <span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span>
+                <span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span>
+                <span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span><span class="span-bar"></span>
+                <span class="span-bar"></span><span class="span-bar"></span>
+              </div>
+              <span style="font-family:var(--font-mono); font-size:0.72rem; font-weight:700; color:var(--accent-rail);">0.011 ms</span>
+            </div>
+
+            <div class="preview-foot">
+              <span>sha-256 chain · secret scrubber</span>
+              <div class="preview-foot-links">
+                <a href="./proof.html">benchmarks</a>
+                <a href="./docs.html">docs</a>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="pipeline-card reveal" aria-label="Interactive preflight guard pipeline">
+          <div class="pipeline-top">
+            <div>
+              <strong>Live 4-Stage Preflight Pipeline &amp; Telemetry Switchboard</strong>
+              <span style="display:block; font-size:0.86rem; color:var(--text-70);">Select any flight scenario to trace SHA-256 hashing, secret redaction, loop breaking, and CI replay.</span>
+            </div>
+            <a class="action-mini" href="./rules.html">Inspect 15 Rules →</a>
+          </div>
+
+          <div class="flight-pipeline" id="home-pipeline">
+            <div class="flight-stage"><small>01 · Record</small><strong>Canonical SHA-256</strong><span>Tamper-evident hash</span></div>
+            <div class="flight-stage"><small>02 · Redact</small><strong>Scrub Secrets &amp; Keys</strong><span>Bearer, API keys masked</span></div>
+            <div class="flight-stage active"><small>03 · Guard</small><strong>Trip Loops &amp; Spend</strong><span>CB001–CB005 pre-flight</span></div>
+            <div class="flight-stage amber-hit"><small>04 · Replay</small><strong>Deterministic CI Run</strong><span>$0.00 · 353k spans/s</span></div>
+          </div>
+
+          <div class="flight-ribbon" aria-label="Preflight scenarios">
+            <button type="button" class="flight-chip active" data-flight-key="demo" data-flight-note="Doctor Demo: 4 spans chained with SHA-256 digests and replayed in 0.011 ms offline.">Doctor &amp; Demo</button>
+            <button type="button" class="flight-chip" data-flight-key="breaker" data-flight-note="CB002 Ping-Pong Trap: Aborts alternating search_logs &lt;-&gt; refine_query loops before upstream spend.">Ping-Pong Trap (CB002)</button>
+            <button type="button" class="flight-chip" data-flight-key="redact" data-flight-note="Secret Scrubber: Replaces sk-live-*** and Bearer tokens cleanly prior to hashing .flight.json.">Secret Scrubbing</button>
+            <button type="button" class="flight-chip" data-flight-key="pytest" data-flight-note="Pytest CI Plugin: Replays full multi-step tool trajectories offline in milliseconds at $0.00.">Pytest CI ($0.00)</button>
+            <button type="button" class="flight-chip" data-flight-key="otel" data-flight-note="OpenTelemetry Export: Emits standards-compliant W3C TraceContext spans for Prometheus &amp; Grafana.">OTel W3C Export</button>
+            <button type="button" class="flight-chip" data-flight-key="lint" data-flight-note="MCP Tool Linter: Audits JSON schemas across TS001–TS010 at 1,676 tools/sec.">MCP Lint (TS001–TS010)</button>
+          </div>
+          <p class="diag-note" id="flight-sample-note" style="margin:0; text-align:center;">
+            Doctor Demo: 4 spans chained with SHA-256 digests and replayed in 0.011 ms offline.
+          </p>
+        </section>
+
+        <section class="reveal" aria-labelledby="bento-title">
+          <div class="section-head">
+            <span class="section-eyebrow">Deterministic Agent Engineering</span>
+            <h2 id="bento-title">Four flight recorders in one pure-stdlib core</h2>
+            <p>Catch infinite loops, leaked API keys, schema ambiguities, and trajectory drift before they burn budgets.</p>
+          </div>
+
+          <div class="bento-grid">
+            <article class="bento-card">
+              <div class="bento-top">
+                <span class="bento-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="bento-stat">SHA-256 Chain</span>
+              </div>
+              <h3>Tamper-Evident Cassettes</h3>
+              <p>Every LLM turn and MCP call is hashed into canonical-JSON <code>.flight.json</code> chains with API keys scrubbed automatically before disk write.</p>
+            </article>
+
+            <article class="bento-card">
+              <div class="bento-top">
+                <span class="bento-icon amber" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </span>
+                <span class="bento-stat">353,356 spans/s</span>
+              </div>
+              <h3>$0.00 Microsecond CI Replay</h3>
+              <p>Replace slow, non-deterministic live LLM CI runs with local cassette stubs that verify argument equality and flag <code>TrajectoryDivergenceError</code>.</p>
+            </article>
+
+            <article class="bento-card">
+              <div class="bento-top">
+                <span class="bento-icon amber" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </span>
+                <span class="bento-stat">CB001–CB005</span>
+              </div>
+              <h3>Loop &amp; USD Spend Shield</h3>
+              <p>Stop identical call loops, alternating A↔B ping-pong cycles, error storms, and thread-safe token/USD cap overruns before dispatching requests.</p>
+            </article>
+
+            <article class="bento-card">
+              <div class="bento-top">
+                <span class="bento-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </span>
+                <span class="bento-stat">TS001–TS010</span>
+              </div>
+              <h3>Static MCP Tool Linter</h3>
+              <p>Audit schemas statically across 10 rules at 1,676 tools/sec to catch short descriptions, sibling overlap, deep nesting, and unguarded delete actions.</p>
+            </article>
           </div>
         </section>
 
-        <section class="cta-area" aria-label="Install AgentFlight">
-          <div class="split-btn-group">
-            <button type="button" class="split-main" id="cta-main-btn">
-              <strong>install agentflight</strong>
-              <span id="hero-cmd-sub">pypi · uvx · claude mcp · pytest · v1.5.0</span>
-            </button>
-            <button
-              type="button"
-              class="split-caret"
-              id="cta-caret-btn"
-              aria-expanded="false"
-              aria-controls="cta-popover"
-              aria-label="Choose runtime target"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path
-                  d="M4 6L8 10L12 6"
-                  stroke="currentColor"
-                  stroke-width="2.2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
+        <section class="reveal" aria-labelledby="compare-title">
+          <div class="section-head">
+            <span class="section-eyebrow">Flight Test Matrix</span>
+            <h2 id="compare-title">Live LLM CI vs. Hand-Rolled Mocks vs. AgentFlight</h2>
+            <p>Deterministic replay and pre-flight guards built specifically for multi-turn tool-calling agents.</p>
           </div>
 
-          <code class="cmd-caption" id="hero-cmd">pip install agentflight-mcp</code>
-
-          <div class="cta-popover" id="cta-popover" role="region" aria-label="Installation options" hidden>
-            <div class="pop-tabs" role="tablist" aria-label="Runtime mode">
-              <button type="button" class="pop-tab active" role="tab" aria-selected="true" data-persona="pypi">
-                PyPI (pip)
-              </button>
-              <button type="button" class="pop-tab" role="tab" aria-selected="false" data-persona="uvx">
-                uvx Stdio
-              </button>
-              <button type="button" class="pop-tab" role="tab" aria-selected="false" data-persona="mcp">
-                Claude MCP
-              </button>
-              <button type="button" class="pop-tab" role="tab" aria-selected="false" data-persona="pytest">
-                Pytest CI
-              </button>
-            </div>
-
-            <div class="pop-cmd">
-              <code id="pop-cmd-code">pip install agentflight-mcp &amp;&amp; agentflight doctor</code>
-              <button type="button" class="action-mini" id="pop-copy-btn">Copy</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="preview-frame" aria-label="AgentFlight preview">
-          <div class="frame-bar">
-            <div class="dots" aria-hidden="true">
-              <span></span><span></span><span></span>
-            </div>
-            <div class="frame-tabs" role="tablist" aria-label="Preview view">
-              <button type="button" class="frame-tab active" role="tab" aria-selected="true" data-homeview="term">
-                Doctor &amp; Replay
-              </button>
-              <button type="button" class="frame-tab" role="tab" aria-selected="false" data-homeview="cassette">
-                .flight.json
-              </button>
-              <button type="button" class="frame-tab" role="tab" aria-selected="false" data-homeview="linter">
-                MCP Lint (TS001)
-              </button>
-            </div>
-            <a class="frame-open-link" href="./studio.html">open studio →</a>
-          </div>
-
-          <div class="preview-body">
-            <pre class="code-block" id="home-preview-code">$ agentflight demo
-
-FlightRecorder: 4 spans chained (SHA-256 verified, API keys scrubbed)
-CassetteReplayer: replayed 4/4 spans in 0.011 ms  [$0.0000 CI spend]
-TrajectoryCircuitBreaker: tripped ping_pong_oscillation (A -&gt; B -&gt; A -&gt; B)
-ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)</pre>
-          </div>
-
-          <div class="preview-foot">
-            <span>0.08 us/span replay · 10 MCP rules · pure Python 3.10+ stdlib core</span>
-            <div class="preview-foot-links">
-              <a href="./studio.html">Try MCP &amp; Breaker Studio</a>
-              <a href="./docs.html">Read docs</a>
+          <div class="mesh-table-card">
+            <div class="mesh-table-scroll">
+              <table class="mesh-table">
+                <thead>
+                  <tr>
+                    <th>Reliability Gate</th>
+                    <th>Live API CI Runs</th>
+                    <th>Hand-Rolled Mocks</th>
+                    <th>AgentFlight v1.5.0</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>CI Latency &amp; Token Spend</strong></td>
+                    <td>10–45s · $0.05–$5.00</td>
+                    <td>Free but brittle</td>
+                    <td><span class="pill pill-good">2.83 µs/span · $0.00</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tamper Evidence</strong></td>
+                    <td>None</td>
+                    <td>Silent fixture drift</td>
+                    <td><span class="pill pill-sky">Canonical SHA-256 Chain</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ping-Pong Loop Prevention</strong></td>
+                    <td>Alerts after overspend</td>
+                    <td>Not included</td>
+                    <td><span class="pill pill-amber">Pre-Flight CB001–CB005</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>API Key Scrubbing</strong></td>
+                    <td>Manual env sanitizers</td>
+                    <td>Manual redaction</td>
+                    <td><span class="pill pill-good">Scrubbed Before Disk</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>MCP Schema Ergonomics</strong></td>
+                    <td>Manual trial &amp; error</td>
+                    <td>Not included</td>
+                    <td><span class="pill pill-sky">TS001–TS010 + Fix CLI</span></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </section>
 
         <hr class="hairline" />
 
-        <section class="editorial-grid" aria-label="Core principles">
-          <div>
-            <h2>Tamper-Evident</h2>
-            <p>
-              Every LLM turn and MCP call is hashed into a canonical-JSON SHA-256 chain with API keys scrubbed automatically.
-            </p>
-          </div>
-
-          <div>
-            <h2>$0.00 CI Replay</h2>
-            <p>
-              Replace flaky 30-second live API CI runs with deterministic cassette replay executing in microseconds offline.
-            </p>
-          </div>
-
-          <div>
-            <h2>Loop &amp; Cost Shield</h2>
-            <p>
-              Stop infinite repeat calls, A↔B ping-pong cycles, error storms, and dollar budget spikes before spending another token.
-            </p>
-          </div>
-
-          <div>
-            <h2>10 MCP Rules</h2>
-            <p>
-              Lint schemas statically across TS001–TS010 to catch missing descriptions, deep nesting, overlap collisions, and unguarded deletes.
-            </p>
-          </div>
-        </section>
-
-        <hr class="hairline" />
-
-        <section class="ecosystem-section" aria-labelledby="eco-title">
+        <section class="ecosystem-section reveal" aria-labelledby="eco-title">
           <h2 id="eco-title">Works Everywhere</h2>
           <p class="ecosystem-sub">
             Drop into OpenAI, Anthropic, Pytest, Claude Code, Cursor, or OpenTelemetry pipelines — pairs cleanly with Prometheus, StackPulse, Plausible, and Vercel.
@@ -387,7 +495,7 @@ ToolSmellLinter: 200 MCP schemas audited in 119.3 ms (1,676 tools/sec)</pre>
 
         <hr class="hairline" />
 
-        <section id="faq" aria-labelledby="faq-title">
+        <section id="faq" class="reveal" aria-labelledby="faq-title">
           <h2 id="faq-title" class="sec-title">questions</h2>
           <div class="faq-stack">
             <details class="faq-item">
