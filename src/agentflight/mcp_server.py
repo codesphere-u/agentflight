@@ -399,6 +399,10 @@ MCP_TOOLS: List[Dict[str, Any]] = [
                     "description": "Array of raw MCP tool schema objects containing name, description, and inputSchema.",
                     "items": {"type": "object"},
                 },
+                "compact": {
+                    "type": "boolean",
+                    "description": "Strip display-only schema metadata ('title', verbose boilerplate, nullable anyOf wrappers) to cut per-turn tokens.",
+                },
             },
         },
         "outputSchema": {
@@ -769,14 +773,18 @@ class AgentFlightMCPServer:
             tools = arguments.get("tools")
             if not isinstance(tools, list):
                 raise ValueError("'tools' must be a list of MCP tool definitions.")
-            optimizer = ToolSchemaOptimizer()
+            compact = bool(arguments.get("compact", False))
+            optimizer = ToolSchemaOptimizer(compact=compact)
             results = optimizer.optimize_tools(tools)
             hardened = [r.hardened_tool for r in results]
             post_lint = self.linter.lint(hardened)
+            tokens_saved = sum(r.original_token_estimate for r in results) - post_lint.estimated_tokens_per_turn
             return self._tool_response(
                 {
                     "tools_optimized": len(results),
+                    "compact": compact,
                     "smells_resolved": sum(r.smells_resolved for r in results),
+                    "tokens_saved": tokens_saved,
                     "post_lint_score": post_lint.ergonomics_score,
                     "post_lint_grade": post_lint.grade,
                     "hardened_tools": hardened,

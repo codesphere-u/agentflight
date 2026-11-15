@@ -58,7 +58,7 @@ from .recorder import (
     verify_cassette,
 )
 from .redact import contains_sensitive_data, redact_cassette, redact_sensitive
-from .schema_optimizer import SchemaOptimizationResult, ToolSchemaOptimizer
+from .schema_optimizer import SchemaOptimizationResult, ToolSchemaOptimizer, compact_mcp_tools
 from .testing import FlightSession, flight_test
 from .wrappers import FlightCallbackHandler, wrap_anthropic, wrap_callable, wrap_openai
 
@@ -121,6 +121,7 @@ __all__ = [
     "assert_trajectory",
     "ToolSchemaOptimizer",
     "SchemaOptimizationResult",
+    "compact_mcp_tools",
     "FlightCallbackHandler",
     "wrap_openai",
     "wrap_anthropic",

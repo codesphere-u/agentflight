@@ -597,6 +597,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_fix.add_argument("schema_file", type=str, help="Path to JSON file containing tool definitions to fix.")
     p_fix.add_argument("--output", "-o", type=str, default=None, help="Output path for hardened schemas.")
     p_fix.add_argument("--in-place", "-i", action="store_true", help="Overwrite input file with hardened schemas.")
+    p_fix.add_argument(
+        "--compact",
+        "-c",
+        action="store_true",
+        help="Strip redundant JSON Schema UI metadata ('title', verbose boilerplate, nullable anyOf wrappers) to reduce per-turn prompt tokens.",
+    )
+    p_fix.add_argument("--json", action="store_true", help="Print a machine-readable JSON token & grade savings report.")
     p_fix.set_defaults(func=_run_fix_command)
 
     p_doctor = sub.add_parser(
@@ -871,16 +878,23 @@ def _run_ci_command(args: argparse.Namespace) -> int:
 
 
 def _run_fix_command(args: argparse.Namespace) -> int:
+    from .linter import ToolSmellLinter
     from .schema_optimizer import ToolSchemaOptimizer
+
     with open(args.schema_file, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     is_dict = isinstance(data, dict)
     tools = data.get("tools", []) if is_dict else data
 
-    optimizer = ToolSchemaOptimizer()
+    linter = ToolSmellLinter()
+    before_report = linter.lint(tools)
+
+    compact = bool(getattr(args, "compact", False))
+    optimizer = ToolSchemaOptimizer(compact=compact)
     results = optimizer.optimize_tools(tools)
     hardened_tools = [r.hardened_tool for r in results]
+    after_report = linter.lint(hardened_tools)
 
     output_data: Any = copy.deepcopy(data) if is_dict else hardened_tools
     if is_dict:
@@ -891,8 +905,42 @@ def _run_fix_command(args: argparse.Namespace) -> int:
         json.dump(output_data, f, indent=2)
 
     total_smells_resolved = sum(r.smells_resolved for r in results)
-    print(f"✅ Successfully hardened {len(tools)} tool definitions into {target_path}")
-    print(f"   Resolved {total_smells_resolved} tool smells. Meets Glama TDQS Gold Standard.")
+    before_tokens = before_report.estimated_tokens_per_turn
+    after_tokens = after_report.estimated_tokens_per_turn
+    token_delta = after_tokens - before_tokens
+    pct = round((-token_delta / before_tokens) * 100.0, 1) if before_tokens > 0 else 0.0
+
+    if getattr(args, "json", False):
+        print(
+            json.dumps(
+                {
+                    "target_path": target_path,
+                    "compact": compact,
+                    "tool_count": len(tools),
+                    "before_tokens_per_turn": before_tokens,
+                    "after_tokens_per_turn": after_tokens,
+                    "token_delta": token_delta,
+                    "token_reduction_pct": pct,
+                    "before_grade": before_report.grade,
+                    "before_score": before_report.ergonomics_score,
+                    "after_grade": after_report.grade,
+                    "after_score": after_report.ergonomics_score,
+                    "smells_resolved": total_smells_resolved,
+                },
+                indent=2,
+            )
+        )
+    else:
+        print(f"✅ Successfully {'compacted and ' if compact else ''}hardened {len(tools)} tool definitions into {target_path}")
+        print(
+            f"   Grade: {before_report.grade} ({before_report.ergonomics_score}/100) → "
+            f"{after_report.grade} ({after_report.ergonomics_score}/100) | "
+            f"Smells resolved: {total_smells_resolved}"
+        )
+        print(
+            f"   Tokens/turn: {before_tokens} → {after_tokens} "
+            f"({'saved ' + str(-token_delta) + f' ({pct}%)' if token_delta <= 0 else '+' + str(token_delta)})"
+        )
     return 0
 
 
