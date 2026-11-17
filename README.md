@@ -11,6 +11,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![MCP Spec](https://img.shields.io/badge/MCP-2024--11--05%20(8%20Tools)-7c3aed.svg)](https://modelcontextprotocol.io/)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel%20MCP-Live%20(5%20Public%20Tools)-10b981?logo=vercel&logoColor=white)](https://agentflight-tau.vercel.app/mcp)
+[![M8ven Score](https://m8ven.ai/badge/mcp/codesphere-u-agentflight-1ki1u7?v=a753ba2a6f2830f4809787f706288ab3)](https://m8ven.ai/mcp/codesphere-u-agentflight-1ki1u7?s=readme)
 [![Tests Passed](https://img.shields.io/badge/tests-177%20passed%20(90%25%20cov)-brightgreen.svg)](tests/)
 [![Core SDK Stdlib](https://img.shields.io/badge/core%20SDK-100%25%20Python%20stdlib-brightgreen.svg)](src/agentflight/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
